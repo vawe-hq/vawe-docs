@@ -1,10 +1,10 @@
 ---
 title: Prompting
-description: You do not write the page alone. You answer five questions and an agent writes the brief, the stills and the page.
+description: You do not write the page alone. You give a few details and an agent writes the brief, the stills and the page.
 icon: MessageSquare
 ---
 
-Most films are written by agents. You describe the film. An agent asks five questions, writes a brief, shows stills, and then writes `page.html`. Agents in this repo read `AGENTS.md`, so they already know the page contract and the house rules. Your job is the vision.
+Most films are written by agents. You describe the film. An agent asks for the details it lacks, writes a brief, shows stills, and then writes `page.html`. Agents in this repo read `AGENTS.md`, so they already know the page contract and the house rules. Your job is the vision.
 
 ## Start from a template
 
@@ -20,23 +20,35 @@ The repo has a template per film type in `prompts/`. `guides/ROUTING.md` lists t
 | `story-explainer` | explain a topic with invented visuals |
 | `music-video-beat-synced` | a song exists, and every cut lands on a downbeat |
 | `beat-sheet` | any film over one beat: the shot table before code |
+| `interactive-lab-capture` | a mechanism as a working model, then a scripted tour of it |
+| `production-brief-acceptance` | a client brief with claims that someone other than the author must sign off |
+| `pixel-art-sprite` | a 16-bit sprite loop on a logical canvas |
 
-The full index has twelve templates. Start a film from one:
+`prompts/` holds 11 templates in all. Start a film from one:
 
 ```bash
 bin/vawe new my-launch --from prompts/brand-launch-from-url.md
 ```
 
-The command prints the template's five questions, each with its default and its reason. It writes `films/my-launch/brief.md` with every default filled in and marked `[unanswered: default taken]`. A skipped answer keeps its default. Nothing blocks.
+The command checks which details the request leaves open. There are eight: subject, message, show, look, format, family, assets and ending. It prints each open detail with its reason and an example, and writes nothing yet. Answer in a file and pass it with `--answers <file>`, or give one answer with `--detail key=value`. An agent can run `--questions-json` to get the questions as `AskUserQuestion` calls. For an unattended run, pass `--defaults`. It guesses each open detail and marks the guess `(guess: change me)`.
 
-## The brief has six sections
+## The brief is measured
 
-1. **Inputs.** Five questions in the order they change the film, each with a default.
-2. **Direction.** A genre or reference anchor first. Then the feel in numbers: hex colours, type as a fraction of frame height, seconds per beat. End with a ban list.
-3. **Structure.** The beats as a table: start, length, what the viewer notices, the end state. Cuts fall on a beat or two frames early. The slowest beat is at least 3 times the fastest.
-4. **Build.** The page contract. See [The page](/docs/the-page).
-5. **Gotchas.** The few things that fail on the first try.
-6. **Start.** The stills first, then a draft.
+Every brief follows the measured shape in `prompts/ANATOMY.md`. A number that a program can measure is a number. A value that it cannot measure yet is a guess, marked `(guess: change me)`. The agent replaces each guess with a measured value or its own choice. The sections are:
+
+1. **Inputs.** The details of the request: subject, message, show, look, format, family, assets and ending.
+2. **Task.** What the film is, who sees it, the message and the spectacle second.
+3. **Taken from.** Four to six reference frames, with what each one gives.
+4. **Directions.** Three directions from three families (type, object, graphic). The agent picks one and says why.
+5. **Look.** Numbers, not adjectives: hex colours, the typeface, type as a fraction of frame height.
+6. **Design system and kit.** Palette roles, type, and the ground layers.
+7. **Spec.** Three tables, in seconds and percent of frame: shots, words and objects.
+8. **Board.** A plan for time: rhythm, a named move per cut, and the sound.
+9. **Motion pass.** One row per cut, after the draft.
+10. **Acceptance.** Targets for the checks, with the measured value next to each one.
+11. **Gates, Pitfalls and Deliver.** The order of the stills, the draft loop and the final, the pitfalls, and the files to hand over.
+
+The slowest beat is at least 3 times the fastest. For the page contract, see [The page](/docs/the-page).
 
 A short prompt can work. What helps most is a reference or a genre anchor, and a ban list. A default you do not exclude is free for the agent to use.
 

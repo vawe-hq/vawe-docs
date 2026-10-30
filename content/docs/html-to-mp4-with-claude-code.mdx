@@ -29,12 +29,12 @@ Dark background, one big number, a short caption.
 
 A typical run goes in this order:
 
-1. `bin/vawe new <name> --request "<your sentence>"` writes `films/<name>/page.html` and `brief.md`.
+1. `bin/vawe new <name> --request "<your sentence>"` asks for the details that the request leaves open. Then it writes `films/<name>/page.html` and `brief.md`.
 2. It writes three directions in the brief and picks one.
 3. It edits `page.html`.
 4. It renders a draft and looks at it.
 
-You can also start the film yourself and give the page to Claude Code. The command may ask for missing details first. Pass `--defaults` to skip the questions:
+You can also start the film yourself and give the page to Claude Code. Without `--defaults`, the command prints the open details and writes nothing. Pass `--defaults` to guess them instead:
 
 ```bash
 bin/vawe new v2-launch --request "6 second film that announces version 2.0 of my CLI tool" --defaults
@@ -42,7 +42,7 @@ bin/vawe new v2-launch --request "6 second film that announces version 2.0 of my
 
 ## What the page looks like
 
-The page is HTML and CSS. The only vawe parts are a duration tag and, if you want sound, an `<audio>` tag.
+The page is HTML and CSS. The vawe parts are a duration tag, one `data-world` element per beat and, if you want sound, an `<audio>` tag. The starter that `bin/vawe new` writes is longer: it has three worlds, a font and a stand-in mark. This short page shows the core.
 
 ```html
 <!doctype html>
@@ -55,7 +55,7 @@ The page is HTML and CSS. The only vawe parts are a duration tag and, if you wan
        animation: in 0.6s var(--ease-land) 0.4s both; }
   @keyframes in { from { transform: translateY(0.4em); opacity: 0 } to { transform: none; opacity: 1 } }
 </style>
-<h1>2.0</h1>
+<div data-world="s1"><h1>2.0</h1></div>
 ```
 
 Time is the seek, not the clock. CSS `@keyframes` and `element.animate()` run on the time the renderer sets. A page can also define `window.seek(t)` and paint frame `t` as a function of `t`. Do not use timers or unseeded random numbers. vawe replaces `Date`, `requestAnimationFrame`, timers and `Math.random` with versions that follow the seek, so the same page gives the same frames on every render.
@@ -67,9 +67,9 @@ bin/vawe dev  films/v2-launch/page.html
 bin/vawe ship films/v2-launch/page.html
 ```
 
-`bin/vawe dev` renders a draft at half size and 30 fps, without sound, to `out/v2-launch-draft.mp4`. Use `--from` and `--to` to render only the seconds you are working on.
+`bin/vawe dev` renders a draft at half size and 30 fps, with the audio tags mixed, to `out/v2-launch-draft.mp4`. Use `--from` and `--to` to render only the seconds you are working on. A range is silent. Add `--silent` for a picture-only draft of the whole film.
 
-`bin/vawe ship` renders the final at 60 fps with motion blur and the audio mix, to `out/v2-launch.mp4`. It runs in the background. Run `bin/vawe ship --status films/v2-launch/page.html --wait` to wait for the result.
+`bin/vawe ship` renders the final at 60 fps with motion blur and the audio mix, to `out/v2-launch.mp4`. It runs in the background. Run `bin/vawe ship --status films/v2-launch/page.html --wait` to wait for the result. It waits up to 3.5 minutes. If the render is not done, run it again.
 
 ## Review the film in a fresh session
 
@@ -96,7 +96,7 @@ Output can differ between hosts that rasterise on a different GPU or Chrome vers
 ## Next
 
 <Cards>
-  <Card title="Prompting" href="/docs/prompting" description="Templates, the five questions and the brief." />
+  <Card title="Prompting" href="/docs/prompting" description="Templates, the details to give and the brief." />
   <Card title="The page" href="/docs/the-page" description="What a page must contain." />
   <Card title="Troubleshooting" href="/docs/troubleshooting" description="When a render fails." />
 </Cards>

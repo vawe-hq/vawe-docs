@@ -1,10 +1,10 @@
 ---
 title: Aspect ratios
-description: One page, five ratios. Lay out with CSS, never crop.
+description: One page, any ratio. Lay out with CSS, never crop.
 icon: Ratio
 ---
 
-A page renders at `16:9`, `9:16`, `1:1`, `4:5` or `4:3`. You write the layout once in CSS.
+A page renders at any `W:H` ratio of whole numbers. Five ratios are common: `16:9`, `9:16`, `1:1`, `4:5` and `4:3`. `1200:630` and `2:1` work too. You write the layout once in CSS.
 
 ## What the renderer gives you
 
@@ -34,6 +34,8 @@ bin/vawe ship films/<name>/page.html --aspect all     # one file per ratio
 
 Without `--aspect`, the render uses the `aspect` meta of the page, else `16:9`. Draft `--aspect 9:16` once before the final.
 
+A ratio that is not in the table gets a size that fits 1920 px on its long edge. The output name gets the ratio (`-2x1`), so two ratios do not overwrite each other. `bin/vawe still <page> --size 1200x630` writes a PNG of that size when the ratio matches the aspect.
+
 Each ratio is its own reproducible render. See [Determinism](/docs/determinism).
 
 ## Sizes
@@ -45,5 +47,6 @@ Each ratio is its own reproducible render. See [Determinism](/docs/determinism).
 | `1:1` | 1080 × 1080 |
 | `4:5` | 1080 × 1350 |
 | `4:3` | 1440 × 1080 |
+| any other `W:H` | 1920 px on the long edge |
 
-`bin/vawe ship <page> --aspect all` writes one file per ratio. A draft is half this size.
+`bin/vawe ship <page> --aspect all` writes one file per ratio of the table. A draft is half this size.

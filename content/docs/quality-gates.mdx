@@ -11,7 +11,7 @@ bin/vawe check                              # list the gates
 bin/vawe check anim-traps films/<name>/page.html
 ```
 
-The gates are: `anim-traps`, `code-quality`, `dead-branch`, `doc-refs`, `no-emdash`, `page-check`, `provenance`, `rule-length`, `seo-surface`, `site-build-check`, `skill-reach` and `threshold-provenance`.
+There are 20 gates: `anim-traps`, `code-quality`, `coverage`, `dead-branch`, `doc-refs`, `ideas`, `links`, `no-emdash`, `page-check`, `provenance`, `review`, `rule-length`, `seo-pseo`, `seo-surface`, `site-build-check`, `site-typography`, `skill-reach`, `slideshow`, `threshold-provenance` and `transitions`.
 
 Checks advise. Only determinism and a missing waiver reason refuse. A rule broken for cause is declared in the page. See [The page](/docs/the-page#waivers).
 
@@ -33,9 +33,19 @@ Checks advise. Only determinism and a missing waiver reason refuse. A rule broke
 
 **`no-emdash`** scans for an em dash, which the project never allows.
 
+**`review`** gives one report and one picture sheet of what to fix in a page film, worst first.
+
+**`coverage`** compares your render with a reference film, step by step, with SSIM. It prints the worst moments and exits 1 when a second falls below `--min`. See [Reading your film](/docs/reading-your-film).
+
+**`ideas`** reads the Ideas table of the brief and reports a beat with no row, a literal pick or a repeated device. It reads the plan, not the film. It advises.
+
+**`transitions`** checks that the film does the handoffs its Board planned. It names a cut with no planned handoff and a planned handoff that measures as a hard cut. It advises.
+
+**`slideshow`** scores out of 10 how much the film reads as a slideshow, and names each tell with its seconds and its fix. It advises.
+
 ## Gates for the repo
 
-`code-quality`, `dead-branch`, `doc-refs`, `rule-length`, `seo-surface`, `site-build-check`, `skill-reach`, `provenance` and `threshold-provenance` check the repository itself, not a film. A film author does not need them.
+`code-quality`, `dead-branch`, `doc-refs`, `links`, `rule-length`, `seo-pseo`, `seo-surface`, `site-build-check`, `site-typography`, `skill-reach`, `provenance` and `threshold-provenance` check the repository or the site, not a film. A film author does not need them. `links` crawls the site and exits 1 when a link is broken.
 
 ## The order
 

@@ -9,7 +9,7 @@ Vawe turns one HTML page into one film. You write the page in what you already k
 The renderer does not play the page. It seeks the page to a time, takes a picture, and moves to the next time. Then it mixes the audio offline and writes an mp4.
 
 ```bash
-bin/vawe new hello        # writes films/hello/page.html and brief.md
+bin/vawe new hello --defaults   # writes films/hello/page.html and brief.md
 bin/vawe dev films/hello/page.html
 # draft: out/hello-draft.mp4
 ```
@@ -37,8 +37,8 @@ Brief or reference, then stills, then a draft, then a critique in a fresh sessio
 | see every command | [CLI](/docs/cli), [Quality gates](/docs/quality-gates) |
 
 <Cards>
-  <Card title="Quickstart" href="/docs/quickstart" description="Install, write the starter page, render a draft." />
+  <Card title="Quickstart" href="/docs/quickstart" description="Install, start from the starter page, render a draft." />
   <Card title="The page" href="/docs/the-page" description="The page contract: duration, seek, aspect, audio." />
-  <Card title="Prompting" href="/docs/prompting" description="The five questions, and what to leave to the agent." />
+  <Card title="Prompting" href="/docs/prompting" description="The details to give, and what to leave to the agent." />
   <Card title="Motion" href="/docs/motion" description="Springs, keyframe tables and the moves to copy." />
 </Cards>

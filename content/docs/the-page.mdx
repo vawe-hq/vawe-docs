@@ -16,6 +16,7 @@ A film is `films/<name>/page.html` plus its own assets folder. Every path in the
 - It also sets each named ease as `--ease-<name>` on `:root` ([`--ease-land`](/easing/land), [`--ease-launch`](/easing/launch), [`--ease-glide`](/easing/glide)), so plain CSS writes `animation: rise 0.6s var(--ease-land) both`. See [Aspect ratios](/docs/aspect-ratios).
 - Audio is `<audio>` tags, mixed offline. See [Audio](/docs/audio).
 - Every tunable number is a literal in the page: a `[[f, v]]` table, a keyframe stop or a `:root` custom property. `bin/vawe studio <page>` edits these literals in place.
+- Each beat is one element with `data-world="<id>"`. The id is lowercase and matches the Shots ids of the brief. The checks and the judge read the worlds from it.
 - `<meta name="message">` holds the one thing to remember. `<meta name="spectacle">` holds the second of the one big moment. Put quiet before it. Keep one focal point per frame.
 
 ## A complete page
@@ -31,8 +32,10 @@ A film is `films/<name>/page.html` plus its own assets folder. Every path in the
   #bar { position: absolute; left: 8%; top: 62%; width: 40%; height: calc(var(--vh) * 0.012);
          background: #0a87ff; transform-origin: left; transform: scaleX(0); }
 </style>
-<h1 id="word">One page in</h1>
-<div id="bar"></div>
+<div data-world="s1">
+  <h1 id="word">One page in</h1>
+  <div id="bar"></div>
+</div>
 <script type="module">
   import { EASE } from '../../core/motion/presets.js';
   document.getElementById('word').animate(

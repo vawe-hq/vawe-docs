@@ -21,11 +21,11 @@ git clone https://github.com/vawe-hq/vawe.git
 cd vawe
 npm install
 bin/vawe doctor
-bin/vawe new hello --request "a 6 second title sting for a note-taking app"
+bin/vawe new hello --request "a 6 second title sting for a note-taking app" --defaults
 bin/vawe dev films/hello/page.html
 ```
 
-The last command writes a draft mp4 to `out/`. Edit `films/hello/page.html` and run it again. `bin/vawe ship films/hello/page.html` renders the final file.
+`--defaults` guesses the details that the request leaves open. The last command writes a draft mp4 to `out/`. Edit `films/hello/page.html` and run it again. `bin/vawe ship films/hello/page.html` renders the final file.
 
 ## Use it with a coding agent
 
