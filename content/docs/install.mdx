@@ -1,6 +1,6 @@
 ---
 title: Install
-description: What vawe needs, how to install it from source, and how to fix the failures that the tool check finds.
+description: What vawe needs, how to install it from source, and how to fix the failures that `doctor` finds.
 icon: Cog
 ---
 
@@ -48,12 +48,12 @@ npm install
 npx puppeteer browsers install chrome
 ```
 
-The puppeteer postinstall step downloads a full Chrome. The third command installs it again when the download was skipped. The `npm install` ends with the tool check.
+The puppeteer postinstall step downloads a full Chrome. The third command installs it again when the download was skipped. The `npm install` ends with `doctor`.
 
 </Step>
 <Step>
 
-### Run the tool check
+### Run `doctor`
 
 ```bash
 bin/vawe doctor
@@ -64,7 +64,7 @@ When all is well, you see one line: `ok, 7 checks (macOS)`. The system name chan
 </Step>
 </Steps>
 
-## The tool check
+## The `doctor` verb
 
 `vawe doctor` probes each tool, and for each missing tool it prints one line with the cause and one `fix:` line. It exits with code 1 only when a required tool is missing. A missing optional tool prints `optional` and does not change the exit code.
 

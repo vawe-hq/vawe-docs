@@ -70,7 +70,9 @@ The result includes a final check and the judge. Fix the worst finding first. It
 |---|---|
 | `--aspect all` | one file for each aspect; or give a W:H ratio such as `9:16` |
 | `--out <path>` | the output file (not with `--aspect all`); the default is `out/<name>.mp4` |
+| `--param key=value` | a page option, repeatable; the page reads it with `new URLSearchParams(location.search)`; the default output name gets it (`-look-riso`) |
 | `--wait` | wait until the render ends, instead of a background job |
+| `--status` | print the progress or the result of a background render; with `--wait`, wait up to 3.5 minutes |
 | `--profile` | print a cost table: frames, subframes, screenshots, capture and encode seconds, the 5 costliest seconds |
 
 ## What you see
