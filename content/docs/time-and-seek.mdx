@@ -1,0 +1,162 @@
+---
+title: Time and seek
+description: The renderer never plays a page. It seeks the page to a time t and paints one frame, so every frame must come from t alone.
+icon: Clock
+blog:
+  - slug: page-clock
+    title: Seed Math.random and freeze Date.now in JavaScript
+---
+
+To <Term id="seek">seek</Term> is to set the page to a time `t` in seconds and paint the frame for that time. The renderer never plays the page. For each frame it seeks, takes a picture and moves on. Your page code must be a pure function of `t`.
+
+## Why it exists
+
+A film must come out the same on every render, in any order, on any number of workers. A page that plays in real time cannot do this, because the wall clock differs on every run. A seek has no wall clock: frame 400 needs only the number 6.667, not frame 399.
+
+This is also why vawe can render slices of a film in parallel, and render again only the seconds that you changed. See [Determinism](/docs/determinism).
+
+## How it works
+
+<Diagram
+  label="For each frame the renderer sets the virtual clock, calls window.seek, seeks every animation, runs the onFrame hooks, and then takes the screenshot."
+  caption="The order of one seek. The accent marks the step where your own code runs."
+  narrow={
+    <svg viewBox="0 0 361 291">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Virtual clock</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">set(t)</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} accent />
+      <DiagramText x={16} y={110}>Your seek</DiagramText>
+      <DiagramText x={344} y={110} kind="mono" anchor="end">window.seek(t)</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>Animations</DiagramText>
+      <DiagramText x={344} y={190} kind="mono" anchor="end">currentTime</DiagramText>
+      <DiagramArrow points={[[180, 221], [180, 239]]} />
+      <DiagramBox x={0} y={240} w={360} h={50} />
+      <DiagramText x={16} y={270}>Hooks</DiagramText>
+      <DiagramText x={344} y={270} kind="mono" anchor="end">onFrame(t)</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={150} h={80} />
+    <DiagramText x={14} y={30}>Clock</DiagramText>
+    <DiagramText x={14} y={56} kind="mono">set(t)</DiagramText>
+    <DiagramArrow points={[[151, 40], [175, 40]]} />
+    <DiagramBox x={176} y={0} w={160} h={80} accent />
+    <DiagramText x={190} y={30}>Your seek</DiagramText>
+    <DiagramText x={190} y={56} kind="mono">seek(t)</DiagramText>
+    <DiagramArrow points={[[337, 40], [361, 40]]} />
+    <DiagramBox x={362} y={0} w={160} h={80} />
+    <DiagramText x={376} y={30}>Animations</DiagramText>
+    <DiagramText x={376} y={56} kind="mono">currentTime</DiagramText>
+    <DiagramArrow points={[[523, 40], [547, 40]]} />
+    <DiagramBox x={548} y={0} w={132} h={80} />
+    <DiagramText x={562} y={30}>Hooks</DiagramText>
+    <DiagramText x={562} y={56} kind="mono">onFrame(t)</DiagramText>
+  </svg>
+</Diagram>
+
+The function `seekTo` in `core/engine/page-seek.js` does one seek, in this order:
+
+1. It waits for the page to start (image decodes, `fetch` and the fonts) and for `document.fonts`.
+2. It sets the <Term id="virtual-clock">virtual clock</Term> to `t`.
+3. It calls `window.seek(t)` when your page defines it. It waits only for a native `Promise`.
+4. It pauses every CSS animation and Web Animation and sets its `currentTime` to `t * 1000` milliseconds.
+5. It seeks every SVG animation with `setCurrentTime(t)`.
+6. It calls every hook that you registered with `vawe.onFrame`.
+
+After the seek, the renderer waits for fonts, for image decodes and for two real paints. Then it takes the screenshot.
+
+### Two ways to move
+
+You can use either way, or both in one page.
+
+| way | you write | the renderer does |
+|---|---|---|
+| CSS and Web Animations | `@keyframes` or `element.animate()` | It sets `currentTime` on each animation. |
+| `window.seek(t)` | A function that paints the frame for `t` | It calls the function on every seek. |
+
+Use `window.seek(t)` for canvas, three.js and anything else that CSS cannot move. In `window.seek` and in `onFrame` code, use `easeFn(name)` from `core/motion/presets.js` for a named ease, because a CSS `linear()` string cannot run there.
+
+### The virtual clock
+
+Before any page script runs, `core/engine/page-clock.js` replaces these APIs. They follow the seek time.
+
+| API | What the page sees |
+|---|---|
+| `Date`, `performance.now` | The film time in milliseconds. |
+| `requestAnimationFrame` | Callbacks run once for each seek, with the film time. |
+| `setTimeout`, `setInterval` | They fire when the seek passes their due time, in due order. |
+| `Math.random` | A seeded generator. It starts again from `t` on each seek, so the same `t` gives the same numbers. |
+
+A page that reads the clock still gets the seek time. Do not rely on this. Write each value as a function of `t`, and use `rng(seed)` from `core/motion/springs.js` for a value that must look random but stay the same. See <Term id="seeded-random">seeded random</Term>.
+
+## Frames and rates
+
+The render rate is not part of the page. A draft renders at 30 fps and a final at 60 fps. The script `harness/media/render-page.mjs` takes `--fps N` for another rate. The number of frames is `round(duration x fps)`, and frame `i` shows the time `from + i / fps`, where `from` is the `--from` second of a draft window. At 60 fps, 1.2 s is frame 72.
+
+`<meta name="fps">` is a different thing. It is the rate of your own frame tables, and the page reads it as `window.vawe.fps`. A page can seek at a time that is not a whole frame, for example for motion blur, which blends up to 32 subframes for each frame of a final. For this reason, write a table in seconds or in your own frame rate, and never assume that `t` is a multiple of `1 / 60`.
+
+<Video
+  src="time-and-seek/seek-to-frame.mp4"
+  poster="time-and-seek/seek-to-frame.webp"
+  caption="The playhead seeks to 1.2 s, then to 3.0 s, then back to 1.2 s. The third seek gives frame 72 again."
+/>
+
+## An example
+
+This page moves a bar with a Web Animation and a count with `window.seek`. Both use `t` only.
+
+```html
+<meta name="duration" content="3">
+<div data-world="s1"><div id="bar"></div><p id="n"></p></div>
+<script type="module">
+  document.getElementById('bar').animate(
+    [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+    { duration: 2000, fill: 'both' });
+  window.seek = (t) => {
+    document.getElementById('n').textContent = Math.round(Math.min(1, t / 2) * 100);
+  };
+</script>
+```
+
+The same `t` always gives the same bar and the same number, so you can seek to 1.2 s, then to 3.0 s, then back to 1.2 s, and see the same frame.
+
+## Limits
+
+- State between frames does not work. `x += dx` gives a different value for each order of seeks. Frame 400 must not need frame 399.
+- A module-level `await` of something other than an image decode, a `fetch` or `document.fonts.ready` is not waited for. The renderer can paint frame 0 before your `vawe.onFrame` exists. If the renderer waits too long, it stops with the name of what is pending, after 10 s.
+- A `window.seek` that never resolves, or a font that never loads, stops the render after several tries of the slice.
+- `window.seek` returns a value that the renderer ignores, unless it is a native `Promise`. A GSAP timeline has a `then()` that never settles, so the renderer does not wait for it.
+- A `@keyframes` rule with no `100%` stop slides back after it ends. A `fill: both` on an animation with a delay shows the first keyframe from frame 0.
+
+The `anim-traps` gate finds these and more:
+
+```bash
+bin/vawe check anim-traps films/<name>/page.html
+```
+
+<Cards>
+  <Card title="Determinism" href="/docs/determinism">Why the same page gives the same frames.</Card>
+  <Card title="The page" href="/docs/the-page">Every meta and global.</Card>
+  <Card title="When it looks wrong" href="/docs/troubleshooting">Fix a frame that differs.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  seek order: core/engine/page-seek.js:8-25 (seekTo); only native Promise awaited: line 10-11 comment
+  after seek: harness/media/render-page.mjs header lines 20-21 (fonts, image decode, two real paints), settle()
+  clock table: core/engine/page-clock.js:3-8
+  draft 30 fps / final 60 fps / --fps: harness/media/render-page.mjs main(): flag('--fps', final ? 60 : 30)
+  frames = round(dur x fps): render-page.mjs:853; frame i = from + i / fps: frameProblems and sampleWorlds
+  fractional frames, subframe blur: core/engine/page-clock.js:14 comment; blur 32 on final: flag('--blur', final ? 32 : 1)
+  meta fps -> window.vawe.fps: core/engine/page-seek.js installPageFrame
+  easeFn for seek/onFrame: skills/vawe-page/SKILL.md "Springs and tables"
+  module-level await, 10 s: skills/vawe-page/SKILL.md mistake 11; core/engine/page-seek.js awaitReady
+  never resolves: render-page.mjs slice stall message (SLICE_ATTEMPTS)
+  keyframes 100%, fill both: skills/vawe-page/SKILL.md mistakes 6 and 9
+  anim-traps: skills/vawe-page/SKILL.md mistake 5
+  seek-to-frame clip: media-src/seek-to-frame/page.html (docs repo)
+*/}

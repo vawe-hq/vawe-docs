@@ -1,0 +1,109 @@
+---
+title: Text and fonts
+description: Bundle your fonts, size text from the frame height, and learn which text the checks read and which they skip.
+icon: Type
+---
+
+Text in a film has two rules. A font must load from a file in the film folder, and a line that the viewer reads must be big enough. This page lists the verb that gives you fonts, the text checks that run on a <Term id="draft">draft</Term>, and the marks that tell the checks a text is texture.
+
+## Fonts
+
+The renderer waits for `document.fonts`, not for the network. Bundle every face in `films/<name>/assets/` and load it with `@font-face`. A font that the page loads from the network is not waited for.
+
+`bin/vawe fonts` prints the free faces (OFL) that vawe carries, one line each, with the file to copy:
+
+```bash
+bin/vawe fonts
+```
+
+```
+Geist | variable 100-900 | assets/fonts/Geist.woff2
+IBM Plex Mono | 400 | assets/fonts/IBMPlexMono-400.woff2
+...
+```
+
+Copy the file into `films/<name>/assets/` and write the face:
+
+```css
+@font-face {
+  font-family: "Geist";
+  src: url("assets/Geist.woff2") format("woff2");
+  font-weight: 100 900;
+}
+```
+
+If a listed file is not in `assets/fonts`, fetch it with `node generators/media/fonts.mjs`. The flag `--system` lists the faces installed on your machine, with a `local()` name. Use them only in a film that you render yourself. Never copy or commit the font file.
+
+### What the renderer does with a font
+
+| what happens | what you see |
+|---|---|
+| A face has the status `error` after load. | The render stops with `font <family> failed to load: fix its src or remove the @font-face`. |
+| A face is still loading after 10 s. | The seek stops with `font still loading after 10000 ms` and the names of the families. |
+| A file that the page needs is not in `assets/fonts`. | The first error line adds the `node generators/media/fonts.mjs` line. |
+
+## Size text from the frame height
+
+Write sizes with `--vh`, so the text keeps its share of the frame in every <Term id="aspect">aspect</Term>.
+
+```css
+.line { font-size: calc(var(--vh) * 0.08); }
+```
+
+`--vh` is the frame height in pixels, with the unit. The draft check advises when a text is taller than the frame or under 0.2% of it. This is the sign of a size that reads `--vh` as `1vh`.
+
+## The text checks
+
+The `bin/vawe dev` draft check samples the text of the page every 0.5 s (10 to 40 samples). It reads each visible line: a line shows when it has no `visibility: hidden`, its opacity is above 0.5 and it is inside the frame.
+
+| check | what it finds | limit |
+|---|---|---|
+| `readable-text-size` | A held line with a cap height under the floor. The cap height is 0.7 times the font size. A line is held when it stays 0.5 s. | 6% of the frame height. 3% inside `data-ui`. 2.5% inside `data-chrome`. |
+| text collision | Two different texts that overlap. | A quarter of the smaller box. Two texts of different worlds, and a text that travels, are skipped. |
+| text contrast | The text colour against the pixels behind it. | 4.5:1, or 3:1 for large type. |
+
+At 1080p, a cap height of 6% is about 65 px, a font size of about 93 px. Raise the font. Do not shrink the line.
+
+## Texture: `aria-hidden`, `data-chrome`, `data-ui`
+
+Some text is not copy to read: a grid of tiny words behind a title, or the labels of a product that you show as a background. The text checks can skip it.
+
+| mark | meaning | cap floor |
+|---|---|---|
+| `aria-hidden="true"` | The text is texture. The checks skip it. | None, when it is texture by measure. |
+| `data-chrome` | The label of a product shown as texture. | 2.5%, and no read hold. |
+| `data-ui` | A mock screen that is the subject of the film. Its text is read as real UI. | 3% |
+| `data-texture="<reason>"` | Says why the text is texture. | None |
+
+A mark alone is not enough. The checks skip `aria-hidden` and `data-chrome` text only when it is texture by measure. This means one of these is true:
+
+- The cap height is under 2% of the frame.
+- The same words appear 3 times or more on the page.
+- `data-texture` holds a reason of 12 characters or more.
+
+Any other marked text is checked as copy, and the draft check says how many text nodes this affects. Remove the mark, or add `data-texture="why"`.
+
+## Limits
+
+- A `DESIGN.md` line `type-scale: 4%` or `ui-scale: 2.5%` replaces the copy floor or the `data-ui` floor for that film.
+- A text can be part of a canvas or a three.js scene. The checks read only DOM text.
+
+<Cards>
+  <Card title="Aspect ratios" href="/docs/aspect-ratios">One page in any ratio.</Card>
+  <Card title="Worlds" href="/docs/worlds">Texts belong to worlds.</Card>
+  <Card title="Waivers" href="/docs/waivers">Break a text rule with a reason.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  fonts verb output and flags: bin/vawe fonts --help; bin/vawe fonts
+  renderer waits for document.fonts, not the network: skills/vawe-page/SKILL.md mistake 4; core/engine/page-seek.js awaitFonts (10000 ms, message)
+  font error text: harness/media/render-page.mjs fontProblems (672-676); missing line: harness/lib/ensure-fonts.mjs:39-41
+  --vh text size advice (taller than frame or under 0.2%): harness/lib/draft-check.mjs frameUnitLines, FONT_TINY_SHARE 0.002
+  samples every 0.5 s, 10-40: harness/lib/draft-check.mjs sampleTimes; opacity above 0.5, inside frame: harness/media/draft-check.mjs visibleLines
+  cap = 0.7 x font, floors 6, 3, 2.5, held 0.5 s: harness/lib/draft-check.mjs RULES, floorOf; taste/build/limits.json readable-text-size
+  93 px at 1080p: taste/rules/readable-text-size.md
+  texture by measure (2%, 3 repeats, 12 chars): taste/rules/readable-text-size.md; harness/lib/draft-check.mjs TEXTURE; hiddenTextLines
+  collision 25% overlap, different worlds, moving skipped: harness/lib/text-collision.mjs:5-20
+  contrast 4.5 body, 3 large: harness/lib/text-contrast.mjs:54-61; limits.json text-contrast
+  DESIGN.md type-scale / ui-scale: skills/vawe-page/SKILL.md; taste/rules/readable-text-size.md
+*/}
