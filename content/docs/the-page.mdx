@@ -34,7 +34,7 @@ A film is `films/<name>/page.html` plus its own assets folder. Every path in the
 <h1 id="word">One page in</h1>
 <div id="bar"></div>
 <script type="module">
-  import { EASE } from '../../vendor/vawe/core/motion/presets.js';
+  import { EASE } from '../../core/motion/presets.js';
   document.getElementById('word').animate(
     [{ transform: 'translateY(0.5em)', opacity: 0 }, { transform: 'none', opacity: 1 }],
     { duration: 500, delay: 300, easing: EASE.land, fill: 'both' });
