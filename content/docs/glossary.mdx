@@ -1,0 +1,314 @@
+---
+title: Glossary
+description: The words that the vawe docs use, each with one meaning and a link to the page that explains it.
+icon: BookA
+tocDepth: 2
+blog:
+  - slug: page-contract
+    title: 'HTML to video format: the page contract'
+  - slug: page-clock
+    title: Seed Math.random and freeze Date.now in JavaScript
+---
+
+Each word on this page has one meaning in the docs, the CLI and the skills. A word with a dotted underline on another docs page links to its entry here. Hold the pointer on the word to see the first sentence.
+
+## The page and time
+
+### Page [#page]
+
+A page is one HTML file, `films/<name>/page.html`, that describes a whole film. You write it in HTML, CSS, Web Animations, SVG, canvas or three.js, so you learn no private format. Read [The page](/docs/the-page).
+
+### Film [#film]
+
+A film is the mp4 file that the renderer makes from one page. One page gives one film for each aspect and each set of params, and the CLI names each file so that they do not overwrite each other. Read [Introduction](/docs).
+
+### Page contract [#page-contract]
+
+The page contract is the set of rules that a page obeys so that the renderer, the checks and the judge can read it. A page that breaks the contract can render, but the tools then measure the wrong thing. Read [The page](/docs/the-page).
+
+### Duration [#duration]
+
+The duration is the film length in seconds, set by `<meta name="duration" content="12.4">`. The value `auto` uses the end of the last animation plus a hold, and `vawe dev --lock-length` writes the found number into the page. Read [The page](/docs/the-page).
+
+### World [#world]
+
+A world is the one element that holds one beat of the film, marked with `data-world="<id>"`. The checks, the judge, `strip --cuts` and the storyboard find the beats through these elements, so each beat needs its own world element. Read [Worlds](/docs/worlds).
+
+### Beat [#beat]
+
+A beat is one part of the story with one idea, such as the hook, a feature or the end. The brief lists the beats as Shots, and the page gives each beat one <Term id="world">world</Term>. Read [Worlds](/docs/worlds).
+
+### Seek [#seek]
+
+To seek is to set the page to a time `t` in seconds and paint the frame for that time. The renderer never plays the page, so every frame must come from `t` alone and not from a clock. Read [Time and seek](/docs/time-and-seek).
+
+### Virtual clock [#virtual-clock]
+
+The virtual clock is the code in `core/engine/page-clock.js` that controls `Date`, `requestAnimationFrame`, timers and `Math.random` during a render. It makes these follow the seek time, so code that reads the clock still gives the same frames. Read [Determinism](/docs/determinism).
+
+### Determinism [#determinism]
+
+Determinism means that the same page gives the same frames on every render, in any order. It lets the renderer capture slices in parallel and render again only the seconds that you changed. Read [Determinism](/docs/determinism).
+
+### Seeded random [#seeded-random]
+
+A seeded random number comes from a generator that starts from a fixed seed, such as `rng(seed)` in `core/motion/springs.js`. An unseeded random value changes on each render and breaks <Term id="determinism">determinism</Term>. Read [Time and seek](/docs/time-and-seek).
+
+### Aspect [#aspect]
+
+The aspect is the width-to-height ratio of a film, such as `16:9`, `9:16` or `1:1`. The page lays out with `--vw` and `--vh` and never crops, so one page can render in each aspect with `--aspect W:H`. Read [Aspect ratios](/docs/aspect-ratios).
+
+### Message [#message]
+
+The message is the one thing that a viewer must remember, set by `<meta name="message">`. The storyboard and the fresh judge read this sentence, so write it before you write the page. Read [The page](/docs/the-page).
+
+### Spectacle [#spectacle]
+
+The spectacle is the second of the one big moment in a film, set by `<meta name="spectacle" content="6.2">`. You put quiet before it, and the board plans the film around it. Read [The page](/docs/the-page).
+
+### Literal [#literal]
+
+A literal is a tunable number that you write in the page: a `[[f, v]]` table row, a keyframe stop or a `:root` custom property. The studio finds literals and edits them in place; it cannot edit a number that the page computes when it runs. Read [The page](/docs/the-page).
+
+### Param [#param]
+
+A param is a page option that you pass with `--param key=value`, and the page reads it with `new URLSearchParams(location.search)`. One page can then render several looks or rows of data, and each param becomes part of the output name. Read [Render flags](/docs/render-flags).
+
+### Page API [#page-api]
+
+The page API is the `window.vawe` object that the renderer sets before your scripts run: `aspect`, `width`, `height`, `fps`, `duration`, `onFrame` and more. Use it to read the render settings instead of guessing them. Read [Page API](/docs/page-api).
+
+### Waiver [#waiver]
+
+A waiver is a declared break of a check rule, with a measured reason, in the page's `<script id="authoring">` block. The checks accept the break only when the reason names the place and a measured value, so a waiver records a decision and not an excuse. Read [Waivers](/docs/waivers).
+
+## Making a film
+
+### Loop [#loop]
+
+The loop is the ten stages that make a film: brief, references, design kit, states, board, draft, motion pass, critique, fix and final. Each verb prints a `next:` line that names the next stage, so you can follow the loop without a map. Read [Introduction](/docs#the-loop).
+
+### Stage [#stage]
+
+A stage is one step of the <Term id="loop">loop</Term>, with one command and one result. Do the stages in order: the board comes before the draft, and the critique comes before the final. Read [Introduction](/docs#the-loop).
+
+### Brief [#brief]
+
+The brief is `films/<name>/brief.md`, the file of facts and plans for one film. `vawe new` writes it, asks for the details that the request leaves open, and every later stage reads it. Read [Write the brief](/docs/brief).
+
+### Template [#template]
+
+A template is a file in `prompts/` for one type of film, with when to use it, the brief to fill in, a question bank and known mistakes. `vawe new --from prompts/<template>.md` starts a brief from it, so you begin from what worked before. Read [Templates](/docs/templates).
+
+### Reference [#reference]
+
+A reference is an existing film that you study or recreate. References live outside the repo in `~/.vawe/refs`, and `vawe refs add` stores and measures a new one. Read [Study references](/docs/references).
+
+### Recreation [#recreation]
+
+A recreation is a film that rebuilds one reference, started with `vawe new <name> --ref <mp4>`. It gets a `SPEC.md` of measured values, and `vawe critique --ref` compares your draft with the reference until it passes. Read [Match a reference film](/docs/match-a-reference).
+
+### Design kit [#design-kit]
+
+The design kit is `films/<name>/DESIGN.md` and the `kit/` folder: the palette, the type, the ground and the parts of one film. Every key frame uses the kit, so the frames look like one film. Read [Design system and kit](/docs/design-kit).
+
+### Key frame [#key-frame]
+
+A key frame is one still of a world in its settled state. `vawe frames <page>` writes one for each world, so you can see the layout before you animate anything. Read [Key frames and the board](/docs/key-frames).
+
+### Board [#board]
+
+The board is the "Board" section of the brief: a plan for time, with the rhythm of the cuts, the spectacle second, one named move for each cut and the sound. A board finds timing problems before a draft costs render time. Read [Key frames and the board](/docs/key-frames).
+
+### Storyboard [#storyboard]
+
+A storyboard is an HTML page with one card for each world, made by `vawe storyboard`. It shows the moves, eases, handoffs, sound and rhythm of the page on one screen. Read [Key frames and the board](/docs/key-frames).
+
+### Animatic [#animatic]
+
+An animatic is a silent mp4 that holds the key frame of each world for its planned time, with hard cuts, made by `vawe animatic`. It tests the timing of a film in a few seconds, before any motion exists. Read [Key frames and the board](/docs/key-frames).
+
+### Draft [#draft]
+
+A draft is a fast render at half size and 30 fps, with sound, made by `vawe dev`. You make many drafts and one final; a `--from`/`--to` window renders only those seconds, without sound. Read [Draft](/docs/draft).
+
+### Cut [#cut]
+
+A cut is the change from one world to the next. Most of the motion advice is about cuts, because a cut is where the eye can get lost. Read [Motion pass](/docs/motion-pass).
+
+### Handoff [#handoff]
+
+A handoff is the thing that carries the eye across a cut, such as a match cut, a shared axis or a colour flood. vawe names twelve handoff families, and the board names what carries the eye at each cut. Read [Motion pass](/docs/motion-pass).
+
+### Motion pass [#motion-pass]
+
+The motion pass is the stage where you look at every cut of the draft with `vawe strip --cuts` and write one row for each cut in the brief. It finds the flat moves and dead holds that a single frame cannot show. Read [Motion pass](/docs/motion-pass).
+
+### Critique [#critique]
+
+A critique is a review of a draft by a session that did not write the page, run with `vawe critique <page>`. It starts from REJECT and lists each finding with a second, a frame and a fix. Read [Critique and fix](/docs/critique).
+
+### Fresh session [#fresh-session]
+
+A fresh session is an agent session that did not write the page, with its own `VAWE_AGENT` name. The critique and the judge must run in one, because an author misses the faults in their own film. Read [Critique and fix](/docs/critique).
+
+### Judge [#judge]
+
+The judge is a scored review of a film against a rubric, prepared by `vawe judge`. `vawe judge --fresh` scores it in a separate headless session; it advises and never blocks, and an author never records a PASS for their own page. Read [Critique and fix](/docs/critique).
+
+### Owner [#owner]
+
+The owner is the person who asked for the film and signs it off. Only the owner runs `vawe approve`; an agent never runs it. Read [Approve and ship](/docs/ship).
+
+### Approve [#approve]
+
+To approve is to record that the owner accepts the full draft, with `vawe approve <page>`. `vawe ship` refuses to start without this approval, so no final reaches anyone without a person's yes. Read [Approve and ship](/docs/ship).
+
+### Final [#final]
+
+A final is the full-quality render: 60 fps, motion blur and the mixed audio, followed by a final check. It costs much more time than a draft, so you make it once, after the approval. Read [Approve and ship](/docs/ship).
+
+### Ship [#ship]
+
+To ship is to make the final with `vawe ship <page>`, which runs in the background. It refuses until a fresh review and the owner's approval exist, and `vawe ship --status --wait` reports the result. Read [Approve and ship](/docs/ship).
+
+## Motion, look and sound
+
+### Move [#move]
+
+A move is a named, copyable piece of motion, such as `mask-rise` or `whip-pan`, with its CSS and Web Animations code, notes, a sound line and a clip. Moves come in seven groups, from "Reveal a title" to "Grounds", and live in `prompts/moves/`. Read [Moves](/docs/moves).
+
+### Recipe [#recipe]
+
+A recipe is a chain of moves for one short film, with a table of beats, sound cues and transitions. `prompts/moves/RECIPES.md` has fifteen recipes, from a 5 s brand sting to a 22 s product demo. Read [Recipes](/docs/recipes).
+
+### Ease [#ease]
+
+An ease is the curve that sets how a value changes speed during a move. vawe names ten eases, such as `land` for an arrival and `launch` for an exit, and the renderer sets each one as a CSS variable `--ease-<name>`. Read [Motion](/docs/motion).
+
+### Spring [#spring]
+
+A spring is a motion curve that a stiffness and a damping value set, computed by the functions in `core/motion/springs.js`. A spring gives a natural arrival and can overshoot, and it stays a pure function of the time. Read [Motion](/docs/motion).
+
+### Overshoot [#overshoot]
+
+An overshoot is an arrival that goes past its target and comes back. In 17 measured reference films, about 30% of arrivals overshoot, and the `overshoot-share` check compares your draft with that share. Read [Motion](/docs/motion).
+
+### Lens [#lens]
+
+The lens is the camera in `core/surfaces/lens.js` that films a flat page like a real object, with depth of field, bloom, grain and more. It makes these effects in image space, so they look real and never come from CSS fakes. Read [Lens and effects](/docs/lens).
+
+### Look [#look]
+
+A look is a named set of lens settings, such as `film-halation` or `crt`, passed as `lens(source, { look })`. `vawe frames <page> --looks` shows the page under every look, so you can compare them before you choose. Read [Lens and effects](/docs/lens).
+
+### Motion blur [#motion-blur]
+
+Motion blur is the streak of a fast move, made in the final by blending up to 32 subframes for each frame. The renderer measures how far each frame moves and uses more subframes only where the motion is fast. Read [Motion](/docs/motion).
+
+### Ground [#ground]
+
+The ground is the background layer of a world. A ground must never be flat or still, because a dead background makes a held frame look frozen. Read [Backgrounds and images](/docs/backgrounds-and-images).
+
+### Cue [#cue]
+
+A cue is one sound at one second, written as an `<audio>` tag with `data-at`. The house rule is small cues on actions, and a recorded effect comes before a synth voice. Read [Audio](/docs/audio).
+
+### Voice [#voice]
+
+A voice is one of the built-in synth sounds, such as `pluck` or `whoosh`, chosen with `data-synth="<voice>"`. `vawe sound` lists the voices with their default gain and length. Read [Audio](/docs/audio).
+
+### Bed [#bed]
+
+A bed is a music track that plays under the whole film, marked by the `loop` attribute on an `<audio>` tag. A bed must come from a file that the user gives, and the mixer refuses synth beds such as `bed`, `pad` and `drone`. Read [Audio](/docs/audio).
+
+### Duck [#duck]
+
+To duck is to lower the music while a voice speaks. An `<audio>` tag with `data-role="vo"` ducks the bed by 18 dB, so the words stay clear. Read [Audio](/docs/audio).
+
+## Tools and checks
+
+### Verb [#verb]
+
+A verb is one command of the vawe CLI, such as `new`, `dev` or `ship`, run as `bin/vawe <verb>`. `bin/vawe --help` lists the common verbs, `--help --all` lists every verb, and `bin/vawe <verb> --help` explains one. Read [CLI](/docs/cli).
+
+### Next line [#next-line]
+
+The next line is the `next:` line that each verb prints, which names the command to run after it. Follow it, and you do the stages in the right order. Read [CLI](/docs/cli).
+
+### Skill [#skill]
+
+A skill is a `SKILL.md` file of instructions that an agent loads for one task, such as `vawe-page` for writing a page. Install the vawe skills with `npx skills add vawe-hq/skills`, or use them in place inside a vawe checkout. Read [Use with Claude Code, Codex or Cursor](/docs/agents).
+
+### Doctor [#doctor]
+
+The doctor is the verb `vawe doctor`, which checks Node, git, ffmpeg, ffprobe, Chrome and the fonts. It prints the install line for each missing tool, so a failed setup tells you what to do. Read [Install and doctor](/docs/install).
+
+### Studio [#studio]
+
+The studio is a live preview that you open with `vawe studio <page>`, with a scrubber that uses the render clock and seek. It edits the <Term id="literal">literals</Term> of the page in place, so you tune a number and see the result at once. Read [CLI](/docs/cli).
+
+### Strip [#strip]
+
+A strip is a row of frames through one moment or across every cut, made by `vawe strip`. It shows motion in one image, so you can read a move without a video player. Read [CLI](/docs/cli).
+
+### Sheet [#sheet]
+
+A sheet is a grid of frames from a page, a draft or a reference, made by `vawe sheet`. It shows a whole film on one screen, and `--ref` puts the reference beside your film. Read [CLI](/docs/cli).
+
+### Check [#check]
+
+A check is an automatic measurement of a page or a film that reports a problem and a fix. Most checks advise and never stop a render, because the author can know a reason that the check cannot see. Read [Checks](/docs/quality-gates).
+
+### Gate [#gate]
+
+A gate is a named check that you run with `vawe check <name>`, such as `anim-traps` or `page-check`. `vawe check` with no name lists every gate. Read [Checks](/docs/quality-gates).
+
+### Refuse [#refuse]
+
+To refuse is to stop a verb with an error instead of an advice line. vawe refuses only for a page that cannot repeat its frames, a banned item, a waiver without a valid reason or a final without approval. Read [Checks](/docs/quality-gates).
+
+### Taste rule [#taste-rule]
+
+A taste rule is one written rule of film craft in `taste/rules/<id>.md`, such as "exits shorter than entrances". `taste/build/DIGEST.md` is the short list of taste pitfalls, so read it before you write a page. Read [Checks](/docs/quality-gates).
+
+### Render key [#render-key]
+
+The render key is a short hash of the page folder, `core/` and the render settings, including each param. Two renders with the same key give the same pixels, so the renderer can reuse the frames of the first one. Read [Files and outputs](/docs/files-and-outputs).
+
+### Kept frames [#kept-frames]
+
+The kept frames are the captured frames that a render stores in a folder named after its render key. A failed final resumes from them, and a second render of an unchanged page reuses them instead of capturing again. Read [Files and outputs](/docs/files-and-outputs).
+
+### Run log [#run-log]
+
+The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its stage, time and result. `vawe runs <film>` reads it, so you can see where a film spent its time. Read [Files and outputs](/docs/files-and-outputs).
+
+{/* sources (vawe-hq/vawe 0933875ba):
+  page, page contract, duration, world, message, spectacle, literal, param, waiver, loop, stages: AGENTS.md "Hard rules" and "The loop"
+  message read by the fresh judge and the storyboard: harness/media/judge-fresh.mjs:121, harness/media/storyboard.mjs:110
+  virtual clock: core/engine/page-clock.js:5-8; seeded random: core/motion/springs.js rng
+  aspect, param, film names: bin/vawe dev --help, bin/vawe still --help
+  page API: core/engine/page-seek.js, core/engine/page-api.js
+  brief, template, recreation: bin/vawe new --help; prompts/*.md
+  reference: harness/lib/refs.mjs (VAWE_REFS_DIR, ~/.vawe/refs); bin/vawe refs --help
+  key frame, storyboard, animatic, strip, sheet, studio: bin/vawe frames|storyboard|animatic|strip|sheet|studio --help
+  draft: bin/vawe dev --help; final, ship: bin/vawe ship --help; approve, owner: bin/vawe approve --help
+  critique, fresh session: bin/vawe critique --help; skills/vawe-critique/SKILL.md:13 (default REJECT)
+  judge: bin/vawe judge --help
+  handoff families (twelve): taste/craft/transitions.md
+  moves, seven groups: site/lib/moves.json; recipes (fifteen): prompts/moves/RECIPES.md
+  eases (ten), springs: core/motion/README.md, core/motion/presets.js, core/motion/springs.js
+  overshoot share (17 films, about 30%): blog quality-bar; overshoot-share advice in bin/vawe dev output
+  lens, looks: core/surfaces/lens.js:58-72, prompts/moves/lens.md
+  motion blur (up to 32 subframes, measured travel): harness/media/render-page.mjs measureSubframes
+  ground never flat: AGENTS.md loop stage 4 (main checkout copy)
+  cue, voice, bed, duck (18 dB), banned synth beds: harness/media/page-audio.mjs:3-36; bin/vawe sound
+  verb, next line: bin/vawe --help; AGENTS.md
+  skill install: README.md "Use it from your agent"
+  doctor: harness/dev/doctor.mjs; bin/vawe doctor --help
+  check, gate, refuse: bin/vawe check; AGENTS.md "Waivers"
+  taste rule, digest: taste/README.md, taste/build/DIGEST.md, taste/rules/exits-shorter.md
+  render key, kept frames: harness/media/render-page.mjs:313-318, 564-571, 859-862
+  run log: AGENTS.md; bin/vawe runs --help
+*/}
