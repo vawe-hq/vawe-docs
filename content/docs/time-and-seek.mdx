@@ -18,7 +18,7 @@ This is also why vawe can render slices of a film in parallel, and render again 
 ## How it works
 
 <Diagram
-  label="For each frame the renderer sets the virtual clock, calls window.seek, seeks every animation, runs the onFrame hooks, and then takes the screenshot."
+  label="For each frame the renderer sets the virtual clock and calls window.seek. It seeks every animation, runs the onFrame hooks and takes the screenshot."
   caption="The order of one seek. The accent marks the step where your own code runs."
   narrow={
     <svg viewBox="0 0 361 291">
@@ -79,7 +79,7 @@ You can use either way, or both in one page.
 | CSS and Web Animations | `@keyframes` or `element.animate()` | It sets `currentTime` on each animation. |
 | `window.seek(t)` | A function that paints the frame for `t` | It calls the function on every seek. |
 
-Use `window.seek(t)` for canvas, three.js and anything else that CSS cannot move. In `window.seek` and in `onFrame` code, use `easeFn(name)` from `core/motion/presets.js` for a named ease, because a CSS `linear()` string cannot run there.
+Use `window.seek(t)` for canvas, three.js and anything else that CSS cannot move. A CSS `linear()` string cannot run in `window.seek` or `onFrame` code. There, use `easeFn(name)` from `core/motion/presets.js` for a named ease.
 
 ### The virtual clock
 
@@ -92,13 +92,13 @@ Before any page script runs, `core/engine/page-clock.js` replaces these APIs. Th
 | `setTimeout`, `setInterval` | They fire when the seek passes their due time, in due order. |
 | `Math.random` | A seeded generator. It starts again from `t` on each seek, so the same `t` gives the same numbers. |
 
-A page that reads the clock still gets the seek time. Do not rely on this. Write each value as a function of `t`, and use `rng(seed)` from `core/motion/springs.js` for a value that must look random but stay the same. See <Term id="seeded-random">seeded random</Term>.
+A page that reads the clock still gets the seek time. Do not rely on this. Write each value as a function of `t`. For a value that must look random but stay the same, use `rng(seed)` from `core/motion/springs.js`. See <Term id="seeded-random">seeded random</Term>.
 
 ## Frames and rates
 
 The render rate is not part of the page. A draft renders at 30 fps and a final at 60 fps. The script `harness/media/render-page.mjs` takes `--fps N` for another rate. The number of frames is `round(duration x fps)`, and frame `i` shows the time `from + i / fps`, where `from` is the `--from` second of a draft window. At 60 fps, 1.2 s is frame 72.
 
-`<meta name="fps">` is a different thing. It is the rate of your own frame tables, and the page reads it as `window.vawe.fps`. A page can seek at a time that is not a whole frame, for example for motion blur, which blends up to 32 subframes for each frame of a final. For this reason, write a table in seconds or in your own frame rate, and never assume that `t` is a multiple of `1 / 60`.
+`<meta name="fps">` is a different thing. It is the rate of your own frame tables, and the page reads it as `window.vawe.fps`. A page can seek at a time that is not a whole frame. Motion blur does this: it blends up to 32 subframes for each frame of a final. Write a table in seconds or in your own frame rate. Never assume that `t` is a multiple of `1 / 60`.
 
 <Video
   src="time-and-seek/seek-to-frame.mp4"
@@ -123,7 +123,7 @@ This page moves a bar with a Web Animation and a count with `window.seek`. Both 
 </script>
 ```
 
-The same `t` always gives the same bar and the same number, so you can seek to 1.2 s, then to 3.0 s, then back to 1.2 s, and see the same frame.
+The same `t` always gives the same bar and the same number. You can seek to 1.2 s, then to 3.0 s, then back to 1.2 s, and see the same frame.
 
 ## Limits
 

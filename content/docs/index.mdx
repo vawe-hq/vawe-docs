@@ -33,7 +33,7 @@ You need no hosted API and no account.
 <PageToFilm caption="The renderer does this for every t from 0 to the duration, then mixes the audio." />
 
 1. The renderer opens the page in Chrome. Before any script of the page runs, it installs a <Term id="virtual-clock">virtual clock</Term> that owns `Date`, timers, `requestAnimationFrame` and `Math.random`.
-2. It sets the <Term id="aspect">aspect</Term> variables `--vw` and `--vh` and the attribute `data-aspect`, so one page lays out for `16:9`, `9:16`, `1:1`, `4:5` and `4:3`.
+2. It sets the <Term id="aspect">aspect</Term> variables `--vw` and `--vh` and the attribute `data-aspect`. One page then lays out for `16:9`, `9:16`, `1:1`, `4:5` and `4:3`.
 3. For each frame it seeks the page to `t`: CSS animations and `element.animate()` get their `currentTime`, and `window.seek(t)` paints the frame.
 4. It encodes the frames with ffmpeg, mixes the `<audio>` tags offline and writes one mp4 to `out/`.
 

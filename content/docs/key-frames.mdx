@@ -4,7 +4,7 @@ description: Build one still per world from the kit, then plan the time in the B
 icon: LayoutGrid
 ---
 
-At the end of this page every world of the page has a still that you looked at, and the brief has a filled "Ideas" ledger and "Board". These are stages 4 and 5 of the <Term id="loop">loop</Term>. Both come before the motion, because a layout or timing error is cheap to fix now and costly after a render.
+At the end of this page every world of the page has a still that you looked at. The brief has a filled "Ideas" ledger and "Board". These are stages 4 and 5 of the <Term id="loop">loop</Term>. Both come before the motion, because a layout or timing error is cheap to fix now and costly after a render.
 
 You need the design kit from [Design system and kit](/docs/design-kit) and a `films/<name>/page.html` with one `data-world` element for each beat.
 
@@ -46,7 +46,7 @@ A <Term id="key-frame">key frame</Term> is the settled state of one world. If a 
 
 ## Fill the ideas
 
-Before the board, fill the "Ideas" table of `brief.md`. Write one row for each beat and each cut. Each row has a meaning, four ideas from four different devices (each with a typicality number from 0 to 1), the idea you chose, and a reason with the word `because`. Choose an idea that is not the most typical. The method is in `guides/IDEATE.md`. `bin/vawe check ideas <page>` advises on the ledger.
+Before the board, fill the "Ideas" table of `brief.md`. Write one row for each beat and each cut. Each row has a meaning and four ideas from four different devices, each with a typicality number from 0 to 1. It also has the idea you chose and a reason with the word `because`. Choose an idea that is not the most typical. The method is in `guides/IDEATE.md`. `bin/vawe check ideas <page>` advises on the ledger.
 
 ## Fill the board
 
@@ -77,7 +77,7 @@ Write one line: `Spectacle: the one big moment at 2.75 s`. Put the same second i
 
 ### A named move for each cut
 
-Add one row for each cut. Each row names a <Term id="move">move</Term> from `prompts/moves/README.md`, what carries the eye, what leaves first, the overlap in seconds, the camera, the depth, which arrivals overshoot, and the handoff.
+Add one row for each cut. Each row names a <Term id="move">move</Term> from `prompts/moves/README.md` and what carries the eye. It also gives what leaves first, the overlap in seconds, the camera and the depth. The last two columns say which arrivals overshoot and what the handoff is.
 
 ```text
 | cut | move (prompts/moves) | what carries the eye | what leaves first | overlap s | camera | depth | overshoots | handoff (family: object) |

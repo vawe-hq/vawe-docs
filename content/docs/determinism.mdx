@@ -33,6 +33,6 @@ Then the renderer seeks in this order (`core/engine/page-seek.js`): set the cloc
 bin/vawe check anim-traps films/<name>/page.html
 ```
 
-The `anim-traps` gate loads the page, reads the animations the seek will drive, and searches the source for a live clock, an unseeded `Math.random` and WebGL capture mistakes. It also finds seven traps that never throw an error. See [When it looks wrong](/docs/troubleshooting).
+The `anim-traps` gate loads the page and reads the animations that the seek will drive. It searches the source for a live clock, an unseeded `Math.random` and WebGL capture mistakes. It also finds seven traps that never throw an error. See [When it looks wrong](/docs/troubleshooting).
 
 `bin/vawe e2e` runs the page tests and a parallel half-size draft of every film.

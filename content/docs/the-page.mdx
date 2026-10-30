@@ -30,7 +30,7 @@ The attribute `data-blank` on `<html>` takes the same ranges as `blank`.
 
 ### The length
 
-`duration` has three forms. A number gives the length in seconds. The value `auto` gives the end of the last animation plus a hold, which is 1.2 s or the read time of the last <Term id="world">world</Term>, rounded up to 1/30 s. Without the meta, the length is the end of the last animation, with no hold.
+`duration` has three forms. A number gives the length in seconds. The value `auto` gives the end of the last animation plus a hold. The hold is 1.2 s or the read time of the last <Term id="world">world</Term>, rounded up to 1/30 s. Without the meta, the length is the end of the last animation, with no hold.
 
 An `auto` page must have all its animations at load. A page that moves only through `window.seek` has no end to find, so it must state a number. Run `bin/vawe dev <page> --lock-length` to write the found number into the meta.
 

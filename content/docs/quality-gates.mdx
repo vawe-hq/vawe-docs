@@ -17,7 +17,7 @@ Checks advise. A broken determinism rule, a banned item and a waiver reason that
 
 ## Gates for a film
 
-**`anim-traps`** finds the traps of a seeked CSS or Web Animation that never throw an error: fill collisions, a missing end keyframe, `var()` in the `animation` shorthand, a selector that matches nothing, a delay past the end, one easing across three or more keyframes, and a later animation that overrides an earlier one. It also searches the source for a live clock and an unseeded `Math.random`. It reports. `--strict` turns a finding into a failing exit code. See [When it looks wrong](/docs/troubleshooting).
+**`anim-traps`** finds the traps of a seeked CSS or Web Animation that never throw an error. They are fill collisions, a missing end keyframe, `var()` in the `animation` shorthand, and a selector that matches nothing. They also include a delay past the end, one easing across three or more keyframes, and a later animation that overrides an earlier one. The gate also searches the source for a live clock and an unseeded `Math.random`. It reports. `--strict` turns a finding into a failing exit code. See [When it looks wrong](/docs/troubleshooting).
 
 **`page-check`** measures what a rendered page film shows, so your eye judges only what a number cannot. The exit code is always 0. Findings include:
 

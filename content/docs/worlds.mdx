@@ -64,7 +64,7 @@ The draft check (`harness/media/world-sample.mjs`) seeks the page and asks of ea
 
 The check reads every third frame, and every frame between two reads that differ. A world of 0.1 s or more is therefore always found, and its span is exact to the frame. The span starts at the first frame where the world shows. It ends at the first frame after it where the world is hidden.
 
-For each span the check also reads the ground (the first non-transparent background of the element, its ancestors or a large descendant) and the text that the world shows. From the text it computes the read time.
+For each span the check also reads the ground and the text that the world shows. The ground is the first non-transparent background of the element, its ancestors or a large descendant. From the text it computes the read time.
 
 ## Write a world
 

@@ -4,7 +4,7 @@ description: Rebuild one reference as a page. Measure it into SPEC.md, mark ever
 icon: Copy
 ---
 
-At the end of this page you have a page that matches the light, the pacing, the type and the curves of one <Term id="reference">reference</Term> film, and a `critique --ref` that passes. This is a <Term id="recreation">recreation</Term>.
+At the end of this page you have a page that matches the light, pacing, type and curves of one <Term id="reference">reference</Term> film. A `critique --ref` of it passes. This is a <Term id="recreation">recreation</Term>.
 
 Use it when you must match a film, not when you are "inspired by" one. References are in-house and never published. The length of the film is the length of the reference, never longer.
 
@@ -90,7 +90,7 @@ bin/vawe critique films/recreations/hello-remake/page.html --ref quality/refs/ad
 bin/vawe check coverage out/hello-remake.mp4 --ref quality/refs/ad/source.mp4 --min 0.5
 ```
 
-It prints the SSIM of your render against the reference every 0.1 s (`--step`), writes a sheet of the 6 worst moments and exits 1 when any second falls below `--min`. Fix the seconds it lists. `--text` checks the on-screen words instead: every reference row must be in yours within 0.25 s.
+It prints the SSIM of your render against the reference every 0.1 s (`--step`). It writes a sheet of the 6 worst moments. It exits 1 when any second falls below `--min`. Fix the seconds it lists. `--text` checks the on-screen words instead: every reference row must be in yours within 0.25 s.
 
 A fresh session then critiques the draft with `--ref`. Anything the draft added that the reference does not have, and no CHANGE line names, is a rejection.
 
