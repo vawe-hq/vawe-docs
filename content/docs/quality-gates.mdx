@@ -1,5 +1,5 @@
 ---
-title: Quality gates
+title: Checks
 description: The checks you can run by name, and the ones that advise.
 icon: ShieldCheck
 ---
@@ -14,6 +14,8 @@ bin/vawe check anim-traps films/<name>/page.html
 There are 20 gate names (19 distinct gates, because `provenance` and `threshold-provenance` run one script): `anim-traps`, `code-quality`, `coverage`, `dead-branch`, `doc-refs`, `ideas`, `links`, `no-emdash`, `page-check`, `provenance`, `review`, `rule-length`, `seo-pseo`, `seo-surface`, `site-build-check`, `site-typography`, `skill-reach`, `slideshow`, `threshold-provenance` and `transitions`.
 
 Checks advise. A broken determinism rule, a banned item and a waiver reason that does not count refuse. A rule broken for cause is declared in the page. See [Waivers](/docs/waivers).
+
+Green checks do not mean the film is good. Look at the frames. See [Critique and fix](/docs/critique).
 
 ## Gates for a film
 
@@ -35,7 +37,7 @@ Checks advise. A broken determinism rule, a banned item and a waiver reason that
 
 **`review`** gives one report and one picture sheet of what to fix in a page film, worst first.
 
-**`coverage`** compares your render with a reference film, step by step, with SSIM. It prints the worst moments and exits 1 when a second falls below `--min`. See [Reading your film](/docs/reading-your-film).
+**`coverage`** compares your render with a reference film, step by step, with SSIM. It prints the worst moments and exits 1 when a second falls below `--min`. See [Match a reference film](/docs/match-a-reference).
 
 **`ideas`** reads the Ideas table of the brief and reports a beat with no row, a literal pick or a repeated device. It reads the plan, not the film. It advises.
 
@@ -46,9 +48,3 @@ Checks advise. A broken determinism rule, a banned item and a waiver reason that
 ## Gates for the repo
 
 `code-quality`, `dead-branch`, `doc-refs`, `links`, `rule-length`, `seo-pseo`, `seo-surface`, `site-build-check`, `site-typography`, `skill-reach`, `provenance` and `threshold-provenance` check the repository or the site, not a film. A film author does not need them. `links` crawls the site and exits 1 when a link is broken.
-
-## The order
-
-While you write: `bin/vawe dev <page>`, then `anim-traps`. Then `bin/vawe critique <page>` in a fresh session. Before the final: `bin/vawe ship <page>` renders, checks the final and runs a fresh judge. A judge pass is never recorded by the author.
-
-Green checks do not mean the film is good. Look at the frames. See [Reading your film](/docs/reading-your-film).
