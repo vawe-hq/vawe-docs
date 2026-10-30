@@ -1,44 +1,84 @@
 ---
 title: Introduction
-description: Vawe is a framework for agent-native motion graphics. One HTML page in, one film out.
+description: vawe is the framework for agent-native motion graphics. One HTML page in, one film out.
 icon: Sparkles
+blog:
+  - slug: page-contract
+    title: 'HTML to video format: the page contract'
+  - slug: page-clock
+    title: Seed Math.random and freeze Date.now in JavaScript
 ---
 
-Vawe turns one HTML page into one film. You write the page in what you already know: HTML, CSS, Web Animations, SVG, canvas, three.js. There is no private format to learn. If something you would naturally write fails, that is a framework bug.
+import { Rocket, FileCode, Bot } from 'lucide-react';
 
-The renderer does not play the page. It seeks the page to a time, takes a picture, and moves to the next time. Then it mixes the audio offline and writes an mp4.
+vawe turns one HTML <Term id="page">page</Term> into one <Term id="film">film</Term>. You write the page in HTML, CSS, Web Animations, SVG, canvas or three.js. The renderer <Term id="seek">seeks</Term> the page to each time, takes a picture, mixes the audio and writes an mp4.
 
-```bash
-bin/vawe new hello --defaults   # writes films/hello/page.html and brief.md
-bin/vawe dev films/hello/page.html
-# draft: out/hello-draft.mp4
+## Why it exists
+
+A film editor needs a timeline and a private format. An agent does not know either one. An agent does know HTML and CSS, so vawe uses them.
+
+vawe has one promise: if something you would naturally write in a page fails, that is a framework bug. You learn the few rules of the <Term id="page-contract">page contract</Term> and nothing else.
+
+Time is the seek, never the clock. Every frame is a function of the time `t`. The same page gives the same frames on every render. This is <Term id="determinism">determinism</Term>, and it lets the renderer capture frames in parallel and render again only the seconds you change.
+
+## Who it is for
+
+- **Agents.** An agent reads `AGENTS.md`, loads the skills and follows the <Term id="loop">loop</Term>. Read [Use with Claude Code, Codex or Cursor](/docs/agents).
+- **People who write HTML.** You write or edit the page yourself, and you watch the <Term id="draft">draft</Term>.
+
+You do not need an editor or a timeline.
+
+## How it works
+
+<PageToFilm caption="The renderer does this for every t from 0 to the duration, then mixes the audio." />
+
+1. The renderer opens the page in Chrome. Before any script of the page runs, it installs a <Term id="virtual-clock">virtual clock</Term> that owns `Date`, timers, `requestAnimationFrame` and `Math.random`.
+2. It sets the <Term id="aspect">aspect</Term> variables `--vw` and `--vh` and the attribute `data-aspect`, so one page lays out for `16:9`, `9:16`, `1:1`, `4:5` and `4:3`.
+3. For each frame it seeks the page to `t`: CSS animations and `element.animate()` get their `currentTime`, and `window.seek(t)` paints the frame.
+4. It encodes the frames with ffmpeg, mixes the `<audio>` tags offline and writes one mp4 to `out/`.
+
+The owner of this work is `harness/media/render-page.mjs`. Read [The page](/docs/the-page) for the full contract.
+
+## What you make
+
+A film is the folder `films/<name>/`: the file `page.html` and its own `assets/` folder. This is a whole film of six seconds:
+
+```html
+<!doctype html>
+<meta name="duration" content="6">
+<meta name="message" content="one page, one film">
+<style>
+  body { margin: 0; background: #0b0d12; color: #f4f6fb; font: 700 calc(var(--vh) * 0.08) system-ui; }
+  h1 { position: absolute; left: 8%; top: 40%; animation: rise 0.6s cubic-bezier(.2,.9,.2,1) both 0.4s; }
+  @keyframes rise { from { transform: translateY(40px); opacity: 0 } to { transform: none; opacity: 1 } }
+</style>
+<h1>one page, one film</h1>
+<audio data-synth="chime" data-at="0.4" data-gain="-6"></audio>
 ```
 
-## Two ideas
+`<meta name="duration">` sets the length in seconds. The `<audio>` tag is a <Term id="cue">cue</Term>: a built-in <Term id="voice">voice</Term> at 0.4 s.
 
-**A film is a page.** It is `films/<name>/page.html` plus its own `assets/` folder. A `<meta name="duration">` sets the length. Read [The page](/docs/the-page) for the whole contract.
+## Limits
 
-**Time is the seek, never the clock.** Every frame is a function of the time `t`. A virtual clock owns `Date`, `requestAnimationFrame`, timers and `Math.random`, so the same page gives the same frames on every run. Read [Determinism](/docs/determinism).
+- vawe renders one page to one film. It has no timeline editor.
+- A frame must come from `t` alone. A page that reads the wall clock or keeps state between frames breaks the contract.
+- Output can differ between hosts that rasterise on a different GPU or Chrome version.
 
-## The loop
-
-Brief or reference, then stills, then a draft, then a critique in a fresh session, then a fix of only the seconds the critique names, then the final.
-
-| If you want to | Read |
-|---|---|
-| render a film in ten minutes | [Quickstart](/docs/quickstart) |
-| describe a film and let an agent build it | [Prompting](/docs/prompting) |
-| know what a page must contain | [The page](/docs/the-page) |
-| make it move well | [Motion](/docs/motion), [Recipes](/docs/recipes) |
-| set the look, the sound and the aspect | [Backgrounds and images](/docs/backgrounds-and-images), [Audio](/docs/audio), [Aspect ratios](/docs/aspect-ratios) |
-| judge whether it is any good | [Reading your film](/docs/reading-your-film) |
-| find out why it came out wrong | [When it looks wrong](/docs/troubleshooting) |
-| match a real brand | [Brand reflection](/docs/brand-reflection) |
-| see every command | [CLI](/docs/cli), [Quality gates](/docs/quality-gates) |
+## Where to go next
 
 <Cards>
-  <Card title="Quickstart" href="/docs/quickstart" description="Install, start from the starter page, render a draft." />
-  <Card title="The page" href="/docs/the-page" description="The page contract: duration, seek, aspect, audio." />
-  <Card title="Prompting" href="/docs/prompting" description="The details to give, and what to leave to the agent." />
-  <Card title="Motion" href="/docs/motion" description="Springs, keyframe tables and the moves to copy." />
+  <Card icon={<Rocket />} title="Quickstart" href="/docs/quickstart">Install vawe and render a first draft.</Card>
+  <Card icon={<Bot />} title="Use with an agent" href="/docs/agents">Claude Code, Codex or Cursor, the skills and the run log.</Card>
+  <Card icon={<FileCode />} title="The page" href="/docs/the-page">The page contract: duration, seek, aspect, audio.</Card>
 </Cards>
+
+For every <Term id="verb">verb</Term> and flag, read [CLI](/docs/cli). For the words on these pages, read the [Glossary](/docs/glossary).
+
+{/* sources (vawe bce59c817):
+  what vawe is, seek, virtual clock, aspects, audio: README.md "vawe: one page in, one film out" and "A film, in one page"
+  promise "a framework bug": AGENTS.md first paragraph
+  example page: README.md "A film, in one page"
+  host differences: README.md "Install"
+  renderer owner: README.md "Architecture" (harness/media/render-page.mjs)
+  renders frames in parallel: README.md "Determinism"
+*/}

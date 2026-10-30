@@ -1,0 +1,113 @@
+---
+title: Use with an agent
+description: Set up Claude Code, Codex or Cursor to make vawe films, and see what the agent does at each stage of the loop.
+icon: Bot
+---
+
+import { Rocket, FileCode } from 'lucide-react';
+
+By the end of this page, an agent in a vawe checkout reads the house rules, loads the <Term id="skill">skills</Term> and follows the <Term id="loop">loop</Term>, and every command it runs is logged under its name. Install vawe first: [Install](/docs/install).
+
+## What the agent reads
+
+vawe keeps its rules in one file, `AGENTS.md` at the root of the checkout. The file is tool-neutral. `CLAUDE.md` only points to it.
+
+`AGENTS.md` holds the <Term id="page-contract">page contract</Term>, the ten stages of the loop, the shell rules and the <Term id="waiver">waiver</Term> format. An agent that reads one file reads this one. The skills add the detail for one task each.
+
+## The skills
+
+A skill is a folder in `skills/` with a `SKILL.md` file. The agent loads it when its `description` fits the task.
+
+| Skill | Load it when |
+|---|---|
+| `vawe-brief` | A person asks for a film and no `brief.md` exists. |
+| `vawe-page` | You write or edit a `page.html`. |
+| `vawe-critique` | A draft is rendered and needs a fresh look that rejects by default. |
+| `vawe-reference` | A reference mp4 must be matched. |
+
+The folder also holds `impeccable/`, a vendored skill for product UI. It is not film work.
+
+### Claude Code
+
+Open Claude Code in the vawe checkout. It reads `CLAUDE.md`, which loads `AGENTS.md`. The link `.claude/skills` points to `skills/`, so Claude Code finds the four skills with no setup.
+
+The checkout also sets a hook in `.claude/settings.json`. On each prompt the hook runs `harness/live/stage-say.mjs`. It names the next command for the film you edited last. It stays silent when no page changed in the last three hours.
+
+### Codex, Cursor and other agents
+
+Point the agent at `AGENTS.md` and tell it to read the file first. A tool without a skill mechanism reads the same `SKILL.md` file by its path, for example `skills/vawe-page/SKILL.md` before the first line of a page.
+
+Without the Claude Code hook, the agent still gets the same guidance. Each <Term id="verb">verb</Term> of `bin/vawe` prints a `next:` line that names the next <Term id="stage">stage</Term>.
+
+## What the agent does at each stage
+
+<TheLoop caption="Do the stages in order. Each verb prints a next: line that names the next stage." />
+
+| Stage | The agent | The command |
+|---|---|---|
+| Brief | Asks the owner for the missing facts, then writes the <Term id="brief">brief</Term>. With `--defaults` it guesses and marks each guess. | `bin/vawe new <name> --request "..."` |
+| Reference study | Reads the reference frames at full size and fills "Taken from" with 4 to 6 named frames. Then it reads the strips of 2 references and names 3 moves. | `bin/vawe refs list`, `bin/vawe strip <ref-id> --cuts` |
+| Design system and kit | Writes `DESIGN.md` and `kit/` for the film. | none |
+| States | Builds one key frame for each world from the kit. | `bin/vawe frames <page>` |
+| Board | Plans the time in the brief: rhythm, the spectacle second, one named move for each cut, sound. | none |
+| Draft | Renders a half-size draft. It starts with the hardest 2 to 4 seconds. | `bin/vawe dev <page> [--from s --to s]` |
+| Motion pass | Reads a strip of every cut and fixes what looks flat. | `bin/vawe strip <page> --cuts` |
+| Critique | Runs in a <Term id="fresh-session">fresh session</Term> that did not write the page. | `bin/vawe critique <page>` |
+| Fix | Renders again only the seconds that the critique names. | `bin/vawe dev <page> --from s --to s` |
+| Final | Makes the final, then waits for the result. | `bin/vawe ship <page>`, `bin/vawe ship --status --wait` |
+
+<Callout kind="rule">
+A PASS is never self-recorded. The agent that wrote the page does not score it. A fresh session scores it with `bin/vawe judge`.
+</Callout>
+
+### Rules for the shell
+
+`AGENTS.md` lists the mistakes that agents make in the shell:
+
+- The shell is zsh. Quote every glob and every `?`.
+- Read one file for each `cat` or `head` call.
+- Never use `sleep`. Wait with `bin/vawe ship --status --wait`.
+- Run `git` plainly from the worktree. Do not use `git -C`.
+
+Use `bin/vawe` before a raw `ffmpeg` or Chrome call. Run `bin/vawe <verb> --help` first. If a verb lacks what you need, say so in your report and do not write your own script.
+
+## The run log
+
+Each `new`, `dev`, `judge` and `ship` call adds one JSON line to `out/<film>.runs.jsonl`. The line holds the time, the verb, the film, the session, the agent name, the model and the git state.
+
+To name an agent, set two variables in the shell before the first command:
+
+```bash
+export VAWE_AGENT=writer-1
+export VAWE_MODEL=<model>
+```
+
+`VAWE_AGENT` is the only way to name an agent. A subagent shares the session id of its parent, so the session cannot tell them apart. Without `VAWE_AGENT`, the log writes the first 8 characters of the session id, a `#` and a random tag, and the tag changes on each command. Give each agent its own name, and give the fresh session of the critique a name that differs from the author.
+
+Read the log with `vawe runs`:
+
+```bash
+bin/vawe runs hello          # one row for each step of the film
+bin/vawe runs --all          # one row for each film of the last 30 days, then medians for each model
+```
+
+## What to read next
+
+<Cards>
+  <Card icon={<Rocket />} title="Quickstart" href="/docs/quickstart">Make the first draft by hand.</Card>
+  <Card icon={<FileCode />} title="The page" href="/docs/the-page">The contract that every page obeys.</Card>
+</Cards>
+
+{/* sources (vawe bce59c817):
+  AGENTS.md is the house rules, CLAUDE.md is a pointer: CLAUDE.md; CONTRIBUTING.md ("tool-neutral; CLAUDE.md is a shim")
+  skills table, "a tool without the skill mechanism reads the file by path", impeccable vendored: skills/README.md
+  .claude/skills -> ../skills: ls -l .claude/skills
+  hook, UserPromptSubmit: .claude/settings.json; silent after 3 hours: harness/live/stage-say.mjs RECENT_MS
+  next: line from each verb: AGENTS.md "The loop"; harness/live/stage-say.mjs SAY
+  stage table: AGENTS.md "The loop" rows 1 to 10
+  PASS never self-recorded: AGENTS.md "Waivers" area, last paragraph before "Waivers"; bin/vawe judge --help
+  shell rules, use bin/vawe first: AGENTS.md "Shell" and "The loop"
+  run log fields, VAWE_AGENT, VAWE_MODEL, subagent note: harness/lib/runlog.mjs agentId, appendRun
+  verbs logged (new, dev, judge, ship): bin/vawe runs --help
+  runs flags: bin/vawe runs --help
+*/}

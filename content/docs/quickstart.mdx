@@ -1,85 +1,102 @@
 ---
 title: Quickstart
-description: Install, start a film from the starter page, and render a draft.
+description: Install vawe, start a film from a request, and render the first draft.
 icon: Rocket
 ---
 
-## Setup
+import { Cog, FileCode, Bot } from 'lucide-react';
 
-Run `npm install`, then `bin/vawe doctor`. It checks Node, ffmpeg, Chrome and the other tools. For each tool that is missing, it prints the install line.
+By the end of this page you have a <Term id="draft">draft</Term> of a short <Term id="film">film</Term> in `out/`. You need a terminal and Node 22 or newer. [Install](/docs/install) lists every requirement.
 
-## Start a film
+<Steps>
+<Step>
 
-```bash
-bin/vawe new hello --defaults --length 5 --title "hello, film"
-```
+### Install vawe
 
-`new` asks for up to six details: subject, message and what to show (required), then format, assets and ending (optional). It writes nothing while a required detail is open. With `--defaults`, it guesses each open detail and marks the guess `(guess: change me)`. The look and the font family are design choices for later.
-
-The command writes `films/hello/page.html` (a valid starter), `brief.md` and `directions.html`. Flags such as `--length`, `--aspect` and `--title` set the starter values. Run `bin/vawe new --help` for the list.
-
-The starter is a short brand sting with three worlds. This is its outline:
-
-```html
-<!doctype html>
-<html data-aspect="16:9">
-<head>
-<meta charset="utf-8">
-<meta name="duration" content="5">
-<meta name="aspect" content="16:9">
-<meta name="message" content="one thing to remember">
-<meta name="spectacle" content="1.8">
-<meta name="signature" content="band=; ease=; stagger=; seam=; palette=; thread=">
-<title>hello, film</title>
-<style>
-  @font-face { font-family: "Unbounded"; src: url("assets/Unbounded.woff2") format("woff2"); font-weight: 100 900; }
-  :root { --ground: #8c8c8c; --ink: #1c1c1c; --beat-1: 0s; --beat-2: 1.5s; --beat-3: 3.5s; }
-  /* styles for the worlds, the ground, the mark, the word and the line */
-</style>
-<script type="module">
-import { enter, EASE } from '../../core/motion/presets.js';
-/* each world cuts in at its beat, the mark enters, and the word opens at the spectacle */
-</script>
-</head>
-<body>
-<div class="world" data-world="s1"><div class="ground" aria-hidden="true"><i></i><i></i><i></i></div></div>
-<div class="world" data-world="s2">...</div>
-<div class="world" data-world="s3">...</div>
-<div class="lockup">
-  <div class="row">
-    <svg class="mark" viewBox="0 0 100 100" role="img" aria-label="mark">...</svg>
-    <h1 class="word">hello, film</h1>
-  </div>
-  <p class="line">why it matters</p>
-</div>
-</body>
-</html>
-```
-
-Each beat is one element with `data-world`. `new` picks the font from the film name (here, Unbounded). Replace the stand-in mark, colours and font with your own. Keep the beats. The page has no `<audio>` tag yet. Add the cues later (see [Audio](/docs/audio)).
-
-## The loop
+Clone the vawe repository, go into its folder, and install the packages.
 
 ```bash
-bin/vawe dev      films/hello/page.html                  # draft: half size, 30 fps, audio mixed
-bin/vawe dev      films/hello/page.html --from 2 --to 4  # only the seconds you work on (silent)
-bin/vawe critique films/hello/page.html                  # in a fresh session
-bin/vawe approve  films/hello/page.html                  # you, after you watch the whole draft
-bin/vawe ship     films/hello/page.html                  # final: 60 fps, blur, audio
+npm install
 ```
 
-Draft the hardest two to four seconds first. Give the draft to a session that did not write the page. It names the shot, the frame and the fix. Fix the worst items, render only those seconds again, and critique again.
+The install copies GSAP into `assets/vendor/` and runs the tool check.
 
-`bin/vawe ship` refuses until a fresh session has reviewed the page and you have run `bin/vawe approve` on the whole draft. It runs in the background. Run `bin/vawe ship --status --wait` to wait for the result. It waits up to 3.5 minutes. If the render is not done, run it again.
+</Step>
+<Step>
 
-<Callout title="No em dashes on screen">
-On-screen copy cannot contain an em dash. The validator rejects it. Use a comma, a period or a middot.
+### Check the tools
+
+```bash
+bin/vawe doctor
+```
+
+When all is well, you see `ok, 8 checks` and the name of your system. If a tool is missing, `doctor` prints `MISSING` and a `fix:` line with the install command. Read [Install](/docs/install).
+
+</Step>
+<Step>
+
+### Start a film
+
+```bash
+bin/vawe new hello --request "a 5 s sting for a coffee brand" --defaults --length 5
+```
+
+`new` writes `films/hello/page.html`, a valid starter <Term id="page">page</Term>, and `films/hello/brief.md`. The <Term id="brief">brief</Term> holds the facts of the film.
+
+Without `--defaults`, `new` asks for the details that the request leaves open: subject, message, what to show, look, format, family, assets and ending. With `--defaults`, it guesses each open detail and marks the guess `(guess: change me)`. Change each guess before you go on.
+
+</Step>
+<Step>
+
+### Render a draft
+
+```bash
+bin/vawe dev films/hello/page.html
+```
+
+The draft is half size at 30 fps and has no sound. Add `--audio` to mix the `<audio>` tags. To render only the seconds you work on, add `--from 2 --to 4`.
+
+</Step>
+<Step>
+
+### Find the output
+
+The draft is `out/hello-draft.mp4`, with a sheet of key frames next to it. A range gives `out/hello-draft-<from>-<to>.mp4`. Open the mp4 in any player.
+
+Each command also adds a line to `out/hello.runs.jsonl`. Read [Use with an agent](/docs/agents#the-run-log).
+
+</Step>
+</Steps>
+
+<Callout kind="note">
+`dev` runs a stills judge on the three directions of the film, once for each change of `directions.html` or of their brief lines. It takes about 25 s. Add `--no-judge` to skip it.
 </Callout>
 
-## Next
+## If it fails
+
+| What you see | Why | What to do |
+|---|---|---|
+| `MISSING ...` from `doctor` | A required tool is not installed. | Run the `fix:` line, then run `bin/vawe doctor` again. |
+| `unknown verb` | The verb name has a typo, or the checkout is old. | Run `bin/vawe --help` and compare the names. |
+| `new` prints questions and writes nothing | The request leaves a required detail open. | Answer with `--answers <file>` or `--detail key=value`, or add `--defaults`. |
+
+## What to read next
 
 <Cards>
-  <Card title="The page" href="/docs/the-page" description="What a page must contain." />
-  <Card title="CLI" href="/docs/cli" description="Every verb and its flags." />
-  <Card title="Motion" href="/docs/motion" description="Springs, tables and moves to copy." />
+  <Card icon={<Cog />} title="Install" href="/docs/install">Requirements, the tool check and common failures.</Card>
+  <Card icon={<Bot />} title="Use with an agent" href="/docs/agents">Let an agent write the page and run the loop.</Card>
+  <Card icon={<FileCode />} title="The page" href="/docs/the-page">What a page must contain.</Card>
 </Cards>
+
+{/* sources (vawe bce59c817):
+  npm install, postinstall (gsap copy, doctor --quiet): package.json "scripts"
+  doctor output "ok, N checks", MISSING and fix lines, 8 tools: harness/dev/doctor.mjs (TOOLS list, report block)
+  new flags and the open details: bin/vawe new --help
+  new writes page.html and brief.md: bin/vawe new --help
+  dev flags, output paths, --no-judge, directions.html: bin/vawe dev --help
+  draft is half size, 30 fps, silent: bin/vawe dev --help
+  sheet next to the mp4: bin/vawe --help ("dev")
+  run log path: harness/lib/runlog.mjs runsPathFor
+  unknown verb text: bin/vawe approve (prints "unknown verb ...; valid: ...")
+  new asks first, writes nothing while a detail is open: AGENTS.md "The loop" row 1
+*/}
