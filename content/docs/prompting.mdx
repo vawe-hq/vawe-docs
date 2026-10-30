@@ -30,23 +30,27 @@ The repo has a template per film type in `prompts/`. `guides/ROUTING.md` lists t
 bin/vawe new my-launch --from prompts/brand-launch-from-url.md
 ```
 
-The command checks which details the request leaves open. There are eight: subject, message, show, look, format, family, assets and ending. It prints each open detail with its reason and an example, and writes nothing yet. Answer in a file and pass it with `--answers <file>`, or give one answer with `--detail key=value`. An agent can run `--questions-json` to get the questions as `AskUserQuestion` calls. For an unattended run, pass `--defaults`. It guesses each open detail and marks the guess `(guess: change me)`.
+The command checks which details the request leaves open. There are six: subject, message and show (required), then format, assets and ending (optional). While a required detail is open, the command prints each open detail with its reason and an example, and writes nothing. Answer in a file and pass it with `--answers <file>`, or give one answer with `--detail key=value`. An agent can run `--questions-json` to get the questions as `AskUserQuestion` calls. For an unattended run, pass `--defaults`. It guesses each open detail and marks the guess `(guess: change me)`.
 
 ## The brief is measured
 
-Every brief follows the measured shape in `prompts/ANATOMY.md`. A number that a program can measure is a number. A value that it cannot measure yet is a guess, marked `(guess: change me)`. The agent replaces each guess with a measured value or its own choice. The sections are:
+`bin/vawe new` writes `brief.md` in a measured shape. A number that a program can measure is a number. A value that it cannot measure yet is a guess, marked `(guess: change me)`. The agent replaces each guess with a measured value or its own choice. The sections come in this order:
 
-1. **Inputs.** The details of the request: subject, message, show, look, format, family, assets and ending.
+1. **Inputs.** The questions of the template, each with its default marked `[unanswered: default taken]`.
 2. **Task.** What the film is, who sees it, the message and the spectacle second.
 3. **Taken from.** Four to six reference frames, with what each one gives.
 4. **Directions.** Three directions from three families (type, object, graphic). The agent picks one and says why.
-5. **Look.** Numbers, not adjectives: hex colours, the typeface, type as a fraction of frame height.
-6. **Design system and kit.** Palette roles, type, and the ground layers.
-7. **Spec.** Three tables, in seconds and percent of frame: shots, words and objects.
-8. **Board.** A plan for time: rhythm, a named move per cut, and the sound.
-9. **Motion pass.** One row per cut, after the draft.
-10. **Acceptance.** Targets for the checks, with the measured value next to each one.
-11. **Gates, Pitfalls and Deliver.** The order of the stills, the draft loop and the final, the pitfalls, and the files to hand over.
+5. **Signature.** Six dials: band, ease, stagger, seam, palette and thread. The page repeats them in `<meta name="signature">`.
+6. **Look.** Numbers, not adjectives: colours, the typeface, type as a fraction of frame height.
+7. **Design system and kit.** Palette roles, type, and the ground layers.
+8. **States.** One static key frame per world, built from the kit before any motion.
+9. **Ideas.** A table with four ideas for each beat and cut, and the pick with its reason.
+10. **Board.** A plan for time: rhythm, a named move per cut, and the sound.
+11. **Motion pass.** One row per cut, after the draft.
+12. **Spec.** Three tables, in seconds and percent of frame: shots, words and objects.
+13. **Acceptance.** Targets for the checks, with the measured value next to each one.
+14. **Gates, Pitfalls and Deliver.** The order of the stills, the draft loop and the final, the pitfalls, and the files to hand over.
+15. **First draft.** The taste list to read and the `bin/vawe dev` command.
 
 The slowest beat is at least 3 times the fastest. For the page contract, see [The page](/docs/the-page).
 

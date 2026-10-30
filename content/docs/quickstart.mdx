@@ -14,7 +14,7 @@ Run `npm install`, then `bin/vawe doctor`. It checks Node, ffmpeg, Chrome and th
 bin/vawe new hello --defaults --length 5 --title "hello, film"
 ```
 
-Without `--defaults`, `new` asks for the details it needs and writes nothing. It asks for up to eight: subject, message, what to show, look, format, family, assets and ending. With `--defaults`, it guesses each open detail and marks the guess `(guess: change me)`.
+`new` asks for up to six details: subject, message and what to show (required), then format, assets and ending (optional). It writes nothing while a required detail is open. With `--defaults`, it guesses each open detail and marks the guess `(guess: change me)`. The look and the font family are design choices for later.
 
 The command writes `films/hello/page.html` (a valid starter), `brief.md` and `directions.html`. Flags such as `--length`, `--aspect` and `--title` set the starter values. Run `bin/vawe new --help` for the list.
 
@@ -32,7 +32,7 @@ The starter is a short brand sting with three worlds. This is its outline:
 <meta name="signature" content="band=; ease=; stagger=; seam=; palette=; thread=">
 <title>hello, film</title>
 <style>
-  @font-face { font-family: "Hanken Grotesk"; src: url("assets/HankenGrotesk.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "Unbounded"; src: url("assets/Unbounded.woff2") format("woff2"); font-weight: 100 900; }
   :root { --ground: #8c8c8c; --ink: #1c1c1c; --beat-1: 0s; --beat-2: 1.5s; --beat-3: 3.5s; }
   /* styles for the worlds, the ground, the mark, the word and the line */
 </style>
@@ -56,7 +56,7 @@ import { enter, EASE } from '../../core/motion/presets.js';
 </html>
 ```
 
-Each beat is one element with `data-world`. Replace the stand-in mark, colours and font with your own. Keep the beats. The page has no `<audio>` tag yet. Add the cues later (see [Audio](/docs/audio)).
+Each beat is one element with `data-world`. `new` picks the font from the film name (here, Unbounded). Replace the stand-in mark, colours and font with your own. Keep the beats. The page has no `<audio>` tag yet. Add the cues later (see [Audio](/docs/audio)).
 
 ## The loop
 
