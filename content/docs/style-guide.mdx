@@ -1,0 +1,123 @@
+---
+title: Docs components
+description: Every component that a docs page can use, rendered live. For docs writers; the rules are in DESIGN.md and WRITING.md.
+icon: Shapes
+---
+
+import { BookA, Rocket } from 'lucide-react';
+
+This page shows each docs component once. Copy the MDX from `content/docs/style-guide.mdx`. The design rules are in `DESIGN.md` and the writing rules are in `WRITING.md`, both at the root of the docs repo.
+
+## Video
+
+The renderer <Term id="seek">seeks</Term> the page to a time and captures one frame. The same time always gives the same frame.
+
+<Video
+  src="time-and-seek/seek-to-frame.mp4"
+  poster="time-and-seek/seek-to-frame.webp"
+  caption="The playhead seeks to 1.2 s, then to 3.0 s, then back to 1.2 s. The third seek gives frame 72 again."
+/>
+
+## Figure
+
+<Figure
+  src="time-and-seek/between-seeks.webp"
+  alt="The page on the left with the playhead between two seeks; the frame on the right still shows frame 72."
+  caption="Between two seeks, the frame does not change. Made with vawe still at 2.2 s."
+  width={1280}
+  height={720}
+/>
+
+## Diagram
+
+<PageToFilm caption="The renderer does this for every t from 0 to the duration, then mixes the audio." />
+
+<TheLoop caption="Do the stages in order. Each verb prints a next: line that names the next stage." />
+
+A new diagram uses the primitives. Mark the one thing to notice with `accent`.
+
+<Diagram
+  label="A draft goes to the critique. When the critique passes, the film goes to the final."
+  caption="A small custom diagram from the primitives, with a narrow drawing for a phone."
+  narrow={
+    <svg viewBox="0 0 361 281">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Draft</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">vawe dev</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 109]]} />
+      <DiagramBox x={0} y={110} w={360} h={60} accent />
+      <DiagramText x={16} y={140}>Critique</DiagramText>
+      <DiagramText x={344} y={140} kind="mono" anchor="end">vawe critique</DiagramText>
+      <DiagramArrow points={[[180, 171], [180, 219]]} />
+      <DiagramText x={194} y={195} kind="mono">pass</DiagramText>
+      <DiagramBox x={0} y={220} w={360} h={60} />
+      <DiagramText x={16} y={250}>Final</DiagramText>
+      <DiagramText x={344} y={250} kind="mono" anchor="end">ship</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Draft</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">vawe dev</DiagramText>
+    <DiagramArrow points={[[201, 40], [279, 40]]} />
+    <DiagramBox x={280} y={0} w={200} h={80} accent />
+    <DiagramText x={296} y={30}>Critique</DiagramText>
+    <DiagramText x={296} y={56} kind="mono">vawe critique</DiagramText>
+    <DiagramArrow points={[[481, 40], [559, 40]]} />
+    <DiagramText x={520} y={24} kind="mono" anchor="middle">pass</DiagramText>
+    <DiagramBox x={560} y={0} w={120} h={80} />
+    <DiagramText x={576} y={30}>Final</DiagramText>
+    <DiagramText x={576} y={56} kind="mono">ship</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new hello --request "a 5 s sting for a coffee brand"
+```
+
+</Step>
+<Step>
+
+### Render a draft
+
+```bash
+bin/vawe dev films/hello/page.html
+```
+
+You see `out/hello-draft.mp4` and a `next:` line.
+
+</Step>
+</Steps>
+
+## Callout
+
+<Callout kind="note">
+A draft with `--from` and `--to` renders only those seconds, without sound.
+</Callout>
+
+<Callout kind="warning">
+Never pipe `bin/vawe` into `head`, `tail` or `grep`. The pipe hides the exit code.
+</Callout>
+
+<Callout kind="rule">
+Time is the seek, never the clock. Every frame must come from `t` alone.
+</Callout>
+
+## Term
+
+A <Term id="world">world</Term> holds one <Term id="beat">beat</Term>. The <Term id="virtual-clock">virtual clock</Term> makes timers follow the seek.
+
+## Cards
+
+<Cards>
+  <Card icon={<Rocket />} title="Quickstart" href="/docs/quickstart">Render a film in ten minutes.</Card>
+  <Card icon={<BookA />} title="Glossary" href="/docs/glossary">The words the docs use.</Card>
+</Cards>
