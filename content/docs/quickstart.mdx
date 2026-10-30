@@ -13,13 +13,15 @@ By the end of this page you have a <Term id="draft">draft</Term> of a short <Ter
 
 ### Install vawe
 
-Clone the vawe repository, go into its folder, and install the packages.
+Clone the repository, go into its folder, install the packages, and install Chrome for the renderer.
 
 ```bash
+git clone https://github.com/vawe-hq/vawe.git && cd vawe
 npm install
+npx puppeteer browsers install chrome
 ```
 
-The install copies GSAP into `assets/vendor/` and runs the tool check.
+The install runs the tool check at the end.
 
 </Step>
 <Step>
@@ -30,7 +32,7 @@ The install copies GSAP into `assets/vendor/` and runs the tool check.
 bin/vawe doctor
 ```
 
-When all is well, you see `ok, 8 checks` and the name of your system. If a tool is missing, `doctor` prints `MISSING` and a `fix:` line with the install command. Read [Install](/docs/install).
+When all is well, you see `ok, 7 checks` and the name of your system. If a tool is missing, `doctor` prints `MISSING` and a `fix:` line with the install command. Read [Install](/docs/install).
 
 </Step>
 <Step>
@@ -43,7 +45,7 @@ bin/vawe new hello --request "a 5 s sting for a coffee brand" --defaults --lengt
 
 `new` writes `films/hello/page.html`, a valid starter <Term id="page">page</Term>, and `films/hello/brief.md`. The <Term id="brief">brief</Term> holds the facts of the film.
 
-Without `--defaults`, `new` asks for the details that the request leaves open: subject, message, what to show, look, format, family, assets and ending. With `--defaults`, it guesses each open detail and marks the guess `(guess: change me)`. Change each guess before you go on.
+Without `--defaults`, `new` asks for the details that the request leaves open: subject, message, what to show, format, assets and ending. With `--defaults`, it guesses each open detail and marks the guess `(guess: change me)`. Change each guess before you go on.
 
 </Step>
 <Step>
@@ -54,16 +56,16 @@ Without `--defaults`, `new` asks for the details that the request leaves open: s
 bin/vawe dev films/hello/page.html
 ```
 
-The draft is half size at 30 fps and has no sound. Add `--audio` to mix the `<audio>` tags. To render only the seconds you work on, add `--from 2 --to 4`.
+The draft is half size at 30 fps, with the `<audio>` tags mixed. Add `--silent` for a picture-only draft. To render only the seconds you work on, add `--from 2 --to 4`. A range has no sound.
 
 </Step>
 <Step>
 
 ### Find the output
 
-The draft is `out/hello-draft.mp4`, with a sheet of key frames next to it. A range gives `out/hello-draft-<from>-<to>.mp4`. Open the mp4 in any player.
+The draft is `out/hello-draft.mp4`, with a sheet of key frames next to it. A range gives `out/hello-draft-<from>-<to>.mp4`. Open the mp4 in any player. To look at the whole draft, run `bin/vawe sheet out/hello-draft.mp4`.
 
-Each command also adds a line to `out/hello.runs.jsonl`. Read [Use with an agent](/docs/agents#the-run-log).
+Every verb ends with a line such as `vawe: dev ok in 12s`. Each verb also adds a line to `out/hello.runs.jsonl`. Read [Use with an agent](/docs/agents#the-run-log).
 
 </Step>
 </Steps>
@@ -78,7 +80,7 @@ Each command also adds a line to `out/hello.runs.jsonl`. Read [Use with an agent
 |---|---|---|
 | `MISSING ...` from `doctor` | A required tool is not installed. | Run the `fix:` line, then run `bin/vawe doctor` again. |
 | `unknown verb` | The verb name has a typo, or the checkout is old. | Run `bin/vawe --help` and compare the names. |
-| `new` prints questions and writes nothing | The request leaves a required detail open. | Answer with `--answers <file>` or `--detail key=value`, or add `--defaults`. |
+| `new` prints questions | The request leaves a required detail open. | Answer with `--answers <file>` or `--detail key=value`, or add `--defaults`. |
 
 ## What to read next
 
@@ -88,15 +90,15 @@ Each command also adds a line to `out/hello.runs.jsonl`. Read [Use with an agent
   <Card icon={<FileCode />} title="The page" href="/docs/the-page">What a page must contain.</Card>
 </Cards>
 
-{/* sources (vawe bce59c817):
-  npm install, postinstall (gsap copy, doctor --quiet): package.json "scripts"
-  doctor output "ok, N checks", MISSING and fix lines, 8 tools: harness/dev/doctor.mjs (TOOLS list, report block)
+{/* sources (vawe d8481cc61):
+  clone URL, npm install, Chrome install: README.md "Quickstart"; postinstall (doctor --quiet): package.json "scripts"
+  doctor output "ok, N checks", MISSING and fix lines, 7 tools: harness/dev/doctor.mjs (TOOLS list, report block); bin/vawe doctor run on main, 2026-10-30
   new flags and the open details: bin/vawe new --help
   new writes page.html and brief.md: bin/vawe new --help
   dev flags, output paths, --no-judge, directions.html: bin/vawe dev --help
-  draft is half size, 30 fps, silent: bin/vawe dev --help
+  draft is half size, 30 fps, with sound; --silent; a range stays silent: bin/vawe dev --help
   sheet next to the mp4: bin/vawe --help ("dev")
   run log path: harness/lib/runlog.mjs runsPathFor
-  unknown verb text: bin/vawe approve (prints "unknown verb ...; valid: ...")
-  new asks first, writes nothing while a detail is open: AGENTS.md "The loop" row 1
+  verb end line: AGENTS.md "Shell"
+  new asks first: bin/vawe new --help; the questions: --questions-json in the same help
 */}

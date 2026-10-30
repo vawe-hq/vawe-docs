@@ -10,7 +10,7 @@ By the end of this page, `bin/vawe doctor` reports no missing tool and you can r
 
 ## Requirements
 
-`bin/vawe doctor` checks these eight items. The list comes from `harness/dev/doctor.mjs`.
+`bin/vawe doctor` checks these seven items. The list comes from `harness/dev/doctor.mjs`.
 
 | Item | Needed | What it is for |
 |---|---|---|
@@ -19,7 +19,6 @@ By the end of this page, `bin/vawe doctor` reports no missing tool and you can r
 | ffmpeg with libx264 and drawtext | yes | Encodes the frames and mixes the audio. |
 | ffprobe | yes | Part of the ffmpeg package. |
 | puppeteer Chrome | yes | Draws every frame of the page. |
-| `assets/vendor/gsap.min.js` | yes | The GSAP library for pages. `npm install` copies it. |
 | `assets/fonts` | yes | The free font faces. The folder must hold files. |
 | tesseract | no | OCR for `vawe spec` and `vawe coverage --text`. |
 
@@ -41,15 +40,15 @@ Add `tesseract` if you want OCR. `doctor` prints the exact line for Debian, Ubun
 </Step>
 <Step>
 
-### Install the packages
-
-Run this in the vawe folder.
+### Clone vawe and install the packages
 
 ```bash
+git clone https://github.com/vawe-hq/vawe.git && cd vawe
 npm install
+npx puppeteer browsers install chrome
 ```
 
-The install runs `scripts/vendor-gsap.mjs`, which copies GSAP to `assets/vendor/gsap.min.js`. Puppeteer downloads a full Chrome in its own install step. The install then runs the tool check.
+The puppeteer postinstall step downloads a full Chrome. The third command installs it again when the download was skipped. The `npm install` ends with the tool check.
 
 </Step>
 <Step>
@@ -60,7 +59,7 @@ The install runs `scripts/vendor-gsap.mjs`, which copies GSAP to `assets/vendor/
 bin/vawe doctor
 ```
 
-When all is well, you see one line: `ok, 8 checks (macOS)`. The system name changes with your system. The exit code is 0.
+When all is well, you see one line: `ok, 7 checks (macOS)`. The system name changes with your system. The exit code is 0.
 
 </Step>
 </Steps>
@@ -74,11 +73,11 @@ When all is well, you see one line: `ok, 8 checks (macOS)`. The system name chan
 | `--quiet` | Prints only problems and writes `.vawe/doctor.json`. |
 | `--json` | Prints `[{tool, required, ok, version, fix}]` instead of text. |
 
-Example output for a missing GSAP file:
+Example output for a Node that is too old:
 
 ```text
-MISSING  assets/vendor/gsap.min.js: assets/vendor/gsap.min.js is missing
-         fix: npm install (its postinstall copies gsap)
+MISSING  node 22+: found v20.11.0, need 22 or newer
+         fix: brew install node
 1 required tool(s) missing.
 ```
 
@@ -93,7 +92,6 @@ The postinstall step runs `doctor --quiet`, so the result is in `.vawe/doctor.js
 | `this ffmpeg build cannot run libx264 encode or drawtext` | The ffmpeg build lacks an encoder or a filter. | Install a full ffmpeg build. On Fedora and RHEL, enable the RPM Fusion repository first. |
 | `puppeteer has no Chrome download` | The install skipped the Chrome download. | Run `npm install`, then `npx puppeteer browsers install chrome`. |
 | `Chrome did not launch: ...` | Chrome downloaded but does not start on this system. | Read the text after the colon. It is the first line of the Chrome error. |
-| `assets/vendor/gsap.min.js is missing` | The postinstall step did not run. | Run `npm install`. |
 | `assets/fonts is missing` | The font folder is empty or absent. | Run `git checkout -- assets/fonts`, or `node generators/media/fonts.mjs`. |
 
 <Callout kind="note">
@@ -107,13 +105,13 @@ Output can differ between hosts that rasterise on a different GPU or Chrome vers
   <Card icon={<Bot />} title="Use with an agent" href="/docs/agents">Set up Claude Code, Codex or Cursor.</Card>
 </Cards>
 
-{/* sources (vawe bce59c817):
-  requirements table, eight checks, required flags, optional tesseract: harness/dev/doctor.mjs TOOLS list
+{/* sources (vawe d8481cc61):
+  requirements table, seven checks, required flags, optional tesseract: harness/dev/doctor.mjs TOOLS list
   Node 22: harness/dev/doctor.mjs probeNode; README.md "Install"
   doctor flags, exit code: bin/vawe doctor --help; harness/dev/doctor.mjs header
-  output example: bin/vawe doctor run in a checkout without assets/vendor/gsap.min.js, 2026-10-30
+  output format: harness/dev/doctor.mjs report block; the version in the example is invented to show the format
   ok line: harness/dev/doctor.mjs final report block
-  postinstall (vendor-gsap, doctor --quiet), puppeteer note: package.json "scripts" and "//puppeteer-note"
+  postinstall (doctor --quiet), puppeteer note: package.json "scripts" and "//puppeteer-note"; clone URL and Chrome command: README.md "Quickstart"
   .vawe/doctor.json: harness/dev/doctor.mjs RESULT_FILE
   fix lines, RPM Fusion: harness/dev/doctor.mjs TOOLS (pkg dnf)
   host differences: README.md "Install"

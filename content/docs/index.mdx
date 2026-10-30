@@ -26,7 +26,7 @@ Time is the seek, never the clock. Every frame is a function of the time `t`. Th
 - **Agents.** An agent reads `AGENTS.md`, loads the skills and follows the <Term id="loop">loop</Term>. Read [Use with Claude Code, Codex or Cursor](/docs/agents).
 - **People who write HTML.** You write or edit the page yourself, and you watch the <Term id="draft">draft</Term>.
 
-You do not need an editor or a timeline.
+You need no hosted API and no account.
 
 ## How it works
 
@@ -49,7 +49,7 @@ A film is the folder `films/<name>/`: the file `page.html` and its own `assets/`
 <meta name="message" content="one page, one film">
 <style>
   body { margin: 0; background: #0b0d12; color: #f4f6fb; font: 700 calc(var(--vh) * 0.08) system-ui; }
-  h1 { position: absolute; left: 8%; top: 40%; animation: rise 0.6s cubic-bezier(.2,.9,.2,1) both 0.4s; }
+  h1 { position: absolute; left: 8%; top: 40%; animation: rise 0.6s var(--ease-land) both 0.4s; }
   @keyframes rise { from { transform: translateY(40px); opacity: 0 } to { transform: none; opacity: 1 } }
 </style>
 <h1>one page, one film</h1>
@@ -60,7 +60,7 @@ A film is the folder `films/<name>/`: the file `page.html` and its own `assets/`
 
 ## Limits
 
-- vawe renders one page to one film. It has no timeline editor.
+- vawe renders one page to one film. You learn no timeline API.
 - A frame must come from `t` alone. A page that reads the wall clock or keeps state between frames breaks the contract.
 - Output can differ between hosts that rasterise on a different GPU or Chrome version.
 
@@ -74,10 +74,11 @@ A film is the folder `films/<name>/`: the file `page.html` and its own `assets/`
 
 For every <Term id="verb">verb</Term> and flag, read [CLI](/docs/cli). For the words on these pages, read the [Glossary](/docs/glossary).
 
-{/* sources (vawe bce59c817):
-  what vawe is, seek, virtual clock, aspects, audio: README.md "vawe: one page in, one film out" and "A film, in one page"
+{/* sources (vawe d8481cc61):
+  what vawe is, seek, virtual clock, aspects, audio: README.md "vawe: HTML to video for coding agents" and "A film is one HTML page"
   promise "a framework bug": AGENTS.md first paragraph
-  example page: README.md "A film, in one page"
+  example page: README.md "A film is one HTML page"
+  no hosted API, no account: skills/html-to-video/SKILL.md
   host differences: README.md "Install"
   renderer owner: README.md "Architecture" (harness/media/render-page.mjs)
   renders frames in parallel: README.md "Determinism"
