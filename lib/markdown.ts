@@ -1,6 +1,6 @@
 import { source } from '@/lib/source';
 
-export { prefersMarkdown } from './accept';
+export { prefersMarkdown } from '../vendor/vawe/site/lib/md/accept';
 
 export const SITE = 'https://vawe.dev';
 

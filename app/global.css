@@ -13,7 +13,7 @@
   --color-fd-primary: #3291ff;
 }
 
-/* Typography rules (site/DESIGN.md "Typography rules"): the same values as the site's tokens. */
+/* Typography rules (vawe-hq/vawe site/DESIGN.md "Typography rules"): the same values as the site's tokens. */
 :root {
   --measure: 46ch;
   --fw-head: 600;

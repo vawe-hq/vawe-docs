@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { Geist, IBM_Plex_Mono } from 'next/font/google';
 
-// The same two faces as the site (site/app/layout.tsx), because this app is served at /docs on the same
+// The same two faces as the site (site/app/layout.tsx in vawe-hq/vawe), because this app is served at /docs on the same
 // domain and one nav tab away: Geist for prose and headings, IBM Plex Mono for anything literal.
 const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const mono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono', display: 'swap' });

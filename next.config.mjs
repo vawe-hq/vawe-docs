@@ -6,7 +6,7 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
   outputFileTracingRoot: import.meta.dirname,
-  // The marketing site serves this app at /docs by rewriting to it (see site/next.config.mjs).
+  // The marketing site serves this app at /docs by rewriting to it (see site/next.config.mjs in vawe-hq/vawe).
   // This app's fumadocs routes ALREADY live at /docs, so basePath:"/docs" would double the prefix
   // into /docs/docs, the routes need no help. Only the assets do: without a prefix they sit at
   // /_next/*, which collides with the site's own /_next/* and never reaches this app. assetPrefix
