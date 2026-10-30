@@ -11,15 +11,31 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
   if (!page) notFound();
 
   const MDXContent = page.data.body;
+  const { tocDepth = 3, blog } = page.data;
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage toc={page.data.toc.filter((item) => item.depth <= tocDepth)} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
         <MDXContent components={getMDXComponents()} />
+        {blog && blog.length > 0 && <FromTheBlog posts={blog} />}
       </DocsBody>
     </DocsPage>
+  );
+}
+
+function FromTheBlog({ posts }: { posts: { slug: string; title: string }[] }) {
+  return (
+    <p className="vd-fromblog not-prose">
+      <span className="vd-fromblog-h">From the blog</span>
+      {posts.map((post, i) => (
+        <span key={post.slug}>
+          {i > 0 && ' · '}
+          <a href={`/blog/${post.slug}`}>{post.title}</a>
+        </span>
+      ))}
+    </p>
   );
 }
 

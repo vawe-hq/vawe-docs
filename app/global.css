@@ -1,26 +1,84 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+@import '../components/docs.css';
 
 @source '../node_modules/fumadocs-ui/dist/**/*.js';
 
-/* The site accent #3291ff measures 3.2:1 on white, so light mode takes the same hue darkened to 4.9:1. */
+/* Docs tokens (DESIGN.md "Tokens"). Dark is the site's palette (vawe-hq/vawe site/app/globals.css); light mirrors it. */
 :root {
-  --color-fd-primary: #1a6fd6;
+  --vd-bg: #ffffff;
+  --vd-surface: #fafafa;
+  --vd-surface-2: #f2f2f2;
+  --vd-raised: #ebebeb;
+  --vd-line: #e3e3e3;
+  --vd-line-2: #c7c7c7;
+  --vd-ink: #000000;
+  --vd-ink-2: #171717;
+  --vd-muted: #5c5c5c;
+  --vd-dim: #6b6b6b;
+  /* The site accent #3291ff measures 3.2:1 on white, so light mode takes the same hue darkened to 4.9:1. */
+  --vd-accent: #1a6fd6;
+  --vd-accent-soft: rgba(26, 111, 214, 0.1);
+  --vd-warning: #a35a00;
+
+  --vd-measure: 68ch;
+  --vd-fw-head: 600;
+  --vd-lh-body: 1.6;
+  --vd-r: 12px;
+  --vd-r-in: 4px;
+  --vd-dur-state: 200ms;
+  --vd-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --color-fd-background: var(--vd-bg);
+  --color-fd-foreground: var(--vd-ink-2);
+  --color-fd-card: var(--vd-surface);
+  --color-fd-card-foreground: var(--vd-ink-2);
+  --color-fd-popover: var(--vd-bg);
+  --color-fd-border: var(--vd-line);
+  --color-fd-muted-foreground: var(--vd-muted);
+  --color-fd-primary: var(--vd-accent);
 }
 
 .dark {
-  --color-fd-primary: #3291ff;
+  --vd-bg: #000000;
+  --vd-surface: #0a0a0a;
+  --vd-surface-2: #111111;
+  --vd-raised: #171717;
+  --vd-line: #242424;
+  --vd-line-2: #3a3a3a;
+  --vd-ink: #ffffff;
+  --vd-ink-2: #ededed;
+  --vd-muted: #a1a1a1;
+  --vd-dim: #8f8f8f;
+  --vd-accent: #3291ff;
+  --vd-accent-soft: rgba(50, 145, 255, 0.16);
+  --vd-warning: #f5b84a;
+
+  --color-fd-background: var(--vd-bg);
+  --color-fd-foreground: var(--vd-ink-2);
+  --color-fd-card: var(--vd-surface);
+  --color-fd-card-foreground: var(--vd-ink-2);
+  --color-fd-popover: var(--vd-surface);
+  --color-fd-popover-foreground: var(--vd-ink-2);
+  --color-fd-secondary: var(--vd-surface-2);
+  --color-fd-muted: var(--vd-surface-2);
+  --color-fd-accent: var(--vd-raised);
+  --color-fd-border: var(--vd-line);
+  --color-fd-muted-foreground: var(--vd-muted);
+  --color-fd-primary: var(--vd-accent);
 }
 
-/* Typography rules (vawe-hq/vawe site/DESIGN.md "Typography rules"): the same values as the site's tokens. */
-:root {
-  --measure: 46ch;
-  --fw-head: 600;
+/* neutral.css greys the dark sidebar; the site ground is pure black, so the sidebar keeps the docs tokens. */
+.dark #nd-sidebar {
+  --color-fd-muted: var(--vd-surface-2);
+  --color-fd-secondary: var(--vd-raised);
+  --color-fd-muted-foreground: var(--vd-muted);
 }
 
-article > p {
-  line-height: 1.45;
+/* Typography rules (vawe-hq/vawe site/DESIGN.md "Typography rules"), with the docs measure in DESIGN.md "Type scale". */
+p {
+  text-wrap: pretty;
 }
 
 body {
@@ -30,28 +88,22 @@ body {
 }
 
 .prose {
-  font-size: 16px;
-  line-height: 1.45;
+  font-size: 1rem;
+  line-height: var(--vd-lh-body);
 }
 
-.prose :is(p, ul, ol, blockquote),
-article > p {
-  max-width: var(--measure);
+.prose :is(p, ul, ol, blockquote) {
+  max-width: var(--vd-measure);
 }
 
-.prose :is(p, li, dd, blockquote),
-article > p {
+.prose :is(p, li, dd, blockquote, figcaption) {
   text-wrap: pretty;
 }
 
 .prose :is(h1, h2, h3, h4) {
-  font-weight: var(--fw-head);
-  line-height: 1.15;
+  font-weight: var(--vd-fw-head);
+  line-height: 1.2;
   text-wrap: balance;
-}
-
-.prose h1 {
-  letter-spacing: -0.045em;
 }
 
 .prose h2 {
@@ -63,15 +115,24 @@ article > p {
 }
 
 .prose strong {
-  font-weight: var(--fw-head);
+  font-weight: var(--vd-fw-head);
 }
 
 .prose table {
   font-variant-numeric: tabular-nums;
 }
 
+.prose :not(pre) > code {
+  font-size: 0.875em;
+}
+
+.prose pre {
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
 @media (max-width: 640px) {
   .prose {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
 }

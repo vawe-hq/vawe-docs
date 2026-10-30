@@ -15,6 +15,9 @@ const config = {
   // reason for proxying instead of merging.
   assetPrefix: "/docs-static",
   output: "standalone",
+  async rewrites() {
+    return [{ source: "/docs-static/media/:path*", destination: "/media/:path*" }];
+  },
 };
 
 export default withMDX(config);

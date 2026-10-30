@@ -1,9 +1,16 @@
-import { defineDocs, defineConfig } from 'fumadocs-mdx/config';
+import { defineDocs, defineConfig, frontmatterSchema } from 'fumadocs-mdx/config';
+import { z } from 'zod';
 import remarkTypo from './lib/remark-typo.mjs';
 
 export const docs = defineDocs({
   dir: 'content/docs',
-  docs: { postprocess: { includeProcessedMarkdown: { headingIds: false } } },
+  docs: {
+    schema: frontmatterSchema.extend({
+      blog: z.array(z.object({ slug: z.string(), title: z.string() })).optional(),
+      tocDepth: z.number().int().min(2).max(4).optional(),
+    }),
+    postprocess: { includeProcessedMarkdown: { headingIds: false } },
+  },
 });
 
 export default defineConfig({
