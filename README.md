@@ -1,12 +1,16 @@
-# docs-site/
+# vawe-docs
 
-A standalone fumadocs (Next.js) app that publishes MDX documentation pages. Separate from
-`guides/` and `taste/`, which are the doctrine an agent reads while authoring; this is the public site build.
+The documentation app for vawe: fumadocs 16, fumadocs-mdx 15 and Next 16. It is served at
+https://vawe.dev/docs. The site in vawe-hq/vawe (a separate Next 15 app) proxies `/docs/*` and
+`/docs-static/*` to this app, which runs in its own container.
 
-Read by: a human browsing the published docs, and Next.js at build/dev time. Not read by the engine or
-by an authoring agent.
+Run it locally: `npm ci && npm run dev`, then open http://localhost:3000/docs.
 
-The one doc: `docs-site/content/docs/`, the MDX source. No gate covers this folder; `npm run build`
-inside it is the check (fumadocs 16 + mdx 15 + Next 16 must stay lockstep).
+Content is in `content/docs/*.mdx`. The page order is `content/docs/meta.json`.
 
-Look first: `docs-site/content/docs/` for the pages, `docs-site/package.json` for the version pins.
+`vendor/vawe/` holds copies of vawe code that the pages import (motion helpers, the typography
+function, the Accept-header parser). The vawe-hq/vawe repo pushes them. Do not edit them here.
+
+Keep fumadocs, fumadocs-mdx and Next on matching major versions.
+
+The Docker image listens on port 3000: `docker build -t vawe-docs . && docker run -p 3000:3000 vawe-docs`.
