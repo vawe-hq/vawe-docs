@@ -20,7 +20,7 @@ The renderer reads `<meta name="..." content="...">` before the page runs.
 | `duration` | The film length in seconds, or `auto` (see below). | The end of the last animation. | `<meta name="duration" content="12.4">` |
 | `aspect` | The <Term id="aspect">aspect</Term> of the film. `--aspect` on a render verb replaces it. | `16:9` | `<meta name="aspect" content="9:16">` |
 | `fps` | The rate of your frame tables. The render rate is separate. | None. `window.vawe.fps` is `undefined`. | `<meta name="fps" content="30">` |
-| `message` | The one thing a viewer must remember. The layout check and the judge read it. | None. | `<meta name="message" content="zero fees">` |
+| `message` | The one thing a viewer must remember. The storyboard, `frames` and the fresh judge read it. | None. | `<meta name="message" content="zero fees">` |
 | `spectacle` | The second of the one big moment. Put quiet before it. | None. | `<meta name="spectacle" content="6.2">` |
 | `signature` | Six dials, written as `dial=value` pairs split by `;`: `band`, `ease`, `stagger`, `seam`, `palette`, `thread`. | None. | `<meta name="signature" content="band=professional; ease=land">` |
 | `loudness` | A delivery loudness in LUFS. The mix then normalises to it. See [Audio](/docs/audio). | The mix is not normalised. | `<meta name="loudness" content="-14">` |

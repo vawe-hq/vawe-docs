@@ -30,7 +30,7 @@ Audio is `<audio>` tags in the page. The renderer never plays them live. It read
 | `data-trim` | The second of the file where playback starts. | `0` |
 | `data-trim-end` | The second of the file where playback ends. Each cut gets an 8 ms fade, so there is no click. | The end of the file |
 | `data-duck` | How many dB this cue lowers the music while it plays. | `-18` for a `data-role="vo"` cue, else none |
-| `data-role` | `vo` marks a voice-over. | `music` when the tag has `loop`, else a sound effect |
+| `data-role` | `vo` marks a voice-over. | `music` when the tag has `loop`, else a cue (`sfx`) |
 | `data-on` | `world:<id>`: `data-at` counts from the first second that world `<id>` shows. See [Worlds](/docs/worlds). | None |
 | `data-length` | The length in seconds of the move a voice sits under. Only `air` and `swoosh-long` read it. | The voice default |
 | `loop` | Marks a music file. It repeats to fill the film. | Off |

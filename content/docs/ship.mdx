@@ -70,7 +70,7 @@ The result includes a final check and the judge. Fix the worst finding first. It
 |---|---|
 | `--aspect all` | one file for each aspect; or give a W:H ratio such as `9:16` |
 | `--out <path>` | the output file (not with `--aspect all`); the default is `out/<name>.mp4` |
-| `--wait` | block until the render ends, instead of a background job |
+| `--wait` | wait until the render ends, instead of a background job |
 | `--profile` | print a cost table: frames, subframes, screenshots, capture and encode seconds, the 5 costliest seconds |
 
 ## What you see
@@ -117,5 +117,5 @@ If a gate refuses, the message says which one and ends with the command to run, 
   ship warnings: harness/live/ship-warn.mjs, harness/lib/board.mjs (shipWarnings)
   show the draft with sheet: harness/lib/approval.mjs (SHOW_OWNER); AGENTS.md "Hard rules"
   iterate on drafts until PASS: skills/vawe-page/SKILL.md "Commands"
-  ship refuses for a recreation: AGENTS (REFERENCE-STUDY.md "Recreating a reference end to end"); bin/vawe critique --help (--final)
+  ship refuses for a recreation: harness/media/render-page.mjs assertFinalReady (unverified-final); bin/vawe critique --help (--final)
 */}

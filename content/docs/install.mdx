@@ -20,7 +20,7 @@ By the end of this page, `bin/vawe doctor` reports no missing tool and you can r
 | ffprobe | yes | Part of the ffmpeg package. |
 | puppeteer Chrome | yes | Draws every frame of the page. |
 | `assets/fonts` | yes | The free font faces. The folder must hold files. |
-| tesseract | no | OCR for `vawe spec` and `vawe coverage --text`. |
+| tesseract | no | OCR for `vawe see` (also `see --spec`) and `vawe check coverage --text`. |
 
 ## Install
 
@@ -73,10 +73,10 @@ When all is well, you see one line: `ok, 7 checks (macOS)`. The system name chan
 | `--quiet` | Prints only problems and writes `.vawe/doctor.json`. |
 | `--json` | Prints `[{tool, required, ok, version, fix}]` instead of text. |
 
-Example output for a Node that is too old:
+The output for a Node that is too old, on macOS, has this form. `<version>` is the version that `doctor` finds.
 
 ```text
-MISSING  node 22+: found v20.11.0, need 22 or newer
+MISSING  node 22+: found v<version>, need 22 or newer
          fix: brew install node
 1 required tool(s) missing.
 ```
@@ -87,7 +87,7 @@ The postinstall step runs `doctor --quiet`, so the result is in `.vawe/doctor.js
 
 | What you see | Why | What to do |
 |---|---|---|
-| `found v20.x, need 22 or newer` | Node is too old. | Install Node 22 or newer. |
+| `found v<version>, need 22 or newer` | Node is too old. | Install Node 22 or newer. |
 | `ffmpeg not on PATH` | ffmpeg is not installed, or not in `PATH`. | Run the `fix:` line of `doctor`. |
 | `this ffmpeg build cannot run libx264 encode or drawtext` | The ffmpeg build lacks an encoder or a filter. | Install a full ffmpeg build. On Fedora and RHEL, enable the RPM Fusion repository first. |
 | `puppeteer has no Chrome download` | The install skipped the Chrome download. | Run `npm install`, then `npx puppeteer browsers install chrome`. |
@@ -106,10 +106,10 @@ Output can differ between hosts that rasterise on a different GPU or Chrome vers
 </Cards>
 
 {/* sources (vawe d8481cc61):
-  requirements table, seven checks, required flags, optional tesseract: harness/dev/doctor.mjs TOOLS list
+  requirements table, seven checks, required flags, optional tesseract: harness/dev/doctor.mjs TOOLS list; OCR users: bin/vawe see --help (--no-ocr, --spec), harness/media/coverage.mjs --text
   Node 22: harness/dev/doctor.mjs probeNode; README.md "Install"
   doctor flags, exit code: bin/vawe doctor --help; harness/dev/doctor.mjs header
-  output format: harness/dev/doctor.mjs report block; the version in the example is invented to show the format
+  output format: harness/dev/doctor.mjs report block and probeNode (found ${process.version}, need 22 or newer); brew line: MANAGERS.brew + TOOLS node pkg
   ok line: harness/dev/doctor.mjs final report block
   postinstall (doctor --quiet), puppeteer note: package.json "scripts" and "//puppeteer-note"; clone URL and Chrome command: README.md "Quickstart"
   .vawe/doctor.json: harness/dev/doctor.mjs RESULT_FILE

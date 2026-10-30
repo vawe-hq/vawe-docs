@@ -72,11 +72,11 @@ A literal is a tunable number that you write in the page: a `[[f, v]]` table row
 
 ### Param [#param]
 
-A param is a page option that you pass with `--param key=value`, and the page reads it with `new URLSearchParams(location.search)`. One page can then render several looks or rows of data, and each param becomes part of the output name. Read [Render flags](/docs/render-flags).
+A param is a page option that you pass with `--param key=value`, and the page reads it with `new URLSearchParams(location.search)`. One page can then render several looks or rows of data, and each param becomes part of the output name. Read [CLI](/docs/cli#the-flags-you-use-most).
 
 ### Page API [#page-api]
 
-The page API is the `window.vawe` object that the renderer sets before your scripts run: `aspect`, `width`, `height`, `fps`, `duration`, `onFrame` and more. Use it to read the render settings instead of guessing them. Read [Page API](/docs/page-api).
+The page API is the `window.vawe` object that the renderer sets before your scripts run: `aspect`, `width`, `height`, `fps`, `duration`, `onFrame` and more. Use it to read the render settings instead of guessing them. Read [The page](/docs/the-page#globals).
 
 ### Waiver [#waiver]
 
@@ -86,11 +86,11 @@ A waiver is a declared break of a check rule, with a measured reason, in the pag
 
 ### Loop [#loop]
 
-The loop is the ten stages that make a film: brief, references, design kit, states, board, draft, motion pass, critique, fix and final. Each verb prints a `next:` line that names the next stage, so you can follow the loop without a map. Read [Introduction](/docs#the-loop).
+The loop is the ten stages that make a film: brief, references, design kit, states, board, draft, motion pass, critique, fix and final. Each verb prints a `next:` line that names the next stage, so you can follow the loop without a map. Read [Use with an agent](/docs/agents#what-the-agent-does-at-each-stage).
 
 ### Stage [#stage]
 
-A stage is one step of the <Term id="loop">loop</Term>, with one command and one result. Do the stages in order: the board comes before the draft, and the critique comes before the final. Read [Introduction](/docs#the-loop).
+A stage is one step of the <Term id="loop">loop</Term>, with one command and one result. Do the stages in order: the board comes before the draft, and the critique comes before the final. Read [Use with an agent](/docs/agents#what-the-agent-does-at-each-stage).
 
 ### Brief [#brief]
 
@@ -98,7 +98,7 @@ The brief is `films/<name>/brief.md`, the file of facts and plans for one film. 
 
 ### Template [#template]
 
-A template is a file in `prompts/` for one type of film, with when to use it, the brief to fill in, a question bank and known mistakes. `vawe new --from prompts/<template>.md` starts a brief from it, so you begin from what worked before. Read [Templates](/docs/templates).
+A template is a file in `prompts/` for one type of film, with when to use it, the brief to fill in, a question bank and known mistakes. `vawe new --from prompts/<template>.md` starts a brief from it, so you begin from what worked before. Read [Write the brief](/docs/brief#choose-a-template).
 
 ### Reference [#reference]
 
@@ -150,7 +150,7 @@ A critique is a review of a draft by a session that did not write the page, run 
 
 ### Fresh session [#fresh-session]
 
-A fresh session is an agent session that did not write the page, with its own `VAWE_AGENT` name. The critique and the judge must run in one, because an author misses the faults in their own film. Read [Critique and fix](/docs/critique).
+A fresh session is an agent session that did not write the page, in a separate terminal or agent. A new `VAWE_AGENT` name in the same session does not make one. The critique and the judge must run in one, because an author misses the faults in their own film. Read [Critique and fix](/docs/critique).
 
 ### Judge [#judge]
 
@@ -176,7 +176,7 @@ To ship is to make the final with `vawe ship <page>`, which runs in the backgrou
 
 ### Move [#move]
 
-A move is a named, copyable piece of motion, such as `mask-rise` or `whip-pan`, with its CSS and Web Animations code, notes, a sound line and a clip. Moves come in seven groups, from "Reveal a title" to "Grounds", and live in `prompts/moves/`. Read [Moves](/docs/moves).
+A move is a named, copyable piece of motion, such as `mask-rise` or `whip-pan`, with its CSS and Web Animations code, notes, a sound line and a clip. Moves come in seven groups, from "Reveal a title" to "Grounds", and live in `prompts/moves/`. Read [Motion](/docs/motion#moves-to-copy).
 
 ### Recipe [#recipe]
 
@@ -196,11 +196,11 @@ An overshoot is an arrival that goes past its target and comes back. In 17 measu
 
 ### Lens [#lens]
 
-The lens is the camera in `core/surfaces/lens.js` that films a flat page like a real object, with depth of field, bloom, grain and more. It makes these effects in image space, so they look real and never come from CSS fakes. Read [Lens and effects](/docs/lens).
+The lens is the camera in `core/surfaces/lens.js` that films a flat page like a real object, with depth of field, bloom, grain and more. It makes these effects in image space, so they look real and never come from CSS fakes. Read [Motion](/docs/motion#looks-and-the-lens).
 
 ### Look [#look]
 
-A look is a named set of lens settings, such as `film-halation` or `crt`, passed as `lens(source, { look })`. `vawe frames <page> --looks` shows the page under every look, so you can compare them before you choose. Read [Lens and effects](/docs/lens).
+A look is a named set of lens settings, such as `film-halation` or `crt`, passed as `lens(source, { look })`. `vawe frames <page> --looks` shows the page under every look, so you can compare them before you choose. Read [Motion](/docs/motion#looks-and-the-lens).
 
 ### Motion blur [#motion-blur]
 
@@ -266,7 +266,7 @@ A gate is a named check that you run with `vawe check <name>`, such as `anim-tra
 
 ### Refuse [#refuse]
 
-To refuse is to stop a verb with an error instead of an advice line. vawe refuses only for a page that cannot repeat its frames, a banned item, a waiver without a valid reason or a final without approval. Read [Checks](/docs/quality-gates).
+To refuse is to stop a verb with an error instead of an advice line. vawe refuses only for a page that cannot repeat its frames, a banned item, a waiver without a valid reason, or a final without a fresh review and the owner's approval. Read [Checks](/docs/quality-gates).
 
 ### Taste rule [#taste-rule]
 
@@ -274,15 +274,15 @@ A taste rule is one written rule of film craft in `taste/rules/<id>.md`, such as
 
 ### Render key [#render-key]
 
-The render key is a short hash of the page folder, `core/` and the render settings, including each param. Two renders with the same key give the same pixels, so the renderer can reuse the frames of the first one. Read [Files and outputs](/docs/files-and-outputs).
+The render key is a short hash of the page folder, `core/` and the render settings, including each param. Two renders with the same key give the same pixels, so the renderer can reuse the frames of the first one. Read [Determinism](/docs/determinism).
 
 ### Kept frames [#kept-frames]
 
-The kept frames are the captured frames that a render stores in a folder named after its render key. A failed final resumes from them, and a second render of an unchanged page reuses them instead of capturing again. Read [Files and outputs](/docs/files-and-outputs).
+The kept frames are the captured frames that a render stores in a folder named after its render key. A failed final resumes from them, and a second render of an unchanged page reuses them instead of capturing again. Read [Determinism](/docs/determinism).
 
 ### Run log [#run-log]
 
-The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its stage, time and result. `vawe runs <film>` reads it, so you can see where a film spent its time. Read [Files and outputs](/docs/files-and-outputs).
+The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its stage, time and result. `vawe runs <film>` reads it, so you can see where a film spent its time. Read [Use with an agent](/docs/agents#the-run-log).
 
 {/* sources (vawe-hq/vawe 0933875ba):
   page, page contract, duration, world, message, spectacle, literal, param, waiver, loop, stages: AGENTS.md "Hard rules" and "The loop"

@@ -49,7 +49,7 @@ Skill type: pbakaus/typeset: one face, the name untracked, the heaviest weight o
 Skipped depth: the light is a glow drawn by the page (cites the reference frame it comes from).
 ```
 
-A reason for a skipped rung cites a reference frame path or a line of `SPEC.md`. The `frame` rung uses vawe's own rules: about 1 line and 2 or 3 things in a frame, a ground that is never flat, and an eye path. The frame rung rejects web-page patterns such as a nav, a CTA button, a pill or an eyebrow.
+A reason for a skipped rung cites a reference frame path or a line of `SPEC.md`. The `frame` rung uses vawe's own rules: about 1 line and 2 or 3 things in a frame, a ground that is never flat, and an eye path. The frame rung removes web-page patterns such as a nav, a CTA button, a pill or an eyebrow.
 
 </Step>
 <Step>
@@ -83,7 +83,7 @@ The `next:` line after the files exist names the missing rungs, if any. `bin/vaw
 | What you see | Why | What to do |
 |---|---|---|
 | Advice says a rung has no line | The line does not match `Skill <rung>: <slug>: <what it decided>` or `Skipped <rung>: <reason>` | Write the line in one of the two forms |
-| The kit looks like a web page | A builder skill added a nav, a pill or section padding | Keep the builder rung for the UI parts, then reject web-page patterns at the frame rung and say so |
+| The kit looks like a web page | A builder skill added a nav, a pill or section padding | Keep the builder rung for the UI parts, then remove web-page patterns at the frame rung and say so |
 | A new film does not look like the kit | The page set colours of its own | Take every value from `kit.css` |
 
 ## What to read next

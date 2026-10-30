@@ -44,7 +44,7 @@ Write one line for each finding under each view.
 bin/vawe judge films/hello/page.html --struct --runs A,B
 ```
 
-This prepares key frames and the rubric for a fresh session to score. The rubric has seven dimensions (`guides/judge.md`), each scored 1 to 10. The threshold is 7 on every one. Two runs, A and B, close a beat. `--fresh` scores now with a separate headless `claude` session (about 30 s); it advises and never blocks.
+This prepares key frames and the rubric for a fresh session to score. `--struct --runs A,B` writes one rubric for each run. Two judges score the 12 criteria in `harness/lib/judge-codes.mjs`, and two runs close a beat. `--fresh` scores now with a separate headless `claude` session (about 30 s). It scores each axis of `guides/judge.md` from 1 to 10, and a score under 8 needs a fix. It advises and never blocks.
 
 </Step>
 <Step>
@@ -113,7 +113,7 @@ Give the next critic the previous report. They check that each finding is fixed,
 {/* sources (vawe d8481cc61):
   critique build steps and 1 to 3 min: harness/cli/verbs.mjs (critique)
   separate session, VAWE_AGENT=critic: harness/lib/critique-gate.mjs
-  judge dimensions: guides/judge.md; Ideas view: skills/vawe-critique/SKILL.md "The judge"
+  judge criteria: harness/lib/judge-codes.mjs JUDGE_CODES (12), guides/judge.md "Commands" and "The fresh judge" (1 to 10, under 8 needs a fix); Ideas view: skills/vawe-critique/SKILL.md "The judge"
   views, report shape, judge, defaults, stop rule: skills/vawe-critique/SKILL.md
   judge flags (--struct, --runs, --fresh): bin/vawe judge --help
   fresh session, VAWE_AGENT: AGENTS.md "Every step logs", skills/vawe-critique/SKILL.md

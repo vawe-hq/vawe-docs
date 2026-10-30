@@ -98,7 +98,7 @@ export VAWE_MODEL=<model>
 
 `VAWE_AGENT` is the only way to name an agent. A subagent shares the session id of its parent, so the session cannot tell them apart. Without `VAWE_AGENT`, the log writes the first 8 characters of the session id, a `#` and a short tag. A name with a `#` counts as unnamed.
 
-The critique must come from another `VAWE_AGENT` than the author. `bin/vawe runs <name>` shows a `critique` line with the agent that ran it.
+The critique must come from another session than the author. Another `VAWE_AGENT` name in the same session does not count: `ship` refuses it. `bin/vawe runs <name>` shows a `critique` line with the agent that ran it.
 
 Read the log with `vawe runs`:
 
@@ -125,6 +125,6 @@ bin/vawe runs --all          # one row for each film of the last 30 days, then m
   approve, never self-run, fresh review: AGENTS.md "Hard rules"; bin/vawe approve --help; bin/vawe ship --help
   shell rules: AGENTS.md "Shell" and "Hard rules"
   run log fields, VAWE_AGENT, subagent note, "#": harness/lib/runlog.mjs agentId, namedAgent, appendRun
-  critique from another VAWE_AGENT: AGENTS.md "The proof before you say done" item 4
+  critique from another session, a VAWE_AGENT label is not a session: harness/lib/critique-gate.mjs critiqueProblem; AGENTS.md "The proof before you say done" item 4
   runs flags: bin/vawe runs --help
 */}

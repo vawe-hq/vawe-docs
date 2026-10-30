@@ -28,7 +28,7 @@ To measure the reference again, run `bin/vawe see <ref.mp4> --spec`. It writes `
 
 ### Read SPEC.md line by line
 
-`SPEC.md` has the measured cut list. The reference-study guide (`guides/REFERENCE-STUDY.md`) holds the judgement behind this loop. At every cut and hold it gives the time, the light map, every string on screen, the type size as a fraction of the frame height, the position of each element, the camera, the fitted curve of the one thing that moves, and every entrance and exit. Its "On-screen text" table lists the lines on screen every 0.25 s. Where the tool could not measure, measure by eye from a strip.
+`SPEC.md` has the measured cut list. For each cut and hold, it gives the time, the light map and every string on screen. It also gives the type size as a fraction of the frame height, the position of each element and the camera. Then come the fitted curve of the one thing that moves, and every entrance and exit. The "On-screen text" table of `SPEC.md` lists the lines on screen every 0.25 s. The judgement behind this loop is in `guides/REFERENCE-STUDY.md`. Where the tool could not measure, measure by eye from a strip.
 
 Write no code yet.
 
@@ -98,7 +98,7 @@ A fresh session then critiques the draft with `--ref`. Anything the draft added 
 
 | What you see | Why | What to do |
 |---|---|---|
-| Every later score is wrong | The background is wrong | Match stills first, then motion |
+| Every later score is wrong | The ground is wrong | Match stills first, then motion |
 | Three passes in a row with no progress | The loop is stuck | Stop and report; do not keep going |
 | `ship` refuses | The `critique --ref` loop has not passed for the current content | Run the loop to a pass |
 | A word of the reference is missing | You skipped a row of "On-screen text" | Walk the table row by row, or run `check coverage --text` |
