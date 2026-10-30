@@ -1,0 +1,122 @@
+---
+title: Study references
+description: Look at real films before you design. Fill the Taken from section of the brief with frames and three moves.
+icon: Film
+---
+
+At the end of this page the brief has a "Taken from" section with 4 to 6 named frames and 3 named moves. This is stage 2 of the <Term id="loop">loop</Term>. It comes before the design files, because the frames you take decide the look.
+
+You need the brief from [Write the brief](/docs/brief) and at least two <Term id="reference">reference</Term> films. References live outside the repo, in `~/.vawe/refs` (or `$VAWE_REFS_DIR`).
+
+## Steps
+
+<Steps>
+<Step>
+
+### List the references
+
+```bash
+bin/vawe refs list
+```
+
+Add a reference id to print the frame paths of that film. To add a film, give `refs add` an mp4 or a URL and a type (`product` or `brand`). `--no-measure` only downloads the film; measure it later with `bin/vawe see <id>`.
+
+```bash
+bin/vawe refs add https://youtu.be/xxxx --type product --title "Linear Agent"
+```
+
+</Step>
+<Step>
+
+### Write the frames to disk
+
+```bash
+bin/vawe refs frames <ref-id>
+```
+
+This writes the settled full-size frame of each shot into `frames/<id>/`, with a `frames.json` manifest, and prints every absolute path.
+
+</Step>
+<Step>
+
+### Read the frames at full size
+
+Open each frame with the Read tool, or in an image viewer, at full size. The frames are at `~/.vawe/refs/frames/<id>/<shot>.png`.
+
+</Step>
+<Step>
+
+### Fill "Taken from"
+
+In `films/<name>/brief.md`, add 4 to 6 rows to the "Taken from" table. Write the exact path of the frame and what you take from it.
+
+```text
+| frame (exact path) | what you take |
+|---|---|
+| films/examples/colour-sting/assets/taken-match-cut.jpg | one shape holds its place across the cut while the ground and the ink flip |
+```
+
+</Step>
+<Step>
+
+### Study how the references move
+
+```bash
+bin/vawe strip <ref-id> --cuts
+```
+
+`--cuts` writes one strip for each shot cut, centred on the cut. Do this on two references. Read every strip. The output also prints the seconds when a move starts, peaks and settles.
+
+</Step>
+<Step>
+
+### Name three moves
+
+Add three rows to the "move taken" table of "Taken from": the name of the <Term id="move">move</Term> (from `prompts/moves`), the reference id and the cut second. Also note which of the ten patterns of "The motion grammar" in `taste/craft/film-structure.md` each reference uses.
+
+```text
+| move taken | ref id | cut s |
+|---|---|---|
+| match-cut | <ref-id> | 0.60 |
+```
+
+</Step>
+</Steps>
+
+## What you see
+
+Each `strip` run prints the path of each grid. A grid holds 9 frames by default (`--fps 8`, `--span 1`), left to right and top to bottom. Read each grid at full size: the frames show the order in which the parts of the move arrive.
+
+## What good looks like
+
+- Each frame row says what you take, not only that you like it. "The name opens from behind the mark on a feathered edge" is a thing you can build.
+- Each move row has a reference id and a second. A move with no second cannot be checked.
+- The <Term id="board">board</Term> uses the moves later. `bin/vawe ship` advises when a move in "Taken from" is in no cut.
+
+The finished example is `films/examples/colour-sting/brief.md`.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The `next:` line still asks for "Taken from" | Fewer than 4 frame rows hold a path to a png, jpg or webp | Add rows until there are 4 |
+| The `next:` line asks for moves | Fewer than 3 rows in "move taken" | Run `strip --cuts` on a second reference and name more |
+| You took a look but no move | You read a contact sheet only | Read the strips of `strip --cuts` |
+
+## What to read next
+
+<Cards>
+  <Card title="Design system and kit" href="/docs/design-kit">Stage 3: turn the frames into a palette and parts.</Card>
+  <Card title="Reading your own film" href="/docs/reading-your-film">The same views for your own draft.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  refs actions and flags: bin/vawe refs --help
+  strip flags and --cuts: bin/vawe strip --help
+  motion grammar note, refs path: harness/live/stage-say.mjs (SAY.moves); harness/cli/new.mjs (takenFromText)
+  --no-measure: bin/vawe refs --help
+  4 to 6 frames, 3 moves, thresholds: harness/live/stage-say.mjs (TAKEN_FROM_MIN, MOVES_MIN, SAY.study, SAY.moves)
+  frame and move tables: films/examples/colour-sting/brief.md "Taken from"
+  ship advice on unused moves: harness/lib/board.mjs shipWarnings, harness/live/ship-warn.mjs
+  refs frames path: skills/vawe-page/SKILL.md (~/.vawe/refs/frames/<id>)
+*/}

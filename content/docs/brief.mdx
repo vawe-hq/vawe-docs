@@ -1,0 +1,125 @@
+---
+title: Write the brief
+description: Start a film with bin/vawe new. It asks for the missing details and writes films/<name>/brief.md.
+icon: FileText
+---
+
+At the end of this page you have `films/<name>/page.html` (a valid starter) and `films/<name>/brief.md`, the <Term id="brief">brief</Term> that every later <Term id="stage">stage</Term> reads. This is stage 1 of the <Term id="loop">loop</Term>.
+
+You need a vawe checkout and an ask in your own words, such as "a 5 s sting for a coffee brand".
+
+## Steps
+
+<Steps>
+<Step>
+
+### Print the open details
+
+```bash
+bin/vawe new hello --request "a 5 s sting for a coffee brand" --questions-json
+```
+
+This writes nothing. It prints the details that the ask leaves open, as calls of at most 4 questions each, with the required details first. The list lives in `DETAILS` in `harness/lib/measured-brief.mjs`.
+
+Without `--questions-json`, the verb prints the same questions as text and stops.
+
+</Step>
+<Step>
+
+### Answer them in a file
+
+Write one `key: value` line for each detail. The keys are `subject`, `message`, `show`, `format`, `assets` and `ending`.
+
+```text
+subject: Hollow, a coffee roaster for people who work from home
+message: the first cup is the best part of the day
+show: a cup filling, and the word "Hollow"
+format: 6 s, 16:9
+assets: invent everything
+ending: the Hollow wordmark
+```
+
+For one answer only, pass `--detail key=value` (repeat the flag for more).
+
+</Step>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new hello --request "a 5 s sting for a coffee brand" --answers answers.txt
+```
+
+The verb picks a <Term id="template">template</Term> from your ask and writes the two files.
+
+</Step>
+<Step>
+
+### Take the defaults when nobody can answer
+
+```bash
+bin/vawe new hello --request "a 5 s sting for a coffee brand" --defaults
+```
+
+`--defaults` guesses every open detail and marks each guess `(guess: change me)` in the brief. Use it when no person is there to answer, such as in CI.
+
+</Step>
+</Steps>
+
+## Choose a template
+
+Add `--from` to pick the template yourself. The default is the row of `guides/ROUTING.md` that your ask, the name and `--length` point at.
+
+```bash
+bin/vawe new hello --from prompts/story-explainer.md --answers answers.txt
+```
+
+`guides/ROUTING.md` lists nine film types. Two rules decide most cases:
+
+- A real product from a URL is a brand launch (`prompts/brand-launch-from-url.md`).
+- A reference mp4 that you must match is a reference rebuild. Use `--ref` and read [Match a reference film](/docs/match-a-reference).
+
+If two types fit, the shorter film wins. `--length`, `--aspect` and `--title` write their values into the brief and the page. `--aspect` takes any whole ratio, such as `16:9` or `9:16`.
+
+## What you see
+
+The verb prints the question bank of the template with a default for each question. It writes `films/hello/brief.md` with each default filled in and marked `[unanswered: default taken]`. A field that the ask did not answer holds a guess marked `(guess: change me)`.
+
+The brief also has an "Ideas" section for the later stages. The verb ends with a `next:` line that names the next stage.
+
+## What good looks like
+
+- Every `(guess: change me)` is a number or a name, not a hope. A value that you keep on purpose loses its marker.
+- The brief names a genre or a reference. A brief with no anchor reads like a template.
+- Facts only. The brief holds no plan for time yet: the board comes later.
+
+<Callout kind="note">
+The questions come once. Do not ask a second round. A wrong default is fixed at the <Term id="critique">critique</Term>.
+</Callout>
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The brief is full of `(guess: change me)` | You used `--defaults` | Replace each guess with a measured value, or keep it and delete the marker |
+| The film type is wrong | The ask matched another row of `guides/ROUTING.md` | Run the verb again with `--from prompts/<template>.md` |
+| The verb prints questions and writes nothing | You gave no `--answers`, `--detail` or `--defaults` | Answer the questions, or add `--defaults` |
+
+For how to write the ask itself, read [Prompting](/docs/prompting).
+
+## What to read next
+
+<Cards>
+  <Card title="Study references" href="/docs/references">Stage 2: pick frames and moves to take.</Card>
+  <Card title="Prompting" href="/docs/prompting">How to give an agent the details.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  new flags and examples: bin/vawe new --help
+  DETAILS keys and file: harness/lib/measured-brief.mjs:14-39
+  Ideas section: harness/cli/new.mjs (ideasText)
+  questions flow, --answers, --defaults: skills/vawe-brief/SKILL.md sections 0 to 3
+  default template: bin/vawe new --help (--from); film types: guides/ROUTING.md
+  [unanswered: default taken], (guess: change me): skills/vawe-brief/SKILL.md section 2; prompts/README.md "How to use one"
+  next stage: harness/live/stage-say.mjs (SAY.study)
+*/}
