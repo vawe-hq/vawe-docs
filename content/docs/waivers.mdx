@@ -1,0 +1,114 @@
+---
+title: Waivers
+description: Break a check rule for cause. Declare the break in the page with a measured reason, and learn what refuses and what only advises.
+icon: Scale
+blog:
+  - slug: page-contract
+    title: 'HTML to video format: the page contract'
+---
+
+A <Term id="waiver">waiver</Term> is a declared break of a check rule, with a reason, in the page. The checks accept the break only when the reason names a place and a measured value. So a waiver records a decision, not an excuse.
+
+## Why it exists
+
+A <Term id="check">check</Term> measures the page and prints advice. Some rules have a good reason to break: a held wordmark that is the last beat, for example. A waiver lets the page say so, in the one place where the checks, the critique and the judge all read it. A rule broken without a waiver is a finding in the next draft.
+
+<Callout kind="rule">
+A rule broken for cause is declared in the page with its reason, nowhere else. A waiver is for a break that is the point of the shot. For any other break, try the fix first and write `tried <what>` in the reason.
+</Callout>
+
+## How it works
+
+Put one JSON block in the page.
+
+```html
+<script type="application/json" id="authoring">
+{
+  "allow": ["world-held@3.5-6.2"],
+  "_why": {
+    "world-held@3.5-6.2": "world s4, 2.7 s: the wordmark is the last beat and a caret ticks on it"
+  }
+}
+</script>
+```
+
+| key | what it holds |
+|---|---|
+| `allow` | A list of entries. Each entry is a check code, or `code@instance`. |
+| `_why` | An object. The key is the exact `allow` entry. The value is the reason. |
+
+### Entries
+
+An entry has one of two forms.
+
+| form | covers | example |
+|---|---|---|
+| `code` | Every finding of the check, in the whole film. | `world-held` |
+| `code@a-b` | A finding that lies in the seconds `a` to `b`. | `world-held@3.5-6.2` |
+| `code@t` | A finding at the second `t`. | `static-window@2.6` |
+
+Prefer the scoped form. A bare entry hides every finding of that code, also the ones you did not see. Each check has its own code:
+
+| code | the check |
+|---|---|
+| `world-held` | A <Term id="world">world</Term> stays longer than its limit. |
+| `static-window` | The picture holds still for too long. |
+| `tile-run` | A run of near-identical frames. |
+| `tail-tiles` | The end of the film holds still. |
+| `unverified-final` | A final of a recreation, without a passing match to the reference. |
+
+The draft prints the exact line to paste after each finding that you can waive: `waive: "allow": ["world-held@3.5-6.2"], ...`. Copy the code from that line. The old code `dead-air` waives nothing, and so do `glow` and `off-colour`.
+
+### What a reason must contain
+
+A reason counts only when all of these are true:
+
+1. It has 12 characters or more.
+2. It is not generic. The words "intentional", "by design", "deliberate", "stylistic", "fine", "ok", "as intended", "on purpose", "owner approved" and "owner decision" say nothing, and a reason with fewer than three other words does not count.
+3. It names a place: a world id of this page (such as `s4`) or a second (such as `at 2.6 s`).
+4. It names a measured value, a number with a unit (such as `2.7 s`, `3.4:1`, `42%`, `18 px`). A second is one number but is not the measure. With only a second as place, the reason needs two numbers.
+5. It is not copied. The same reason on three waivers or more does not count.
+
+| reason | counts? | why |
+|---|---|---|
+| `intentional` | No | Generic and under 12 characters. |
+| `the wordmark holds on purpose` | No | No place and no number. |
+| `at 3.5 s the wordmark holds` | No | A second but one number only. |
+| `world s4, 2.7 s: the wordmark is the last beat and a caret ticks on it` | Yes | A world id and a measure. |
+
+## What refuses and what advises
+
+A finding that you did not waive is advice: the draft prints it and goes on. Only these refuse:
+
+| what | what happens |
+|---|---|
+| A broken determinism rule | The render stops. See [Determinism](/docs/determinism). |
+| A banned item, such as `data-synth="bed"` | The render stops. See [Audio](/docs/audio). |
+| A reason that does not count | The waiver covers nothing. The finding stays, and the draft says `waiver "<entry>" refused: <why>`. |
+| A final of a recreation with no passing match | `vawe ship` refuses, unless the page waives `unverified-final` with a reason that counts. |
+
+The draft lists every waiver that covers nothing, and the judge sees every waiver with its reason. When a waiver covers a rule that no earlier draft fired, and its reason does not say `tried`, the draft adds a `fix first` line.
+
+## Limits
+
+- A waiver cannot change a threshold. It accepts one finding.
+- The reason is checked for form, not for truth. A critique from a fresh session checks that the decision is right.
+- A waiver in the brief, in a comment or in another file does not count. Only `#authoring` in the page does.
+
+<Cards>
+  <Card title="Quality gates" href="/docs/quality-gates">The checks that print findings.</Card>
+  <Card title="Worlds" href="/docs/worlds">The `world-held` check.</Card>
+  <Card title="Determinism" href="/docs/determinism">The rule no waiver bends.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  block, allow, _why, entries, ranges, bare: harness/lib/waivers.mjs (splitWaiver, waiverCovers, isWaived); skills/vawe-page/SKILL.md "Waivers"; AGENTS.md "Hard rules"
+  reason rules, stop phrases, 12 chars, units, 2 numbers with only a second, REPEAT_MAX 2: harness/lib/waivers.mjs reasonProblem, STOP_PHRASES, MIN_REASON_LEN, REPEAT_MAX
+  retired codes dead-air glow off-colour: harness/lib/waivers.mjs RETIRED_CODES
+  codes world-held static-window tile-run tail-tiles: skills/vawe-page/SKILL.md "Waivers"; harness/lib/worlds.mjs heldWorlds; harness/lib/still-limit.mjs
+  unverified-final: harness/media/render-page.mjs assertFinalReady (969-979)
+  refused wording: harness/lib/waivers.mjs waiverVerdicts / waiverProblems; judge sees waivers: harness/media/judge-fresh.mjs:121
+  fix first, tried: harness/lib/waivers.mjs waiverAdvice, triedFix; AGENTS.md "Hard rules"
+  "Checks advise; only determinism, banned items and a reason that does not count refuse": skills/vawe-page/SKILL.md "Waivers"
+  waiver line printed after a finding: harness/lib/waivers.mjs waiverHint
+*/}

@@ -1,0 +1,119 @@
+---
+title: Worlds
+description: A world is the one element that holds one beat of the film. The checks, the stills and the sound cues find the beats through it.
+icon: Layers
+blog:
+  - slug: page-contract
+    title: 'HTML to video format: the page contract'
+---
+
+A <Term id="world">world</Term> is an element with `data-world="<id>"`. It holds one <Term id="beat">beat</Term> of the film: one part of the story with one idea. Each beat has its own world element.
+
+## Why it exists
+
+A page is one HTML file with no cuts in it. The renderer sees a stream of frames, so it cannot know where one beat ends and the next starts. The `data-world` attribute tells it. With the worlds, vawe can do these jobs:
+
+- `bin/vawe frames <page>` writes one still of each world, before any motion exists.
+- The `world-held` check finds a beat that stays on screen too long.
+- `bin/vawe sound <track> --cuts <page>` reads the exact world starts from the DOM and compares them with the beat grid of a music file you give.
+- `data-on="world:<id>"` on an `<audio>` tag starts a cue with a world, so the cue follows the world when you move it.
+- The text checks skip a pair of texts that belong to two different worlds, because a <Term id="cut">cut</Term> is in progress.
+- The draft check compares the Board with the page. It reports when the Board lists a different number of beats than the page has worlds.
+
+## How it works
+
+<Diagram
+  label="A page holds three world elements. The renderer samples which of them show at each frame, and gives each one a start and an end."
+  caption="The renderer reads the worlds from the DOM. It never reads them from the brief."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>s1 shows</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">0.0 to 2.1 s</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>s2 shows</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">2.1 to 4.3 s</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>s3 shows</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">4.3 to 6.0 s</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>s1 shows</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">0.0 to 2.1 s</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>s2 shows</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">2.1 to 4.3 s</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>s3 shows</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">4.3 to 6.0 s</DiagramText>
+  </svg>
+</Diagram>
+
+The draft check (`harness/media/world-sample.mjs`) seeks the page and asks of each world element, frame by frame, whether it shows. A world shows when all of these are true:
+
+1. No ancestor has `display: none`, and the element does not have `visibility: hidden`.
+2. The opacity of the element, multiplied with the opacity of its ancestors, is above 0.05.
+3. The box of the element is not empty and meets the viewport.
+
+The check reads every third frame, and every frame between two reads that differ. A world of 0.1 s or more is therefore always found, and its span is exact to the frame. The span starts at the first frame where the world shows. It ends at the first frame after it where the world is hidden.
+
+For each span the check also reads the ground (the first non-transparent background of the element, its ancestors or a large descendant) and the text that the world shows. From the text it computes the read time.
+
+## Write a world
+
+Each world is a direct block of the page. Show one world at a time, and hide the others with opacity or `display`.
+
+```html
+<div data-world="hook">
+  <h1>Zero fees</h1>
+</div>
+<div data-world="proof">
+  <p>Pay only for what you use.</p>
+</div>
+```
+
+- Use lowercase ids that match the Shots ids of the brief.
+- Give each beat one world. Do not put two beats in one world, and do not split one beat over two worlds.
+- A world that never shows gets no span (its start and end are empty).
+- Two worlds in a row that show the same ground, words and things count as one world. Cut the world where the content changes, not where the id changes.
+
+## What the checks read
+
+| check | what it reads | limit |
+|---|---|---|
+| `world-held` | The span of each world. | 2 s, or the read time of the text plus 0.8 s, whichever is longer. A margin of 0.1 s applies. |
+| read time | The words that the world shows. | A line of 4 words or more takes 0.6 s for each word. A shorter line takes 1.2 s or its words divided by 3, whichever is longer. The read time of one world never counts for more than 5 s. |
+| board match | The number of worlds, against the Board beats. | The numbers must agree. |
+
+To hold one world longer on purpose, declare a <Term id="waiver">waiver</Term>, for example `world-held@3.5-6.2`. See [Waivers](/docs/waivers).
+
+## Limits
+
+- A world has no length of its own. Its span is what the animations make visible.
+- The read time is a measure of the words, not of the meaning.
+
+<Cards>
+  <Card title="The page" href="/docs/the-page">Every meta and attribute.</Card>
+  <Card title="Time and seek" href="/docs/time-and-seek">How the renderer sets the time.</Card>
+  <Card title="Waivers" href="/docs/waivers">Hold a world longer on purpose.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  data-world, lowercase, Shots ids: AGENTS.md "Hard rules"
+  shows rules (display, visibility, opacity > 0.05 = SEEN_MIN_OPACITY, box meets viewport): harness/media/world-sample.mjs elementShows, line 7
+  every 3rd frame (STRIDE = 3) and refine: harness/media/world-sample.mjs sampleWorlds; span start/end: sampleWorlds and harness/lib/worlds.mjs worldSpans
+  ground: world-sample.mjs groundOf; read time: harness/lib/worlds.mjs readNeed, harness/lib/read-hold.mjs lineNeed, taste/build/limits.json readable-hold (0.6, 1.2, 3, 4 words, ceiling 5)
+  world-held: harness/lib/worlds.mjs heldWorlds, worldLimit, READ_MARGIN_S 0.8, SPAN_SLACK_S 0.1; turn_seconds_max 2 in taste/build/limits.json world-turns
+  merge: worlds.mjs mergeSameContent
+  frames verb: harness/media/frames.mjs header; sound --cuts <page>: bin/vawe sound --help; data-on: harness/media/page-audio.mjs header
+  text collision skips different worlds: harness/lib/text-collision.mjs:20
+  never visible = null span: harness/lib/worlds.mjs:39
+  board vs worlds: harness/lib/board.mjs:163
+*/}

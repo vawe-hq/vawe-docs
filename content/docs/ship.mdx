@@ -1,0 +1,121 @@
+---
+title: Ship
+description: Get the owner's approval of the draft, render the final with bin/vawe ship, and wait for the verdict.
+icon: Rocket
+---
+
+At the end of this page you have `out/<name>.mp4`, the <Term id="final">final</Term>, and a verdict from a fresh judge. This is stage 10 of the <Term id="loop">loop</Term>.
+
+You need a page that passed the critique on drafts. `ship` refuses without two things: a fresh review of the current page, and the <Term id="owner">owner</Term>'s approval of the full draft.
+
+## Steps
+
+<Steps>
+<Step>
+
+### Get a fresh review
+
+```bash
+bin/vawe judge films/hello/page.html --fresh
+```
+
+This starts its own session. If the `claude` CLI is missing, it exits 2. Then run `bin/vawe critique` from a separate terminal (see [Critique and fix](/docs/critique)). Either one must run on the page as it is now. An edit after the review makes the review stale.
+
+</Step>
+<Step>
+
+### Show the draft to the owner
+
+```bash
+bin/vawe sheet out/hello-draft.mp4
+```
+
+Show the full draft, then stop. The owner <Term id="approve">approves</Term> the draft with `bin/vawe approve films/hello/page.html`. An agent never runs it. The approval holds only for the page as it was when the owner approved it. If you change the page, ask again.
+
+</Step>
+<Step>
+
+### Start the final
+
+```bash
+bin/vawe ship films/hello/page.html
+```
+
+The final is 60 fps, with motion blur and the audio mixed. The job runs in the background. Before it starts, the verb prints a warning if the brief is not done (see below).
+
+</Step>
+<Step>
+
+### Wait for the job
+
+```bash
+bin/vawe wait films/hello/page.html
+```
+
+One call waits up to about 3.5 minutes and prints a progress line each minute. If it says `STILL RUNNING`, call it again. Run it alone. For a final, `bin/vawe ship --status films/hello/page.html --wait` does the same. While you wait, fill any empty Board or Motion pass rows, or prepare the critique notes.
+
+</Step>
+<Step>
+
+### Read the verdict
+
+The result includes a final check and the judge. Fix the worst finding first. Iterate on drafts with `bin/vawe dev` until the verdict is `PASS`, then ship once more.
+
+</Step>
+</Steps>
+
+## Other forms
+
+| Flag | What it does |
+|---|---|
+| `--aspect all` | one file for each aspect; or give a W:H ratio such as `9:16` |
+| `--out <path>` | the output file (not with `--aspect all`); the default is `out/<name>.mp4` |
+| `--wait` | block until the render ends, instead of a background job |
+| `--profile` | print a cost table: frames, subframes, screenshots, capture and encode seconds, the 5 costliest seconds |
+
+## What you see
+
+Before the render, `ship` prints a warning when the brief is not done:
+
+- the "Board" is not filled;
+- the "Motion pass" is not filled;
+- the beats of the Board differ from the worlds of the page;
+- "Taken from" names a move that no Board move cell contains.
+
+The warning is advice. The render goes on. The judge reads the same brief, so a plan that you keep on purpose needs a reason written in the brief.
+
+If a gate refuses, the message says which one and ends with the command to run, for example `no approval for hello` or `no fresh review of the current page`.
+
+## What good looks like
+
+- The brief is done before the final. The Board and the Motion pass have rows.
+- The final follows a review and an approval of the same page. A PASS is never self-recorded.
+- A film that recreates a reference has passed `bin/vawe critique --ref ... --final` first. `ship` refuses until that loop passes. Read [Match a reference film](/docs/match-a-reference).
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| `no fresh review of the current page` | No `judge --fresh` or separate-session critique ran on this page | Run one of the two commands in the message |
+| The critique "ran in the session that rendered the draft" | A `VAWE_AGENT` label does not make a new session | Run it in a separate terminal or agent |
+| `no approval for <film>` or `the page changed after the approval` | The owner has not approved this version | Show the draft and stop; the owner runs `bin/vawe approve` |
+| `wait` says `STILL RUNNING` | The render takes longer than one call | Call it again |
+| The verdict names a second | The judge found a defect | Fix it with `bin/vawe dev <page> --from s --to s`, then critique again |
+
+## What to read next
+
+<Cards>
+  <Card title="Match a reference film" href="/docs/match-a-reference">Recreate a reference, then ship.</Card>
+  <Card title="Troubleshooting" href="/docs/troubleshooting">When a render fails.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  ship refusal, flags, background job, --status --wait 3.5 min: bin/vawe ship --help
+  wait: bin/vawe wait --help; AGENTS.md "Shell"
+  approve (owner only), refusal messages: bin/vawe approve --help; harness/lib/approval.mjs (shipProblem, SHOW_OWNER)
+  fresh review, exit 2, same-session message: harness/lib/critique-gate.mjs
+  ship warnings: harness/live/ship-warn.mjs, harness/lib/board.mjs (shipWarnings)
+  show the draft with sheet: harness/lib/approval.mjs (SHOW_OWNER); AGENTS.md "Hard rules"
+  iterate on drafts until PASS: skills/vawe-page/SKILL.md "Commands"
+  ship refuses for a recreation: AGENTS (REFERENCE-STUDY.md "Recreating a reference end to end"); bin/vawe critique --help (--final)
+*/}

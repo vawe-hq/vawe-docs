@@ -1,20 +1,71 @@
 ---
 title: Aspect ratios
-description: One page, any ratio. Lay out with CSS, never crop.
+description: One page renders at any whole W:H ratio. Lay out with CSS, never crop.
 icon: Ratio
 ---
 
-A page renders at any `W:H` ratio of whole numbers. Five ratios are common: `16:9`, `9:16`, `1:1`, `4:5` and `4:3`. `1200:630` and `2:1` work too. You write the layout once in CSS.
+The <Term id="aspect">aspect</Term> is the width-to-height ratio of a film. A page renders at any ratio of two whole numbers, such as `16:9`, `9:16`, `1:1`, `4:5`, `4:3`, `2:1` or `1200:630`. You write the layout once in CSS, and the renderer gives it a different size.
 
-## What the renderer gives you
+## Why it exists
 
-Before your scripts run, the renderer sets:
+One film often goes to several places: a wide player, a phone feed, a square post. A film that crops one canvas to fit another loses the edges of its layout. A film that lays out again for each canvas keeps every word and every mark in the frame. So the renderer never crops. It gives the page the size of the aspect, and the page lays itself out.
 
-- `<html data-aspect="16:9">` (or the ratio being rendered)
-- `--vw` and `--vh` on `:root`, as pixel lengths
-- `window.vawe`, with `aspect`, `width`, `height` and `fps`
+## How it works
 
-Use them in CSS:
+<Diagram
+  label="One page goes into the renderer three times with three aspects. Each time the page gets its own width, height and data-aspect, and the renderer writes one film for each."
+  caption="One page, three aspects, three films. The names of the files carry the aspect."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} accent />
+      <DiagramText x={16} y={30}>page.html</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={50} />
+      <DiagramText x={16} y={110}>--aspect 16:9</DiagramText>
+      <DiagramText x={344} y={110} kind="mono" anchor="end">1920 x 1080</DiagramText>
+      <DiagramBox x={0} y={140} w={360} h={40} />
+      <DiagramText x={16} y={166}>--aspect 9:16</DiagramText>
+      <DiagramText x={344} y={166} kind="mono" anchor="end">1080 x 1920</DiagramText>
+      <DiagramBox x={0} y={190} w={360} h={30} />
+      <DiagramText x={16} y={210} kind="mono">--aspect 1:1</DiagramText>
+      <DiagramText x={344} y={210} kind="mono" anchor="end">1080 x 1080</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 141">
+    <DiagramBox x={0} y={30} w={180} h={80} accent />
+    <DiagramText x={16} y={64}>page.html</DiagramText>
+    <DiagramText x={16} y={90} kind="mono">one layout</DiagramText>
+    <DiagramArrow points={[[181, 70], [279, 70]]} />
+    <DiagramBox x={280} y={0} w={400} h={40} />
+    <DiagramText x={296} y={26}>--aspect 16:9</DiagramText>
+    <DiagramText x={664} y={26} kind="mono" anchor="end">1920 x 1080</DiagramText>
+    <DiagramBox x={280} y={50} w={400} h={40} />
+    <DiagramText x={296} y={76}>--aspect 9:16</DiagramText>
+    <DiagramText x={664} y={76} kind="mono" anchor="end">1080 x 1920</DiagramText>
+    <DiagramBox x={280} y={100} w={400} h={40} />
+    <DiagramText x={296} y={126}>--aspect 1:1</DiagramText>
+    <DiagramText x={664} y={126} kind="mono" anchor="end">1080 x 1080</DiagramText>
+  </svg>
+</Diagram>
+
+The renderer picks the aspect in this order. The first one that exists wins:
+
+1. `--aspect W:H` on a render verb.
+2. `<meta name="aspect">` in the page.
+3. `16:9`.
+
+It then sets three things before your scripts run:
+
+- `<html data-aspect="W:H">`, for example `data-aspect="9:16"`.
+- `--vw` and `--vh` on `:root`, the width and height of the layout viewport as pixel lengths.
+- `window.vawe.aspect`, `window.vawe.width` and `window.vawe.height`.
+
+The page sees an `--aspect` flag in the same way as the meta. A draft captures at half size, but the layout viewport has the full size, so a draft lays out exactly like a final.
+
+## Write the layout
+
+Use `--vh` and `--vw` for sizes and `[data-aspect]` selectors for changes between aspects.
 
 ```css
 h1 { font-size: calc(var(--vh) * 0.11); }
@@ -23,30 +74,53 @@ h1 { font-size: calc(var(--vh) * 0.11); }
 
 `--vh` holds a unit (for example `1920px`). Write `calc(var(--vh) * 0.11)`, never `* 0.11px`.
 
-Do not crop. Do not lay out in fixed pixels for 16:9.
+<Callout kind="rule">
+Never crop, and never lay out in fixed pixels for 16:9. Draft `--aspect 9:16` once before the final.
+</Callout>
 
-## Render a ratio
+## Render an aspect
 
 ```bash
 bin/vawe dev  films/<name>/page.html --aspect 9:16    # one draft
-bin/vawe ship films/<name>/page.html --aspect all     # one file per ratio
+bin/vawe ship films/<name>/page.html --aspect all     # one file for each of the five common aspects
+bin/vawe dev  films/<name>/page.html --aspect 2:1     # any whole W:H
 ```
 
-Without `--aspect`, the render uses the `aspect` meta of the page, else `16:9`. Draft `--aspect 9:16` once before the final.
+`--aspect all` renders the five aspects in the table below, one file each. Any other ratio gets its own flag value. The default output name gets the aspect (`-2x1`), so two aspects do not overwrite each other.
 
-A ratio that is not in the table gets a size that fits 1920 px on its long edge. The output name gets the ratio (`-2x1`), so two ratios do not overwrite each other. `bin/vawe still <page> --size 1200x630` writes a PNG of that size when the ratio matches the aspect.
-
-Each ratio is its own reproducible render. See [Determinism](/docs/determinism).
+`bin/vawe still <page> --size 1200x630` writes a PNG of that size. The size must have the ratio of the aspect, so pass `--aspect 1200:630` with it.
 
 ## Sizes
 
-| Ratio | Full size |
+| aspect | final size |
 |---|---|
-| `16:9` | 1920 × 1080 |
-| `9:16` | 1080 × 1920 |
-| `1:1` | 1080 × 1080 |
-| `4:5` | 1080 × 1350 |
-| `4:3` | 1440 × 1080 |
+| `16:9` | 1920 x 1080 |
+| `9:16` | 1080 x 1920 |
+| `1:1` | 1080 x 1080 |
+| `4:5` | 1080 x 1350 |
+| `4:3` | 1440 x 1080 |
 | any other `W:H` | 1920 px on the long edge |
 
-`bin/vawe ship <page> --aspect all` writes one file per ratio of the table. A draft is half this size.
+Any ratio with equal sides, such as `3:3`, gives 1080 x 1080. A draft is half the size of the table. The renderer rounds each side of the output to an even number, because the encoder refuses an odd side.
+
+## Limits
+
+- A value that is not two whole numbers, such as `16/9` or `0:1`, stops the render with an error that says `is not a W:H ratio of whole numbers`.
+- Two aspects of one page are two separate renders. Each one is <Term id="determinism">deterministic</Term> by itself. See [Determinism](/docs/determinism).
+
+<Cards>
+  <Card title="The page" href="/docs/the-page">Every meta and global.</Card>
+  <Card title="Text and fonts" href="/docs/text-and-fonts">Size text with the frame height.</Card>
+  <Card title="Determinism" href="/docs/determinism">The same page gives the same frames.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  any W:H, replaces the meta, name gets aspect, still --size: AGENTS.md "Hard rules"; bin/vawe dev|ship|still --help
+  order --aspect, meta, 16:9: harness/media/render-page.mjs resolveFrame (line 782-790); aspectOverride harness/lib/page-params.mjs
+  regex and error text: harness/lib/page-params.mjs isAspect, aspectProblem
+  sizes: core/layout/aspects.js ASPECTS, aspectDims (equal sides 1080x1080, long edge 1920)
+  data-aspect, --vw, --vh, window.vawe: core/engine/page-seek.js installPageFrame
+  half size draft, full-size viewport: harness/media/render-page.mjs header lines 11-13; even sides: resolveFrame comment line 780-781
+  --aspect all = ship help; all = Object.keys(ASPECTS): render-page.mjs main
+  calc(var(--vh) * 0.11): skills/vawe-page/SKILL.md mistakes 8 and 10
+*/}

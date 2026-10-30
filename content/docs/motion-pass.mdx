@@ -1,0 +1,112 @@
+---
+title: Motion pass
+description: Read every cut of the draft at full size, fix what reads flat, and write one row for each cut in the brief.
+icon: Activity
+---
+
+At the end of this page the draft has no flat cut, the three motion checks are clean or waived with a reason, and the brief has a filled "Motion pass". This is stage 7 of the <Term id="loop">loop</Term>.
+
+You need a full draft from [Draft](/docs/draft). The strip verbs read the last full draft, so a range draft does not count.
+
+## Steps
+
+<Steps>
+<Step>
+
+### Read the motion checks
+
+The draft prints these. Each one is clean, or the page declares a <Term id="waiver">waiver</Term> with a reason that names a world or a second and a measured number.
+
+| Check | The rule |
+|---|---|
+| `overshoot-share` | 21 to 61 percent of the arrivals that move overshoot. About 1 in 3 lands with a spring (`EASE.pop`). Type, UI and counts do not overshoot by default. |
+| `live-hold` | No span over 0.5 s outside a declared hold where no part of the frame moves by itself. A camera drift does not count. |
+| `constant-camera` | The camera moves for 60 percent of the film or less. It holds still by default. |
+| `seam-variety` | Each moving seam changes axis or direction from the one before. A hard cut is exempt. |
+
+</Step>
+<Step>
+
+### Strip every cut
+
+```bash
+bin/vawe strip films/hello/page.html --cuts
+```
+
+This writes one strip for each <Term id="world">world</Term> change, centred on the <Term id="cut">cut</Term>. Read each grid at full size. Look at how the outgoing part and the incoming part overlap.
+
+</Step>
+<Step>
+
+### Look closer at the spectacle second
+
+```bash
+bin/vawe strip films/hello/page.html --at 2.75 --onion
+bin/vawe strip films/hello/page.html --at 2.75 --velocity
+```
+
+`--onion` blends several frames of one move into one image: the newest is the strongest, and older frames are fainter. It shows the spacing, the path and the overshoot. `--velocity` graphs the speed and scale of the elements that move most, with the start, peak, settle and overshoot of each. `--sel` picks elements by a CSS selector. `--velocity` reads a page only.
+
+</Step>
+<Step>
+
+### Check each cut against the principles
+
+For each cut, check: anticipation on the hero, follow-through and overlap, eased spacing, arcs on travelling elements, secondary action, exits faster than entrances, holds alive through element motion, and a camera that is still unless it is the spectacle. The sources are `taste/craft/motion-craft.md` and `core/motion/README.md`.
+
+</Step>
+<Step>
+
+### Fix what reads flat
+
+Edit the page. Render only the seconds you changed.
+
+```bash
+bin/vawe dev films/hello/page.html --from 2 --to 4
+bin/vawe strip films/hello/page.html --at 2.75
+```
+
+</Step>
+<Step>
+
+### Write one row for each cut
+
+In `brief.md`, fill the "Motion pass" section with one row for each cut: each principle you checked, what read flat and what you fixed. The `next:` line asks for this while the section is empty.
+
+</Step>
+</Steps>
+
+## What you see
+
+Each `strip` run prints the path of an image. A grid also gives the seconds when the move starts, peaks and settles. `--onion` writes to `out/onion/<film>` and `--velocity` writes a PNG to `out/velocity`.
+
+## What good looks like
+
+- The hold is not frozen. One part moves in every hold (a line typing, a counter, a glint), not the camera.
+- A hero arrival overshoots. Most others land on a soft stop.
+- Two moving seams in a row do not go the same way.
+- Every row of "Motion pass" names a cut and a fix. The example is the last section of `films/examples/colour-sting/brief.md`.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| `strip --cuts` finds no cuts | The page has no `data-world` elements, or no full draft exists | Add the elements, then run `bin/vawe dev` |
+| A camera drift in every hold | You tried to fix `live-hold` with the camera | Give the hold an element motion instead, and keep the camera for the spectacle |
+| `ship` warns that the Motion pass is empty | The section still has its placeholder row | Write the rows; the warning is advice and does not stop the render |
+
+## What to read next
+
+<Cards>
+  <Card title="Critique and fix" href="/docs/critique">Stages 8 and 9: a fresh session looks at the draft.</Card>
+  <Card title="Motion" href="/docs/motion">Eases, springs and the moves.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  stage order and rows: AGENTS.md loop table row 7; harness/live/stage-say.mjs (SAY.motion, SAY.motionRows)
+  strip, --onion, --velocity flags: bin/vawe strip --help
+  rules: taste/rules/overshoot.md, taste/rules/live-hold.md, taste/rules/constant-camera.md, taste/rules/seam-variety.md
+  principles list: harness/live/stage-say.mjs (SAY.motion)
+  Motion pass section and ship warning: harness/lib/board.mjs (motionFilled, shipWarnings)
+  strip reads the last full draft: bin/vawe strip --help
+*/}

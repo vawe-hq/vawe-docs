@@ -1,46 +1,105 @@
 ---
 title: Audio
-description: Audio tags in the page, recorded effects, the synth fallback, and the offline mix.
+description: Audio tags in the page, every attribute the mixer reads, the synth voices, and how the offline mix works.
 icon: Volume2
+blog:
+  - slug: page-contract
+    title: 'HTML to video format: the page contract'
 ---
 
-Audio is `<audio>` tags in the page. The renderer never plays them live. It reads them and mixes one ffmpeg graph onto the video (`harness/media/page-audio.mjs`).
+Audio is `<audio>` tags in the page. The renderer never plays them live. It reads them and mixes one ffmpeg graph onto the video (`harness/media/page-audio.mjs`). This page lists each attribute that the mixer reads, the <Term id="voice">voices</Term> that you can name, and the rules of the mix.
 
 ```html
-<audio src="assets/music.mp3" loop data-at="0" data-gain="-3" data-fade-out="0.4"></audio>
-<audio data-synth="pluck" data-at="0.85" data-gain="-8"></audio>
+<audio src="assets/click.wav" data-at="0.4"></audio>
+<audio data-synth="pluck" data-at="0.85"></audio>
 <audio data-synth="swell" data-at="1.66" data-gain="-6"></audio>
 <audio src="assets/vo.wav" data-role="vo" data-at="1.0"></audio>
+<audio src="assets/music.mp3" loop data-at="0" data-fade-out="0.4"></audio>
 ```
 
-| Attribute | Meaning |
-|---|---|
-| `src` | an audio file, relative to the page |
-| `data-synth` | a synth voice from `core/audio/kit.mjs`, in place of `src` |
-| `data-at` | start time in seconds |
-| `data-gain` | gain in dB. Without it, a synth voice takes its soft default |
-| `data-fade-out` | fade-out length in seconds |
-| `loop` | marks a music file the user gives. There is no synth bed. `data-synth` refuses these names: `bed`, `pad`, `drone`, `hum`, `chord`, `swell-soft` and `braam` |
-| `data-role="vo"` | a voiceover. It ducks a music track by 18 dB while it plays |
+## Attributes
 
-## Synth voices
+| attribute | what it does | default |
+|---|---|---|
+| `src` | An audio file, relative to the page. A `<source>` child also works. | None. A tag needs `src` or `data-synth`. |
+| `data-synth` | A synth voice by name, in place of `src`. | None |
+| `data-at` | The start time in seconds. | `0` |
+| `data-gain` | The gain in dB. It is absolute: it replaces the default, it does not add to it. | The default of the voice. A `src` file has 0 dB. |
+| `data-fade-in` | The length of a fade in, in seconds. | `0` |
+| `data-fade-out` | The length of a fade out, in seconds. | `0` |
+| `data-trim` | The second of the file where playback starts. | `0` |
+| `data-trim-end` | The second of the file where playback ends. Each cut gets an 8 ms fade, so there is no click. | The end of the file |
+| `data-duck` | How many dB this cue lowers the music while it plays. | `-18` for a `data-role="vo"` cue, else none |
+| `data-role` | `vo` marks a voice-over. | `music` when the tag has `loop`, else a sound effect |
+| `data-on` | `world:<id>`: `data-at` counts from the first second that world `<id>` shows. See [Worlds](/docs/worlds). | None |
+| `data-length` | The length in seconds of the move a voice sits under. Only `air` and `swoosh-long` read it. | The voice default |
+| `loop` | Marks a music file. It repeats to fill the film. | Off |
 
-`pluck`, `chime`, `sparkle`, `droplet`, `bloom`, `success`, `ready`, `whoosh`, `riser`, `swell`, `impact`, `drop`.
+Leave `data-gain` off unless you move one cue on purpose.
 
-Each voice is synthesized from parameters with a seeded generator, so a cue gives the same bytes on every machine. Default gains: UI cues (`pluck`, `chime`, `sparkle`, `droplet`, `bloom`, `success`, `ready`) -6 dB, `whoosh`, `riser` and `swell` -4 dB, and the weight voices `impact` and `drop` -2 dB.
+## Voices
+
+`bin/vawe sound` with no argument lists the voices, with the default gain and the tail of each.
+
+| voice | default gain | length |
+|---|---|---|
+| `pluck`, `chime`, `sparkle`, `droplet`, `bloom`, `success`, `ready` | -6 dB | 0.78 s to 3.56 s |
+| `whoosh`, `riser`, `swell` | -4 dB | 0.89 s to 1.75 s |
+| `drop`, `impact` | -2 dB | 4.20 s and 0.83 s |
+| `tap` | -3 dB | 0.49 s |
+| `tick`, `air`, `swoosh-long`, `sub-thump` | -5 dB | 0.24 s to 2.09 s |
+| `shimmer`, `glass` | -7 dB | about 2.2 s |
+
+A voice is synthesized from parameters with a seeded generator, so a cue gives the same bytes on every machine.
+
+### What is refused
+
+A `data-synth` of `bed`, `pad`, `drone`, `hum`, `chord`, `swell-soft` or `braam` stops the render with `synth beds are banned`. A constant synth sound does not read as music. A music track comes only from a file that you give. A name that is not a voice stops the render with a list of the voices. A missing file stops it with the path that the renderer looked for.
 
 ## The mix
 
-The mix is as written. It sums the cues at their gains. It does not normalise. At the default gains, a film lands near -20 LUFS. A safety limiter at -1 dBTP never raises a level. Add `<meta name="loudness" content="-14">` to normalise to a delivery target.
+The mix is as written. The mixer sums the cues at their gains. It does not normalise. Only a safety limiter runs, and it never raises a level. A film with a few soft cues lands near -20 LUFS.
+
+- To normalise to a delivery level, write `<meta name="loudness" content="-14">`.
+- The voice-over ducks a music file by 18 dB, with a 0.05 s attack and a 0.3 s release.
+- A music file with `loop` repeats until the film ends, and starts when `data-at` says.
+- A draft with a `--from` or `--to` window is silent. `bin/vawe dev <page> --silent` leaves the audio out of a whole draft.
+
+### Checks on the sound
+
+| check | what it says | limit or where |
+|---|---|---|
+| level | The mix is outside the band, with the `data-gain` fix. | -24 to -16 LUFS, peak at most -3 dBFS |
+| cue balance | One cue peaks more than 6 dB above the median cue. | 6 dB |
+| bed motion | A looped music file keeps one spectrum for the whole film. A drone is not a bed. | A spectral change of at least 0.1 |
+| `cue-not-heard` | A cue has no onset in the rendered audio near its `data-at`. | `bin/vawe critique <page>` |
+| `cue-onset-drift` | A sample starts early or late from its `data-at`. | `bin/vawe critique <page>` |
+| `sound-off-hit` | A cue sounds off the cut or the spectacle it belongs to. | `bin/vawe critique <page>` |
 
 ## Taste
 
-Sound is felt, not noticed. Use real recorded effects first (`resources/README.md` lists sites); a synth voice is the fallback. A few soft ticks and at most one swell beat many hits. Cue the first and the last key word, not every word. Use `impact` or `drop` only when the brief asks for weight. The mix warns when one cue peaks more than 6 dB above the median cue.
+Sound is felt, not noticed. Use a recorded effect first. With none that fits, use no cue. A few soft ticks and at most one swell beat many hits. Cue the first and the last key word, not every word.
 
 Name each beat once in CSS (`--beat-2: 1.85s`) and read it in every delay of that beat. One edit then moves the beat.
 
-## Check it
+To fit a recorded effect, run `bin/vawe sound <file> --sfx --film <page> --trim a,b`. It writes `assets/sfx/<name>.mp3` and prints the `<audio>` line to paste. To read the cues of a page, run `bin/vawe sound <page> --at 0.8,2.75` or add `--waveform`.
 
-`bin/vawe critique <page>` runs `page-check`. It reports a cue with no onset in the rendered audio (`cue-not-heard`), a cue more than two frames from its `data-at` (`cue-onset-drift`), and a cue off the cut it belongs to (`sound-off-hit`).
+<Cards>
+  <Card title="Determinism" href="/docs/determinism">Why a cue gives the same bytes.</Card>
+  <Card title="Worlds" href="/docs/worlds">Start a cue with a world.</Card>
+  <Card title="The page" href="/docs/the-page">Every meta, including loudness.</Card>
+</Cards>
 
-A whole draft mixes the audio tags. A `--from/--to` window is silent, and `bin/vawe dev <page> --silent` leaves the audio out.
+{/* sources (vawe d8481cc61):
+  attributes, defaults, ducks, data-on, data-length, trim, fades: harness/media/page-audio.mjs header lines 3-17 and readPageAudio (lines 70-97); CUT_FADE 0.008; VO_DUCK_DB -18, DUCK_ATTACK 0.05, DUCK_RELEASE 0.3 (lines 30-37)
+  role default: readPageAudio role: el.dataset.role || (el.loop ? 'music' : null), then 'sfx'
+  voices, gains, lengths: bin/vawe sound (no argument) at d8481cc61; DEFAULT_GAIN_DB core/audio/kit.mjs
+  refused names and message: harness/media/page-audio.mjs BANNED_SYNTH, BANNED_MESSAGE; unknown voice and missing file messages: lines 90-95; AGENTS.md "Hard rules"
+  mix as written, limiter, loudness meta: harness/media/page-audio.mjs header lines 15-17; about -20 LUFS: taste/build/limits.json sound-level lufs_target
+  window silent, --silent: harness/media/render-page.mjs header lines 7-9; bin/vawe dev --help
+  level band, peak, cue 6 dB, bed_change_min 0.1: taste/build/limits.json sound-level; harness/lib/cue-balance.mjs; harness/lib/bed-motion.mjs:65
+  cue codes: quality/gates/page-check.mjs checkOneCue
+  loop repeats to fill: harness/media/page-audio.mjs trackChain (aloop for music)
+  sfx and --at, --waveform: bin/vawe sound --help; taste/craft/sound.md
+  taste lines: skills/vawe-page/SKILL.md "Sound is felt, not noticed"
+*/}

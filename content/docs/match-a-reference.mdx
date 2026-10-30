@@ -1,0 +1,123 @@
+---
+title: Match a reference film
+description: Rebuild one reference as a page. Measure it into SPEC.md, mark every line KEEP or CHANGE, then loop the critique until the match passes.
+icon: Copy
+---
+
+At the end of this page you have a page that matches the light, the pacing, the type and the curves of one <Term id="reference">reference</Term> film, and a `critique --ref` that passes. This is a <Term id="recreation">recreation</Term>.
+
+Use it when you must match a film, not when you are "inspired by" one. References are in-house and never published. The length of the film is the length of the reference, never longer.
+
+## Steps
+
+<Steps>
+<Step>
+
+### Start the recreation
+
+```bash
+bin/vawe new hello-remake --ref quality/refs/ad/source.mp4
+```
+
+This writes `films/recreations/hello-remake` with a page starter and `SPEC.md`. `--score` also renders the starter and scores it against the reference (slow).
+
+To measure the reference again, run `bin/vawe see <ref.mp4> --spec`. It writes `SPEC.md` and `spec.json` next to the reference, or into `--out`.
+
+</Step>
+<Step>
+
+### Read SPEC.md line by line
+
+`SPEC.md` has the measured cut list. The reference-study guide (`guides/REFERENCE-STUDY.md`) holds the judgement behind this loop. At every cut and hold it gives the time, the light map, every string on screen, the type size as a fraction of the frame height, the position of each element, the camera, the fitted curve of the one thing that moves, and every entrance and exit. Its "On-screen text" table lists the lines on screen every 0.25 s. Where the tool could not measure, measure by eye from a strip.
+
+Write no code yet.
+
+</Step>
+<Step>
+
+### Mark every line KEEP or CHANGE
+
+- **KEEP:** what the reference does that you want exactly: the light, the pacing, the curves, the type scale.
+- **CHANGE:** the content (your strings and captures), anything that breaks a house rule, and anything measured off the grid.
+
+An unmarked line is a bug. Show the KEEP/CHANGE list before you rebuild.
+
+</Step>
+<Step>
+
+### Rebuild, light first
+
+Match in this order: the light map, then the camera and depth of field, then the type, then the detail. Every KEEP line becomes a literal in the page: a `@keyframes` stop, an `element.animate` keyframe or a `[[f, v]]` table in `seek(t)`.
+
+Check a few frames without a render:
+
+```bash
+bin/vawe sheet films/recreations/hello-remake/page.html --ref quality/refs/ad/source.mp4 --at 2.5,3.1,4
+```
+
+Each row of the sheet is the reference on the left and your page on the right, at the same second. `--at cuts` uses the middle of each world change of the last full draft. Do not render a range only to look at a few frames.
+
+</Step>
+<Step>
+
+### Loop the critique
+
+```bash
+bin/vawe critique films/recreations/hello-remake/page.html --ref quality/refs/ad/source.mp4
+```
+
+The verb compares the draft with the reference at the same timestamps and prints a match score. Use `--from` and `--to` to match only a range of seconds. Loop until the score passes.
+
+</Step>
+<Step>
+
+### Pass at full size, then ship
+
+```bash
+bin/vawe critique films/recreations/hello-remake/page.html --ref quality/refs/ad/source.mp4 --final
+```
+
+`--final` matches the full-size render. A pass unlocks `bin/vawe ship`. Then read [Ship](/docs/ship).
+
+</Step>
+</Steps>
+
+## What good looks like
+
+`check coverage` is the done check. Render once, then run it:
+
+```bash
+bin/vawe check coverage out/hello-remake.mp4 --ref quality/refs/ad/source.mp4 --min 0.5
+```
+
+It prints the SSIM of your render against the reference every 0.1 s (`--step`), writes a sheet of the 6 worst moments and exits 1 when any second falls below `--min`. Fix the seconds it lists. `--text` checks the on-screen words instead: every reference row must be in yours within 0.25 s.
+
+A fresh session then critiques the draft with `--ref`. Anything the draft added that the reference does not have, and no CHANGE line names, is a rejection.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| Every later score is wrong | The background is wrong | Match stills first, then motion |
+| Three passes in a row with no progress | The loop is stuck | Stop and report; do not keep going |
+| `ship` refuses | The `critique --ref` loop has not passed for the current content | Run the loop to a pass |
+| A word of the reference is missing | You skipped a row of "On-screen text" | Walk the table row by row, or run `check coverage --text` |
+
+`critique --ref` scores the match, not taste. The taste critique is a separate step: [Critique and fix](/docs/critique).
+
+## What to read next
+
+<Cards>
+  <Card title="Critique and fix" href="/docs/critique">The fresh look, with a reference.</Card>
+  <Card title="Study references" href="/docs/references">Add and read references.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  new --ref, --score: bin/vawe new --help
+  see --spec: bin/vawe see --help
+  sheet --ref, --at cuts: bin/vawe sheet --help
+  critique --ref/--from/--to/--final: bin/vawe critique --help
+  check coverage flags: harness/media/coverage.mjs header and flags (--ref, --step, --min, --out, --text)
+  SPEC contents, KEEP/CHANGE, order, three-pass stop, fresh critique: skills/vawe-reference/SKILL.md
+  ship refuses until the loop passes: guides/REFERENCE-STUDY.md "Recreating a reference end to end"
+*/}

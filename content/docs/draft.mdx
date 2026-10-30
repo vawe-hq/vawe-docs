@@ -1,0 +1,108 @@
+---
+title: Draft
+description: Render a fast half-size draft with bin/vawe dev, or only the seconds you changed.
+icon: Zap
+---
+
+At the end of this page you have `out/<name>-draft.mp4` and a list of checks that name what is wrong. This is stage 6 of the <Term id="loop">loop</Term>. You make many <Term id="draft">drafts</Term> and one <Term id="final">final</Term>.
+
+You need a page with motion and a filled "Board".
+
+## Steps
+
+<Steps>
+<Step>
+
+### Render the draft
+
+```bash
+bin/vawe dev films/hello/page.html
+```
+
+The draft is half size at 30 fps, with the sound of the `<audio>` tags mixed. The verb also writes a key-frame sheet PNG next to the mp4. It prints the plan status first: what is empty and what the plan findings are.
+
+</Step>
+<Step>
+
+### Render only a range
+
+```bash
+bin/vawe dev films/hello/page.html --from 2 --to 6
+```
+
+The file is `out/<name>-draft-<from>-<to>.mp4`. A range is silent. Use it for the seconds you just fixed.
+
+</Step>
+<Step>
+
+### Leave the sound out
+
+```bash
+bin/vawe dev films/hello/page.html --silent
+```
+
+`--silent` gives a picture-only draft and is faster.
+
+</Step>
+<Step>
+
+### Check another aspect
+
+```bash
+bin/vawe dev films/hello/page.html --aspect 9:16
+```
+
+The value is a W:H ratio of whole numbers. The common ones are `16:9 9:16 1:1 4:5 4:3`. The default is the page meta, else 16:9. Draft a second <Term id="aspect">aspect</Term> once before the final.
+
+</Step>
+</Steps>
+
+## What you see
+
+`dev` runs the checks and prints a line for each problem, with a fix. It writes every taste line to `out/<name>.dev.md`. Add `--taste` to print them. The `next:` line names the motion pass.
+
+The ship-tier checks are optional here:
+
+| Flag | What it adds |
+|---|---|
+| `--fast` | only the fast checks: page errors, text size and collisions, still windows, tail tiles, smoothness, motion lint on declared animations |
+| `--full` | per-frame box motion lint, object tracks, loudness and peak |
+| `--taste` | print the taste lines |
+| `--lock-length` | write the found length of a `duration="auto"` page into its meta |
+| `--no-judge` | skip the stills judge that runs on the three directions (about 25 s) |
+
+The three motion checks that the next stage needs are `overshoot-share`, `live-hold` and `seam-variety`. Read [Motion pass](/docs/motion-pass).
+
+## What good looks like
+
+- Every acceptance row of the brief is green or has a reason. Read the list with [Quality gates](/docs/quality-gates).
+- A range draft shows the fixed seconds only. The whole draft is the one to judge.
+- Your page changed after the last draft? The next step is another draft, and the `next:` line says so.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The draft has no sound | A range draft is silent, or you passed `--silent` | Render the whole draft without `--silent` |
+| A fix looks right in the range, wrong in the whole film | The range shows no neighbour cuts | Render the whole draft before the critique |
+| `readable-text-size` advice | The text is too small to read at the size of the draft | Make the text larger |
+| `dev` takes long | The stills judge runs once for each change of the directions | Add `--no-judge` while you iterate |
+
+Never pipe `bin/vawe` into `head`, `tail` or `grep`: the pipe hides the exit code.
+
+## What to read next
+
+<Cards>
+  <Card title="Motion pass" href="/docs/motion-pass">Stage 7: read every cut.</Card>
+  <Card title="Reading your own film" href="/docs/reading-your-film">Look at frames, not only at checks.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  dev flags and examples: bin/vawe dev --help (sound, --silent, --lock-length)
+  plan status first: AGENTS.md "The proof before you say done"
+  out/<name>-draft.mp4 default and range name: bin/vawe dev --help (--out)
+  out/<name>.dev.md: harness/live/stage-say.mjs comment ("they are always in out/<name>.dev.md")
+  next line: harness/live/stage-say.mjs (SAY.motion)
+  readable-text-size, key-frame sheet: WRITING.md section 5 and bin/vawe dev --help
+  pipe warning: content/docs/style-guide.mdx
+*/}

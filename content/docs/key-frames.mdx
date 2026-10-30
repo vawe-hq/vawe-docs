@@ -1,0 +1,144 @@
+---
+title: Key frames and the board
+description: Build one still per world from the kit, then plan the time in the Board before you write any motion.
+icon: LayoutGrid
+---
+
+At the end of this page every world of the page has a still that you looked at, and the brief has a filled "Ideas" ledger and "Board". These are stages 4 and 5 of the <Term id="loop">loop</Term>. Both come before the motion, because a layout or timing error is cheap to fix now and costly after a render.
+
+You need the design kit from [Design system and kit](/docs/design-kit) and a `films/<name>/page.html` with one `data-world` element for each beat.
+
+## Build the key frames
+
+<Steps>
+<Step>
+
+### Build one static state for each world
+
+Use the kit parts only. Aim for about 1 line and 2 or 3 things in each frame. Add no motion yet. Give the ground a light, grain or depth device that you named from a reference frame.
+
+</Step>
+<Step>
+
+### Render the stills
+
+```bash
+bin/vawe frames films/hello/page.html
+```
+
+This writes one still for each `data-world` element, with the other worlds hidden. It also writes a contact sheet and prints the still-frame layout rules. It takes about 2 s.
+
+</Step>
+<Step>
+
+### Look at them at full size
+
+```bash
+bin/vawe frames films/hello/page.html --full --world s3,s5
+```
+
+`--full` writes stills at the size of the page (1920x1080 for 16:9) as `out/<name>-frames/<id>-full.png`. `--world` limits the run to the listed ids. Read each file. Fix text that is cramped, overlapping or unreadable now.
+
+</Step>
+</Steps>
+
+A <Term id="key-frame">key frame</Term> is the settled state of one world. If a still has a flat ground, add a device and render again. To try the lens looks on one frame, use `bin/vawe frames <page> --looks --at <s>`.
+
+## Fill the ideas
+
+Before the board, fill the "Ideas" table of `brief.md`. Write one row for each beat and each cut. Each row has a meaning, four ideas from four different devices (each with a typicality number from 0 to 1), the idea you chose, and a reason with the word `because`. Choose an idea that is not the most typical. The method is in `guides/IDEATE.md`. `bin/vawe check ideas <page>` advises on the ledger.
+
+## Fill the board
+
+The <Term id="board">board</Term> is a plan for time, not for frames. Run `bin/vawe storyboard films/hello/page.html` first. It lists what the taste docs say about the plan. Add the board to `brief.md` under the heading "Board". It has four parts.
+
+<Steps>
+<Step>
+
+### Rhythm
+
+List each beat with its start, its hold and its cut-out length. The cuts must not all be equal: one under 0.4 s and one over 0.9 s.
+
+```text
+| beat | in s | hold s | cut out s (length) |
+|---|---|---|---|
+| cold | 0.00 | 0.70 | 0.70 (0.00) |
+```
+
+</Step>
+<Step>
+
+### Spectacle
+
+Write one line: `Spectacle: the one big moment at 2.75 s`. Put the same second in `<meta name="spectacle" content="2.75">`. Plan quiet before it. The <Term id="spectacle">spectacle</Term> second and the meta must differ by 0.25 s at most.
+
+</Step>
+<Step>
+
+### A named move for each cut
+
+Add one row for each cut. Each row names a <Term id="move">move</Term> from `prompts/moves/README.md`, what carries the eye, what leaves first, the overlap in seconds, the camera, the depth, which arrivals overshoot, and the handoff.
+
+```text
+| cut | move (prompts/moves) | what carries the eye | what leaves first | overlap s | camera | depth | overshoots | handoff (family: object) |
+```
+
+The handoff cell holds a family of the twelve in `taste/craft/transitions.md` and the object that carries over, for example `position lock: the lockup holds while ground and ink flip`. If nothing carries over, write `deliberate cut: <reason>`. Do not use the same family on two adjacent cuts, or on more than two cuts. Do not write "fade" as a move. Use the moves you named in "Taken from". The procedure is in `skills/vawe-transitions/SKILL.md`.
+
+</Step>
+<Step>
+
+### Sound
+
+Add rows under a table whose first column is `at s`. Plan small effects on actions: a recorded effect first, and a <Term id="voice">voice</Term> for a cut or the spectacle. Plan no bed. A silent film has one row with the voice `none`. List the voices with `bin/vawe sound`. The rules are in `taste/craft/sound.md`.
+
+```text
+| at s | voice | gain dB | for |
+|---|---|---|---|
+| 0.70 | tick | -14 | the turn cut |
+```
+
+</Step>
+</Steps>
+
+## What you see
+
+`bin/vawe` reads the board and advises. It never refuses. The advice lines start with `board:` or `transitions:` and say, for example, `all 5 cuts last 0.7 s; vary them` or `cuts 1 and 2 both use flood; change the family on adjacent cuts`. A plan that you keep on purpose needs no change.
+
+The example is the "Board" section of `films/examples/colour-sting/brief.md`.
+
+## What good looks like
+
+- The beats of the board match the worlds of the page. The `ship` verb advises when the start of a beat differs from the page by more than 0.25 s.
+- Every move in "Taken from" appears in a cut of the board.
+- Every cut has a handoff, and the idea you chose for it is the one the frames show.
+- Each cut says what carries the eye across it. That is the <Term id="handoff">handoff</Term>.
+- The spectacle has a quiet second or more before it.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| `board: cut 2 names no move` | The move cell is empty or says "fade" | Name a move from `prompts/moves` |
+| `transitions: cut 3 has no planned handoff` | The handoff cell is empty | Write `family: object`, or `deliberate cut: <reason>` |
+| `the Spectacle is at 2.75 s but <meta name="spectacle"> says 3.2 s` | The board and the page disagree | Put the big move at the board's second, or change the board with a reason |
+| A still looks flat | The ground has no light, grain or depth device | Add one from the kit and render again |
+
+## What to read next
+
+<Cards>
+  <Card title="Draft" href="/docs/draft">Stage 6: render the first draft.</Card>
+  <Card title="Recipes" href="/docs/recipes">Chains of moves for one short film.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  frames flags: bin/vawe frames --help; about 2 s and layout rules: same help text
+  out/<name>-frames.png sheet name: harness/live/stage-say.mjs (framed)
+  board parts, thresholds (0.4, 0.9, 0.25), advice text: harness/lib/board.mjs; stage order: harness/live/stage-say.mjs
+  board tables and example rows: films/examples/colour-sting/brief.md "Board"
+  EASE.nudge, EASE.pop, handoff column, sound without bed: skills/vawe-page/SKILL.md step 5; AGENTS.md "Hard rules"
+  Ideas ledger: guides/IDEATE.md; ideas gate: bin/vawe check (lists "ideas")
+  storyboard: bin/vawe storyboard --help; handoff advice: harness/lib/handoffs.mjs (handoffAdvice, MAX_PER_FILM)
+  frames --looks: bin/vawe frames --help
+  ship advice on beat starts and unused moves: harness/live/ship-warn.mjs, harness/lib/board.mjs
+*/}

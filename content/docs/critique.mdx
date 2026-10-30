@@ -1,0 +1,120 @@
+---
+title: Critique and fix
+description: A fresh session looks at the draft and reports findings with a second, a frame and a fix. The author fixes them.
+icon: ScanEye
+---
+
+At the end of this page a session that did not write the page has looked at the draft and ended with `PASS`, and the author has fixed every finding on the way. These are stages 8 and 9 of the <Term id="loop">loop</Term>.
+
+The author never grades their own film. Use a <Term id="fresh-session">fresh session</Term> for the <Term id="critique">critique</Term>. For a subagent, set `VAWE_AGENT=<name>`. A `VAWE_AGENT` label alone does not make a new session: run the critique in a separate terminal or agent. The default verdict is `REJECT`: the film passes only when the critic finds no reason to reject it.
+
+## Steps for the critic
+
+<Steps>
+<Step>
+
+### Run the views
+
+```bash
+VAWE_AGENT=critic bin/vawe critique films/hello/page.html
+```
+
+The verb checks the page for animation traps. It then writes the phone sheet, the strip and the loop seam, and prints the measured deltas. It renders a draft first when the last one is old or has no sound. This takes 1 to 3 minutes.
+
+</Step>
+<Step>
+
+### Look, in this order
+
+Write one line for each finding under each view.
+
+1. **Sheet.** Is the focal point clear in under a second? Is anything cramped or unreadable?
+2. **Strip.** Does each cut land on its beat? Does the eye know where to go after it? Does an exit run slower than its entrance?
+3. **Phone.** Can you read every string? Is the accent still one colour?
+4. **Loop or end.** Compare t=0 with t=duration. A loop is pixel-identical. An end holds long enough to read.
+5. **Checks.** Read the page-check findings and `bin/vawe check anim-traps <page>`.
+6. **Ideas.** Read the "Ideas" table of the brief. Does the frame show the chosen idea, or only the plan text? An idea that is in the ledger and not in the frames is a finding. So is a row whose four ideas are one idea in other words.
+
+</Step>
+<Step>
+
+### Score the film
+
+```bash
+bin/vawe judge films/hello/page.html --struct --runs A,B
+```
+
+This prepares key frames and the rubric for a fresh session to score. The rubric has seven dimensions (`guides/judge.md`), each scored 1 to 10. The threshold is 7 on every one. Two runs, A and B, close a beat. `--fresh` scores now with a separate headless `claude` session (about 30 s); it advises and never blocks.
+
+</Step>
+<Step>
+
+### Write the report
+
+Every finding names the second, the frame and the fix:
+
+```text
+REJECT: 7 findings, top five first.
+1. [3.2s, frame 96] the stat lands on the same frame as the label; stagger the label 60 ms later.
+   fix: films/x/page.html:88, delay 3200 -> 3260
+```
+
+End with one line: `REJECT: <n> findings, the top five first.` or `PASS: I looked for a reason to reject it and found none. <one sentence on what is best>`.
+
+A finding with no file and line is a complaint, not a critique.
+
+</Step>
+</Steps>
+
+## Steps for the author
+
+<Steps>
+<Step>
+
+### Fix the top five
+
+Re-render only the seconds that the findings name.
+
+```bash
+bin/vawe dev films/hello/page.html --from 3 --to 4
+```
+
+</Step>
+<Step>
+
+### Ask for a fresh critique
+
+Give the next critic the previous report. They check that each finding is fixed, not moved. Stop when the critique passes, or when two rounds in a row fix nothing that scores higher.
+
+</Step>
+</Steps>
+
+## What good looks like
+
+- A critic names a default when they see one: a particle burst, a bouncy spring, a glow, a logo slam, a centred title on a gradient, everything fading in, corner labels, fake UI, or dead time with no waiver. Each is a rejection with a rule id such as `no-tells`, `overshoot` or `live-hold`. The ids are in `taste/README.md`.
+- A <Term id="judge">judge</Term> verdict comes from a session that did not write the fix. A PASS is never self-recorded.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The critic grades what the film meant | They read the brief and not the frames | Grade what is on screen |
+| The author runs the critique | Same session as the authoring | Start a fresh session |
+| The same finding returns | It was moved, not fixed | Compare with the last report |
+
+## What to read next
+
+<Cards>
+  <Card title="Ship" href="/docs/ship">Stage 10: the final render.</Card>
+  <Card title="Reading your own film" href="/docs/reading-your-film">The views, as a reader sees them.</Card>
+  <Card title="Quality gates" href="/docs/quality-gates">The checks that run by name.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  critique build steps and 1 to 3 min: harness/cli/verbs.mjs (critique)
+  separate session, VAWE_AGENT=critic: harness/lib/critique-gate.mjs
+  judge dimensions: guides/judge.md; Ideas view: skills/vawe-critique/SKILL.md "The judge"
+  views, report shape, judge, defaults, stop rule: skills/vawe-critique/SKILL.md
+  judge flags (--struct, --runs, --fresh): bin/vawe judge --help
+  fresh session, VAWE_AGENT: AGENTS.md "Every step logs", skills/vawe-critique/SKILL.md
+*/}

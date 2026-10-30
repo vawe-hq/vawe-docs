@@ -1,0 +1,103 @@
+---
+title: Design system and kit
+description: Write DESIGN.md and kit/ for one film, so every key frame comes from the same palette, type and parts.
+icon: Palette
+---
+
+At the end of this page the film has `films/<name>/DESIGN.md` and `films/<name>/kit/kit.css`. Together they are the <Term id="design-kit">design kit</Term>. This is stage 3 of the <Term id="loop">loop</Term>.
+
+You need the "Taken from" section of the brief. The finished example is `films/examples/colour-sting/DESIGN.md` and its `kit/` folder.
+
+## Steps
+
+<Steps>
+<Step>
+
+### Start from a proven combo
+
+`prompts/skill-combos.md` lists combos of design skills that were tested together. A combo is "proven" for type frames, for product-UI frames, or for both. Pick one proven for your frames and write `Combo: <name>` in `DESIGN.md`. Swap at most one rung, and give the reason.
+
+</Step>
+<Step>
+
+### Write DESIGN.md
+
+The example uses these sections: Palette roles, Type, Ground and light devices, Text treatment and Parts. Palette roles give a hex value and a place for each role.
+
+```text
+| role | value | where |
+|---|---|---|
+| ground, cold | ultramarine `#4254ff` to `#0b1170` | world cold |
+| accent | ultramarine `#2536ff` | the word "colour" on amber, nothing else |
+```
+
+</Step>
+<Step>
+
+### Write one line for each rung
+
+The skill ladder has five rungs, in this order: `builder`, `type`, `colour`, `depth`, `frame`. List the skills with:
+
+```bash
+command npx -y ui-skills list
+```
+
+Write one line for each rung in `DESIGN.md`, in one of two forms. Fetch a skill with `command npx -y ui-skills get <slug>`.
+
+```text
+Skill type: pbakaus/typeset: one face, the name untracked, the heaviest weight on one word.
+Skipped depth: the light is a glow drawn by the page (cites the reference frame it comes from).
+```
+
+A reason for a skipped rung cites a reference frame path or a line of `SPEC.md`. The `frame` rung uses vawe's own rules: about 1 line and 2 or 3 things in a frame, a ground that is never flat, and an eye path. The frame rung rejects web-page patterns such as a nav, a CTA button, a pill or an eyebrow.
+
+</Step>
+<Step>
+
+### Write kit/kit.css
+
+Choose the type from `taste/craft/typography.md` and the colour from `taste/craft/color.md`. Put the palette roles in `:root` tokens. Write one rule for each part: `.ground-*`, the light devices, `.grain`, `.lockup`, `.word` and `.line`. Each moving part is its own element. `kit/kit.html` is an optional sheet that shows every part once.
+
+```css
+:root { --ink: #fff3e3; --accent: #2536ff; }
+.ground-cold { background: radial-gradient(var(--at), #4254ff 0, #0b1170 100%); }
+```
+
+</Step>
+</Steps>
+
+## What you see
+
+The `next:` line after the files exist names the missing rungs, if any. `bin/vawe` advises on a rung with no `Skill` or `Skipped` line, with the line form it expects.
+
+## What good looks like
+
+- Every word that moves is its own element, so the page can move it alone.
+- A ground is never one flat fill. The kit names a light, grain or depth device, and the page changes it at each world turn.
+- Product UI in the film is a designed interface with real-looking data, never placeholder bars.
+- An owner decision that differs from a house default goes under `## Declared` in `DESIGN.md`, one `- key: value` line each (`font`, `type-scale`, `ui-scale`, `camera`).
+- `DESIGN.md` holds values, not adjectives: hex codes, a face and weights, a cap height as a percent of the frame.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| Advice says a rung has no line | The line does not match `Skill <rung>: <slug>: <what it decided>` or `Skipped <rung>: <reason>` | Write the line in one of the two forms |
+| The kit looks like a web page | A builder skill added a nav, a pill or section padding | Keep the builder rung for the UI parts, then reject web-page patterns at the frame rung and say so |
+| A new film does not look like the kit | The page set colours of its own | Take every value from `kit.css` |
+
+## What to read next
+
+<Cards>
+  <Card title="Key frames and the board" href="/docs/key-frames">Stages 4 and 5: build the states, plan the time.</Card>
+  <Card title="The page" href="/docs/the-page">What a page must contain.</Card>
+</Cards>
+
+{/* sources (vawe d8481cc61):
+  five rungs and line forms: harness/live/stage-say.mjs (RUNGS, missingRungs, SAY.skills)
+  kit format, Combo rule, frame rung, ## Declared keys: skills/vawe-page/SKILL.md (order, step 3)
+  proven combos: prompts/skill-combos.md
+  type and colour docs: harness/live/stage-say.mjs (SAY.design)
+  example sections and palette table: films/examples/colour-sting/DESIGN.md
+  kit.css tokens and ground rules: films/examples/colour-sting/kit/kit.css
+*/}
