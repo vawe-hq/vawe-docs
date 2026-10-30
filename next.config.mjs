@@ -15,6 +15,12 @@ const config = {
   // reason for proxying instead of merging.
   assetPrefix: "/docs-static",
   output: "standalone",
+  async redirects() {
+    return [
+      { source: "/docs/reading-your-film", destination: "/docs/critique", permanent: true },
+      { source: "/docs/prompting", destination: "/docs/brief", permanent: true },
+    ];
+  },
   async rewrites() {
     return [{ source: "/docs-static/media/:path*", destination: "/media/:path*" }];
   },

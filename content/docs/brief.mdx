@@ -74,7 +74,23 @@ Add `--from` to pick the template yourself. The default is the row of `guides/RO
 bin/vawe new hello --from prompts/story-explainer.md --answers answers.txt
 ```
 
-`guides/ROUTING.md` lists nine film types. Two rules decide most cases:
+The `prompts/` folder holds 11 templates:
+
+| Template | Use when |
+|---|---|
+| `showreel-one-liner` | no brief, a taste probe |
+| `brand-launch-from-url` | a real product from a URL, with its own kit and real captures |
+| `ui-morph-loop` | one element becomes 8 to 12 UI states and loops |
+| `reference-rebuild` | a reference mp4 must be matched |
+| `directors-brief-long-form` | over 60 s, or more than one session or agent |
+| `story-explainer` | explain a topic with invented visuals |
+| `music-video-beat-synced` | a song exists, and every cut lands on its beat |
+| `beat-sheet` | any film over one beat: the shot table before code |
+| `interactive-lab-capture` | a mechanism as a working model, then a scripted tour of it |
+| `production-brief-acceptance` | a claim that someone other than the author must sign off |
+| `pixel-art-sprite` | a 16-bit sprite loop on a logical canvas |
+
+`guides/ROUTING.md` maps a request to nine film types, and a type to one of the first nine templates (a sting takes `beat-sheet`). Two rules decide most cases:
 
 - A real product from a URL is a brand launch (`prompts/brand-launch-from-url.md`).
 - A reference mp4 that you must match is a reference rebuild. Use `--ref` and read [Match a reference film](/docs/match-a-reference).
@@ -86,6 +102,29 @@ If two types fit, the shorter film wins. `--length`, `--aspect` and `--title` wr
 The verb prints the question bank of the template with a default for each question. It writes `films/hello/brief.md` with each default filled in and marked `[unanswered: default taken]`. A field that the ask did not answer holds a guess marked `(guess: change me)`.
 
 The brief also has an "Ideas" section for the later stages. The verb ends with a `next:` line that names the next stage.
+
+## The sections of the brief
+
+The brief is measured. A number that a program can measure is a number. A value that it cannot measure yet is a guess, marked `(guess: change me)`. The agent replaces each guess with a measured value or its own choice. The sections come in this order (`SKELETON` in `harness/cli/new.mjs`):
+
+1. **Inputs.** The questions of the template, each with its default marked `[unanswered: default taken]`.
+2. **Task.** What the film is, who sees it, the message and the spectacle second.
+3. **Taken from.** Four to six reference frames, with what each one gives.
+4. **Directions.** Three directions from three families (type, object, graphic). The agent picks one and says why.
+5. **Signature.** Six dials: band, ease, stagger, seam, palette and thread. The page repeats them in `<meta name="signature">`.
+6. **Look.** Numbers, not adjectives: colours, the typeface, type as a fraction of frame height.
+7. **Design system and kit.** Palette roles, type, and the ground layers.
+8. **States.** One static key frame per world, built from the kit before any motion.
+9. **Ideas.** A table with four ideas for each beat and cut, and the pick with its reason.
+10. **Board.** A plan for time: rhythm, a named move per cut, and the sound.
+11. **Motion pass.** One row per cut, after the draft.
+12. **Keep and swap.** For a reference film only: KEEP or SWAP for each line of its `SPEC.md`.
+13. **Spec.** Three tables, in seconds and percent of frame: shots, words and objects.
+14. **Acceptance.** Targets for the checks, with the measured value next to each one.
+15. **Gates, Pitfalls and Deliver.** The order of the stills, the draft loop and the final, the pitfalls, and the files to hand over.
+16. **First draft.** The taste list to read and the `bin/vawe dev` command.
+
+The slowest move runs at least 3 times the fastest (`taste/rules/speed-bands.md`). For the page contract, see [The page](/docs/the-page).
 
 ## What good looks like
 
@@ -105,13 +144,30 @@ The questions come once. Do not ask a second round. A wrong default is fixed at 
 | The film type is wrong | The ask matched another row of `guides/ROUTING.md` | Run the verb again with `--from prompts/<template>.md` |
 | The verb prints questions and writes nothing | You gave no `--answers`, `--detail` or `--defaults` | Answer the questions, or add `--defaults` |
 
-For how to write the ask itself, read [Prompting](/docs/prompting).
+## Inputs that raise quality
+
+- A real product URL, crawled, not invented. See [Brand reflection](/docs/brand-reflection).
+- A reference film. `bin/vawe see <ref.mp4> --spec` measures it into `SPEC.md`. Mark each line KEEP or CHANGE, then rebuild.
+- Real data. Numbers and copy are true and looked up, never made up for effect.
+- The film type, if you know it. It saves a routing step.
+- A genre anchor and a ban list. A default you do not exclude is free for the agent to use.
+
+## What to avoid
+
+- Do not ask for fake product UI. A screen, logo or photo in the plan must trace to a real capture (`prompts/brand-launch-from-url.md`).
+- Do not name hex codes or easings to fix a weak film. Fix the anchor and the ban list.
+
+## What to say when it is wrong
+
+Name the symptom, not the cause. "Beat three reads as a slide, nothing moves but the text" is better than "make it more dynamic". The agent can find the cause. It cannot guess what you saw.
+
+To change direction instead of fixing a detail, change the anchor and the ban list.
 
 ## What to read next
 
 <Cards>
   <Card title="Study references" href="/docs/references">Stage 2: pick frames and moves to take.</Card>
-  <Card title="Prompting" href="/docs/prompting">How to give an agent the details.</Card>
+  <Card title="Brand reflection" href="/docs/brand-reflection">Start from a real website.</Card>
 </Cards>
 
 {/* sources (vawe d8481cc61):
@@ -122,4 +178,9 @@ For how to write the ask itself, read [Prompting](/docs/prompting).
   default template: bin/vawe new --help (--from); film types: guides/ROUTING.md
   [unanswered: default taken], (guess: change me): skills/vawe-brief/SKILL.md section 2; prompts/README.md "How to use one"
   next stage: harness/live/stage-say.mjs (SAY.study)
+  templates, 11 files: ls prompts/ (minus ANATOMY.md, skill-combos.md); use-when rows: each template's front matter `when`; nine types: guides/ROUTING.md
+  section order: harness/cli/new.mjs SKELETON and briefText; Keep and swap: prompts/ANATOMY.md "3. KEEP/SWAP"
+  slowest 3x fastest: taste/rules/speed-bands.md
+  no fake UI: prompts/brand-launch-from-url.md:10
+  see --spec: bin/vawe see --help
 */}
