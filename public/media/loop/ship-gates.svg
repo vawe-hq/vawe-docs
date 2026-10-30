@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 120" width="900" height="120">
+<rect width="900" height="120" fill="#000"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#a1a1a1"/></marker></defs>
+<g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" text-anchor="middle">
+<rect x="10" y="30" width="180" height="60" rx="10" fill="#0a0a0a" stroke="#3291ff"/><text x="100" y="56" fill="#fff">fresh review</text><text x="100" y="76" fill="#a1a1a1" font-size="12">judge --fresh / critique</text>
+<rect x="250" y="30" width="180" height="60" rx="10" fill="#0a0a0a" stroke="#3291ff"/><text x="340" y="56" fill="#fff">approve</text><text x="340" y="76" fill="#a1a1a1" font-size="12">the owner runs it</text>
+<rect x="490" y="30" width="180" height="60" rx="10" fill="#0a0a0a" stroke="#fff"/><text x="580" y="56" fill="#fff">ship</text><text x="580" y="76" fill="#a1a1a1" font-size="12">full size, 60 fps</text>
+<rect x="730" y="30" width="160" height="60" rx="10" fill="#0a0a0a" stroke="#fff"/><text x="810" y="56" fill="#fff">wait</text><text x="810" y="76" fill="#a1a1a1" font-size="12">the verdict</text>
+<path d="M190 60H246M430 60H486M670 60H726" stroke="#a1a1a1" stroke-width="1.5" marker-end="url(#a)"/>
+</g></svg>

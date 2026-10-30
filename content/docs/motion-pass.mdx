@@ -80,6 +80,30 @@ In `brief.md`, fill the "Motion pass" section with one row for each cut: each pr
 
 Each `strip` run prints the path of an image. A grid also gives the seconds when the move starts, peaks and settles. `--onion` writes to `out/onion/<film>` and `--velocity` writes a PNG to `out/velocity`.
 
+<Figure
+  src="loop/strip-cut.webp"
+  alt="A grid of frames through the cut at 1.53 s of colour-sting."
+  caption="vawe strip --cuts: the frames through one cut, with its motion numbers."
+  width={1566}
+  height={882}
+/>
+
+<Figure
+  src="loop/onion.webp"
+  alt="Six frames of one move blended into one image, older frames fainter."
+  caption="vawe strip --onion: the path, spacing and overshoot of one move."
+  width={960}
+  height={608}
+/>
+
+<Figure
+  src="loop/velocity.webp"
+  alt="A graph of speed and scale over time for the moving element at the cut."
+  caption="vawe strip --velocity: start, peak and settle of each moving element."
+  width={1200}
+  height={760}
+/>
+
 ## What good looks like
 
 - The hold is not frozen. One part moves in every hold (a line typing, a counter, a glint), not the camera.

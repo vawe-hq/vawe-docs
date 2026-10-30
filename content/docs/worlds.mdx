@@ -66,6 +66,14 @@ The check reads every third frame, and every frame between two reads that differ
 
 For each span the check also reads the ground and the text that the world shows. The ground is the first non-transparent background of the element, its ancestors or a large descendant. From the text it computes the read time.
 
+<Figure
+  src="loop/worlds-sheet.webp"
+  alt="A sheet of colour-sting with the world id printed on each frame."
+  caption="vawe sheet --labels prints the id of the world on top at each second."
+  width={1600}
+  height={700}
+/>
+
 ## Write a world
 
 Each world is a direct block of the page. Show one world at a time, and hide the others with opacity or `display`.
