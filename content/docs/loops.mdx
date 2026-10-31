@@ -1,0 +1,151 @@
+---
+title: Loops
+description: Make a film that repeats with no jump, where the last frame leads into the first frame.
+icon: Repeat
+---
+
+At the end of this page you have a <Term id="film">film</Term> whose last frame is the same as its first frame. When a player repeats the film, the viewer sees no seam.
+
+You need a vawe checkout. The template for a loop is `prompts/ui-morph-loop.md`.
+
+## What this film needs
+
+A loop is one element that becomes eight to twelve UI states and returns to the first state, on a beat grid, with a cursor that drives every change (`ui-morph-loop.md`). The length is 12 to 16 s. Seven bars at 120 BPM is 14 s: each bar is 2 s and each beat is 0.5 s.
+
+A loop has no ending, so it has no answer. The `hook-payoff` rule lets a loop break its payoff rule if the brief says so. Write that line in the brief.
+
+The element is never cut. Each state is the same element that morphs its size, radius and colour, while its content swaps with a short blur. Something happens on every beat. The camera zooms so each state fills the frame, and the zoom is a transform on one wrapper.
+
+The <Term id="spectacle">spectacle</Term> still applies: choose one state as the big moment, and give it quiet before it.
+
+<Diagram
+  label="Three boxes in a row: the first frame, the states on the beat grid, and the last frame, which equals the first."
+  caption="The last frame carries the cursor position and velocity of the first."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>First frame</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">state 1, cursor at rest</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>States</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">one per bar, on the grid</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Last frame</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">equals the first</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>First frame</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">state 1, cursor at rest</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>States</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">one per bar, on the grid</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Last frame</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">equals the first</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the brief with the morph template
+
+```bash
+bin/vawe new morph --from prompts/ui-morph-loop.md --length 14 --aspect 1:1
+```
+
+The template asks for the 8 to 12 states, the accent (black and white by default), a song at about 120 BPM or no music, the aspect and length, and the UI sans. The default is 1:1 and 14 s. Read [Write the brief](/docs/brief). Write the state list on the beat grid before any code: state, beat, what the cursor does, what the sound is.
+
+</Step>
+<Step>
+
+### Build every style from time
+
+Every style is computed from `t` inside `window.seek(t)`. Use no CSS transitions and no timers, and carry no state between frames. A value that changes target many times is the sum of one spring per change, so it stays a pure function of time. Use `spring(t, k, d)` and `track(t, keys, k, d)` from `core/motion/springs.js`.
+
+For a periodic part, `loopT(t, dur)` in the same file wraps `t` into `[0, dur)`, also for negative `t`.
+
+</Step>
+<Step>
+
+### Make the last frame the first frame
+
+End each value on the value it had at 0 s, including the position and the speed of the cursor. A spring that is still moving at the last frame shows as a stutter at the seam.
+
+</Step>
+<Step>
+
+### Test the seam
+
+```bash
+bin/vawe still films/morph/page.html --at 0
+bin/vawe still films/morph/page.html --at 14
+bin/vawe critique films/morph/page.html
+```
+
+The template's test is to render `t=0` and `t=duration` and compare the two PNGs. They must be identical. A time past the last frame moves to the last frame, and `still` says so. The critique writes the loop seam: the last frame next to the first, with the pixel difference. Read [Critique and fix](/docs/critique).
+
+</Step>
+<Step>
+
+### Make a small file for sharing
+
+```bash
+bin/vawe dev films/morph/page.html --small
+```
+
+`--small` encodes the draft about 5 times smaller, for a file to post such as an `og:video` share loop.
+
+</Step>
+</Steps>
+
+## Pitfalls
+
+- **Do not fake the blur.** The renderer applies <Term id="motion-blur">motion blur</Term> from subframes on its own.
+- **A swap is its own problem.** A morph between two states with different content is a shape tween plus a content swap. Give the swap its own 120 ms and blur it, and let the shape carry the eye.
+- **Zoom the wrapper.** Zoom the wrapper, never the element, or its springs fight the camera.
+- **No `will-change`** on anything the camera scales, or the text renders blurry.
+- **Text that swaps in a morphing container** needs its own enter and exit timing, or it overlaps.
+- **The `loop` attribute is for the bed.** On an `<audio>` tag, `loop` marks the music <Term id="bed">bed</Term> under the film. It does not make the film repeat.
+
+From the taste digest, three rules matter most. Keep the accent to one thing in each frame (`accent-share`). Keep a hold alive with a part that moves (`live-hold`). Exits run shorter than entrances (`exits-shorter`).
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| A small jump at the seam | The cursor or a spring has not settled at the last frame | End on the first frame's values, with the same speed |
+| The two seam PNGs differ in one corner | A state keeps a part that the first state lacks | Return that part to its first state |
+| The text is blurry after the zoom | `will-change` on a scaled element | Remove it |
+
+## What to read next
+
+<Cards>
+  <Card title="UI demo" href="/docs/ui-demo">A longer film that uses an interface.</Card>
+  <Card title="Time and seek" href="/docs/time-and-seek">Why a frame is a function of time.</Card>
+  <Card title="Cut to the beat" href="/docs/cut-to-the-beat">Put each state on a beat.</Card>
+  <Card title="Motion blur" href="/docs/motion-blur">How the renderer blurs a move.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  states, 12 to 16 s, 7 bars at 120 BPM = 14 s, defaults 1:1 and 14 s, springs, wrapper zoom, 120 ms swap, will-change, loop test: prompts/ui-morph-loop.md
+  2 s a bar, 0.5 s a beat: arithmetic (14 s / 7 bars; 120 BPM)
+  loopT: core/motion/springs.js line 167-168
+  spring, track: core/motion/springs.js lines 13, 26
+  loop seam in critique: bin/vawe critique --help; content/docs/critique.mdx
+  still past the last frame: bin/vawe still --help (--at)
+  --small: bin/vawe dev --help
+  audio loop = music bed: AGENTS.md "Audio"
+  hook-payoff break-when "a loop that has no answer": taste/rules/hook-payoff.md
+  accent-share, live-hold, exits-shorter: taste/rules
+  motion blur from subframes: prompts/ui-morph-loop.md gotchas; bin/vawe ship --help (motion blur)
+*/}

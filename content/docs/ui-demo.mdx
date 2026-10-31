@@ -1,0 +1,147 @@
+---
+title: UI demo
+description: Make a film that shows a product interface working, with a cursor, real captures and a result the viewer can see.
+icon: MousePointerClick
+---
+
+At the end of this page you have a <Term id="film">film</Term> of 12 to 60 s in which a cursor uses an interface and the interface answers. Every click has a visible result.
+
+You need a vawe checkout and a product. For a real product you need its URL. For an invented product the brief must say to invent the interface.
+
+## What this film needs
+
+A UI demo shows a real artifact working. The `show-real-thing` rule is the first test: a click with no result is not a beat, and chrome with no function is not a beat. A real product is shown as it is, from captures or from its own DOM. An invented product gets a real interface, designed for the film.
+
+Pick the template from the subject:
+
+| Subject | Template | Length |
+|---|---|---|
+| a real product or site | `brand-launch-from-url.md` | 9 to 40 s |
+| an invented product | `beat-sheet.md` | the rows you plan |
+| a mechanism you can drive | `interactive-lab-capture.md` | 20 to 60 s |
+| one element that becomes many UI states | `ui-morph-loop.md` (see [Loops](/docs/loops)) | 12 to 16 s |
+
+Three chains in `prompts/moves/RECIPES.md` fit a UI demo. Recipe 10 is an AI product demo of 22 s: a prompt becomes an answer, the answer becomes a deliverable, and the deliverable is sent. Recipe 11 is a feature tour of 20 s on one canvas, with a camera that pans between stations. Recipe 9 is a problem-to-fix launch of 21 s.
+
+The <Term id="spectacle">spectacle</Term> is usually the result: the check that lands, the figure that settles, the status the camera zooms into. Quiet comes before it, with the interface held still for about 2 s.
+
+<Diagram
+  label="Three boxes in a row: the real interface, the cursor acts, the result reads. The result holds the spectacle."
+  caption="The viewer must see what each click did."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>Real interface</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">capture or DOM</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>Cursor acts</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">press, drag, type</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Result reads</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">spectacle, then hold</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Real interface</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">capture or DOM</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>Cursor acts</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">press, drag, type</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Result reads</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">spectacle, then hold</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new ledger-demo --from prompts/brand-launch-from-url.md --length 22 --aspect 16:9
+```
+
+Swap the template for the subject. Fill the Shots, Words and Objects tables. List each capture with its source URL.
+
+</Step>
+<Step>
+
+### Capture a real flow as one clip
+
+```bash
+bin/vawe shot https://example.com --tour steps.json --w 1280 --out films/ledger-demo/assets/tour.mp4
+```
+
+A real page worked by a cursor is one mp4, not screenshots. Hover and click are real events. Add `--scale 3` for a close-up that must stay sharp.
+
+</Step>
+<Step>
+
+### Mark the UI so the checks read it
+
+Put UI that is the subject inside an element with `data-ui`. Its text floor is 3 percent of the frame height. Product labels that only add texture take `data-chrome`, with a floor of 2.5 percent. Other copy needs a cap height of 6 percent. Read [Text and fonts](/docs/text-and-fonts).
+
+</Step>
+<Step>
+
+### Draft and read the click frames
+
+```bash
+bin/vawe dev films/ledger-demo/page.html
+bin/vawe strip films/ledger-demo/page.html --cuts
+```
+
+Check that the frame after each click shows what the click did. Then do the [motion pass](/docs/motion-pass).
+
+</Step>
+</Steps>
+
+## Moves that fit
+
+The index in `prompts/moves/README.md` lists them by job. Show a click doing its job: `cursor-click`, `notification-pop`, `success-check`, `command-palette-summon`. Show a real UI arriving: `card-assemble`, `skeleton-reveal`, `clip-expand`, `device-tilt-stage`. Point at one part: `spotlight-dim`, `bracket-callout`, `ui-focus-zoom`. Show an AI product answering: `ai-stream-response`. Show an agent doing steps: `agent-progress`, `terminal-run`. Read [Motion](/docs/motion).
+
+## Pitfalls from the taste digest
+
+- **Feedback follows its cause** (`cause-first`). A burst comes after the press. A sound lands on its action.
+- **The camera holds still** (`constant-camera`). One move at the spectacle at most. A part moving inside the frame keeps a hold alive.
+- **Read lines** (`readable-hold`). A UI screen dwells at least 1.2 s (`shot-length-varies`).
+- **No tells** (`no-tells`). No glow on UI chrome unless the brief asks.
+- **Exits are faster than entrances** (`exits-shorter`).
+
+Four traps come from the recipes. Use one window for `clip-expand` and `ai-stream-response`, with the same pixels at the swap. A capture cannot morph, so rebuild only the button as live DOM when a move must animate it. Exit the cursor down before each pan, or it streaks with the pan. Pick a zoom target with no glyph under it, such as a status pill.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The click shows no result | The next frame is not the done state | Add the result frame, or cut the click |
+| UI text is hard to read | The mock is scaled below its floor | Crop the capture instead of scaling it |
+| Two cursor clicks look the same | A template pattern | Change the move, as recipe 11 does with `card-assemble` |
+
+## What to read next
+
+<Cards>
+  <Card title="Product UI" href="/docs/product-ui">Build an interface that moves like the real one.</Card>
+  <Card title="Launch video" href="/docs/launch-video">The same craft with a brand kit.</Card>
+  <Card title="Lens and effects" href="/docs/lens-and-effects">Film a screen as a real object.</Card>
+  <Card title="Critique and fix" href="/docs/critique">Fresh eyes on the draft.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  template table and lengths: guides/ROUTING.md rows 2, 3, 7; prompts/brand-launch-from-url.md line 12; prompts/interactive-lab-capture.md line 16; prompts/ui-morph-loop.md line 15
+  recipes 9, 10, 11 and their traps: prompts/moves/RECIPES.md
+  quiet ~2 s before the spectacle: RECIPES.md recipe 10 ("Keep the report still for 2 s")
+  shot --tour, --scale: bin/vawe shot --help
+  data-ui 3 percent, data-chrome 2.5 percent, 6 percent: taste/rules/readable-text-size.md; AGENTS.md "Text checks"
+  moves by job: prompts/moves/README.md "Pick by job"
+  show-real-thing, cause-first, constant-camera, no-tells, exits-shorter: taste/build/DIGEST.md; dwell 1.2 s: taste/rules/shot-length-varies.md
+*/}

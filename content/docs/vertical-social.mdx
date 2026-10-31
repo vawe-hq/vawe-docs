@@ -1,0 +1,157 @@
+---
+title: Vertical social
+description: Make a 9:16 film for a phone feed from one page, with the layout rules and the safe area that vertical needs.
+icon: Smartphone
+blog:
+  - slug: html-video-aspect-ratios
+    title: 'HTML video aspect ratio: 16:9, 9:16 and 1:1'
+---
+
+At the end of this page you have a 9:16 <Term id="film">film</Term> of 1080 x 1920 from the same page that makes the 16:9 film. The layout fits the tall frame, and nothing is cropped.
+
+You need a vawe checkout and a page with a `duration` meta. Read [Aspect ratios](/docs/aspect-ratios) for the contract. This page covers what vertical changes in the design.
+
+## What this film needs
+
+A vertical film is read on a phone, once, in a feed. The `colour-sting` brief states the viewer as "people who see it once, muted or not, in a feed". So the picture carries the message. The first frame shows the subject (`first-frame`), and the hook is in the first 3 s (`hook-payoff`).
+
+The frame is tall and narrow. A 6 percent cap height is 6 percent of 1920, about 115 px, but the lines are short, so most headlines wrap to two or three lines. Plan the copy for the width, not for 16:9.
+
+The <Term id="spectacle">spectacle</Term> keeps its rule: one big moment, with quiet before it. In 9:16, put the hero in the upper-middle third (`safe-margin`).
+
+<Diagram
+  label="Three bands from top to bottom: keep the top clear, put the hero in the upper-middle third, keep the bottom clear for the caption band of the app."
+  caption="The hero sits in the upper-middle third. The outer 10 percent stays clear."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>Top margin</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">outer 10 percent</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>Hero</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">upper-middle third</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Caption band</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">keep clear</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Top margin</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">outer 10 percent</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>Hero</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">upper-middle third</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Caption band</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">keep clear</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Start the film in 9:16
+
+```bash
+bin/vawe new teaser --from prompts/beat-sheet.md --length 12 --aspect 9:16
+```
+
+The `--aspect` flag writes the ratio into `brief.md` and into the page `aspect` meta. A film that starts in 9:16 needs no override later. The list of templates is in [Templates](/docs/templates).
+
+</Step>
+<Step>
+
+### Lay out with the frame size
+
+The renderer sets `--vw` and `--vh` on `:root` and `data-aspect` on `<html>`. Size with `--vh` and change with `[data-aspect]` selectors.
+
+```css
+h1 { font-size: calc(var(--vh) * 0.11); }
+[data-aspect="9:16"] h1 { left: 8%; top: 30%; }
+```
+
+Never crop, and never lay out in fixed pixels for 16:9.
+
+</Step>
+<Step>
+
+### Draft in 9:16
+
+```bash
+bin/vawe dev films/teaser/page.html --aspect 9:16
+```
+
+A draft of a page that is already 9:16 needs no flag. For a 16:9 page, the flag gives the draft in 9:16, and the output name gets `-9x16`, so the two aspects do not overwrite each other. A draft is half size, but the layout viewport is full size, so it lays out like the final.
+
+</Step>
+<Step>
+
+### Check the real boxes
+
+```bash
+bin/vawe still films/teaser/page.html --at 3 --aspect 9:16
+bin/vawe critique films/teaser/page.html
+```
+
+The critique writes a phone sheet, the film at 360 px wide. Ask of each string: can I read it? The `text-margin` check reports text that reaches past the title-safe area. Read [Critique and fix](/docs/critique).
+
+</Step>
+<Step>
+
+### Ship one file for each aspect
+
+```bash
+bin/vawe ship films/teaser/page.html --aspect all
+```
+
+`all` renders the five common aspects (16:9, 9:16, 1:1, 4:5, 4:3), one file each. To ship only the vertical film, pass `--aspect 9:16`. `ship` needs a fresh review and the <Term id="owner">owner</Term>'s approval first. Read [Ship](/docs/ship).
+
+</Step>
+</Steps>
+
+## Pitfalls from the taste digest
+
+- **Safe area** (`safe-margin`). Margins are 6 to 8 percent. For social, keep key content out of the outer 10 to 12 percent. A headline near the bottom collides with a caption band that looks empty in the draft.
+- **Read lines** (`readable-hold`). A line holds for max(1.2 s, words / 3), also on a short vertical film.
+- **Few text sizes** (`type-scale`). At most six sizes, each step 1.25 or more apart.
+- **Exits are faster than entrances** (`exits-shorter`).
+- **End on motion** (`moving-tail`). Keep one part of the end card moving in the last second.
+- **One action at the end** (`cta-last-short`). The end card is the shortest beat and carries one action.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| A headline touches the top edge | It sits in the outer margin | Move it inside 10 percent |
+| The 16:9 layout looks lost in 9:16 | Fixed pixel sizes | Size with `--vh` and add a `[data-aspect="9:16"]` rule |
+| `is not a W:H ratio of whole numbers` | The value is `9/16` | Write `9:16` |
+
+## What to read next
+
+<Cards>
+  <Card title="Platforms" href="/docs/platforms">Length and size limits for each feed.</Card>
+  <Card title="Aspect ratios" href="/docs/aspect-ratios">Sizes and the layout contract.</Card>
+  <Card title="Text and fonts" href="/docs/text-and-fonts">Size text with the frame height.</Card>
+  <Card title="Launch video" href="/docs/launch-video">A film for the feed with a brand kit.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  new --aspect, dev/ship/still --aspect, --aspect all: bin/vawe new|dev|ship|still --help
+  --vw --vh data-aspect, never crop, five aspects: AGENTS.md "The page contract"; content/docs/aspect-ratios.mdx
+  output name -9x16: harness/lib/page-params.mjs aspectSlug
+  viewer "once, muted or not, in a feed": films/examples/colour-sting/brief.md "Task"
+  safe-margin numbers and 9:16 hero upper-middle third: taste/rules/safe-margin.md
+  text-margin check: harness/lib/layout-lint.mjs line 76
+  phone sheet 360 px: content/docs/critique.mdx (lead-main harness/media critique)
+  first-frame, hook-payoff, type-scale, cta-last-short, moving-tail: taste/rules
+  ship needs review and approval: bin/vawe ship --help
+  6 percent of 1920 = 115 px: arithmetic from taste/rules/readable-text-size.md (cap height 6 percent of frame height)
+*/}

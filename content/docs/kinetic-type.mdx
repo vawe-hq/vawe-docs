@@ -1,0 +1,133 @@
+---
+title: Kinetic type
+description: Make a film where the words are the picture, with a chain of type moves, one hit and a line that holds.
+icon: Type
+blog:
+  - slug: kinetic-typography-css
+    title: 'CSS text animation: 5 kinetic typography effects'
+---
+
+At the end of this page you have a <Term id="film">film</Term> of 6 to 20 s in which type does all the work. It has a hook, a hit, and a last line that still moves.
+
+You need a vawe checkout and the words. A kinetic film is only as good as its copy, so write the lines first.
+
+## What this film needs
+
+There is no template for this type. Start with `beat-sheet.md`, the template for a short unnarrated film, and take a chain from `prompts/moves/RECIPES.md`:
+
+| Recipe | Length | Thread |
+|---|---|---|
+| 8 Kinetic type line | 6 s | one dot carries the line: a full stop, then a ball across the cut, then a full stop |
+| 13 Kinetic type manifesto | 20 s | one sentence in four beats: the problem, the values, the claim, the name |
+| 2 Brand sting, type-led | 5 s | one pulse every 0.48 s (125 bpm); every landing and cut is on it |
+
+Each beat has its own engine, so the type never repeats a trick. In recipe 13 the beats are a soft resolve (`blur-word-cascade`), a slot roll (`word-swap-slot`), a hit (`scale-punch`) and the name (`wordmark-cascade`).
+
+Keep one hit. The <Term id="spectacle">spectacle</Term> is the one word that lands hard, with quiet before it. Do not punch a second word: the same hit twice reads as a template. Land the accent on the claim word, and give it to one word only.
+
+<Diagram
+  label="Three boxes in a row: a soft line resolves, one word hits, the last line holds with one part still moving. The hit holds the spectacle."
+  caption="Quiet first, one hit, then a hold that stays alive."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>Line resolves</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">soft, in place</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>The hit</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">one word, spectacle</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Hold</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">a dot still moves</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Line resolves</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">soft, in place</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>The hit</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">one word, spectacle</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Hold</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">a dot still moves</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new one-page-in --from prompts/beat-sheet.md --length 6 --title "One page in."
+```
+
+`--title` writes the starter headline into `brief.md` and the page. Fill the Shots and Words tables. The Words table holds each line with its appear and settle seconds, cap height, position and colour.
+
+</Step>
+<Step>
+
+### Pick the moves by job
+
+The index `prompts/moves/README.md` has a row for each job. Land one hero word: `scale-punch`, `letter-stagger`, `outline-fill`, `variable-weight-wave`. Decide a word on screen: `word-swap-slot`, `flap-resolve`, `text-scramble-decode`. Point at one word: `word-sweep`, `marker-highlight`, `underline-draw`. Change what a word means: `weight-morph`. Read [Motion](/docs/motion) and choose from the clip, not the name.
+
+</Step>
+<Step>
+
+### Check the key frames, then draft
+
+```bash
+bin/vawe frames films/one-page-in/page.html
+bin/vawe dev films/one-page-in/page.html
+```
+
+Read each line at full size. Then follow the [motion pass](/docs/motion-pass).
+
+</Step>
+</Steps>
+
+## Pitfalls from the taste digest
+
+- **Read lines** (`readable-hold`). Cap height is 6 percent of the frame or more. A line holds for max(1.2 s, words / 3). Prose words take 0.6 s each. Add hold, never slow the move.
+- **Type scale** (`type-scale`). A frame uses at most six text sizes, and each step is at least 1.25 apart. Pick hero, support and label.
+- **Text breathing** (`text-breathing`). A kinetic film is the named exception to the 84 percent limit. Write the exception in the brief.
+- **Frame 0 has a subject** (`first-frame`). The first word starts to resolve at 0 s, not after empty ground.
+- **Face and ground** (`typeface-default`). Use the kit's face, not Inter or Space Grotesk by habit.
+- **Live hold** (`live-hold`). A held line keeps one part alive, such as a caret or the last dot. A camera drift does not count.
+- **Exits are faster than entrances** (`exits-shorter`). In recipe 13 an exit runs 0.22 s and an entrance 0.6 s or more.
+
+Three traps from recipe 8 repeat. Launch the ball from the full stop's measured rect and hide the stop on that frame. Read a dot's slot with `offsetLeft` and `offsetTop`, because they ignore transforms. Put no transform on the `h1`: a drifting line reads as a move, not a hold.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| Letters land on one frame | The stagger is too small | Stay in the 30 to 80 ms band for each letter |
+| The line is hard to read | Cap height under 6 percent | Raise the font size, never shrink the line |
+| Two accents compete | Accent on the slot word and the punch word | Give the accent to the claim word only |
+
+## What to read next
+
+<Cards>
+  <Card title="Text and fonts" href="/docs/text-and-fonts">Size type with the frame height.</Card>
+  <Card title="Recipes" href="/docs/recipes">Recipes 8 and 13 in full.</Card>
+  <Card title="Cut to the beat" href="/docs/cut-to-the-beat">Land each word on a beat.</Card>
+  <Card title="Logo sting" href="/docs/logo-sting">A short film with a mark.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  recipes 2, 8, 13 (length, thread, traps, one punch): prompts/moves/RECIPES.md
+  move names by job: prompts/moves/README.md "Pick by job"
+  new --title: bin/vawe new --help
+  45 ms stagger in the 30 to 80 ms band: prompts/moves/letter-stagger.md
+  readable-hold, type-scale, text-breathing, first-frame, live-hold, typeface-default, exits-shorter: taste/build/DIGEST.md; taste/rules/type-scale.md; text-breathing.md break-when
+  0.22 s exits, 0.6 s entrances: prompts/moves/RECIPES.md "Complete videos"
+*/}

@@ -1,0 +1,143 @@
+---
+title: Explainer
+description: Make a film that explains a topic, an article or a process with invented visuals, facts first and nothing sold.
+icon: Lightbulb
+---
+
+At the end of this page you have an explainer <Term id="film">film</Term> of 9 s to 3 min. Each <Term id="beat">beat</Term> shows one idea, and a facts list that you checked backs every claim.
+
+You need a vawe checkout and a source: a link, a paper, a recipe or an outline.
+
+## What this film needs
+
+An explainer teaches. It has no product to sell and no capture to show, so the agent invents the visuals. The picture is the explanation: a diagram that builds, a number that counts, or a process that fills from empty to complete. Type is for labels and one sentence for each beat, never for paragraphs.
+
+The length is 9 s to 3 min (`prompts/story-explainer.md`). Over 60 s, use the director's brief (`prompts/directors-brief-long-form.md`) and one chapter file for each agent. A common length is 30 s in 16:9.
+
+Plan the beat count from the length. The `scene-budget` rule gives 5 to 7 beats of 3 to 6 s for 30 s, and 8 to 12 beats of 4 to 7 s for 60 s. Beat length varies, and the payoff holds longest.
+
+The <Term id="spectacle">spectacle</Term> of an explainer is the payoff: the beat where the idea becomes clear. The `hook-payoff` rule puts the question in the first 3 s and the answer at 77 to 90 percent of the length. Do not spend the best fact in the hook.
+
+<Diagram
+  label="Three boxes in a row: the facts list, the beat list, and the page. The beat list is the box to approve."
+  caption="Two lists come before any code. Each list is a stop."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>Facts list</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">every claim, sourced</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>Beat list</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">one idea per beat</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Page</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">built from the lists</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Facts list</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">every claim, sourced</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>Beat list</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">one idea per beat</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Page</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">built from the lists</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new fsync --from prompts/story-explainer.md --length 30 --aspect 16:9
+```
+
+The template asks for the source, the audience in one line, the three things the viewer must be able to explain afterwards, the length, the aspect, and the narration. A skipped question takes its default. Read [Write the brief](/docs/brief).
+
+</Step>
+<Step>
+
+### Write the facts list and stop
+
+Before any visual, list every claim the film makes, with its source and the line it comes from. Mark anything you could not verify. Copy formulas, dates, numbers and names. Never paraphrase them. The owner checks this list before you draw.
+
+</Step>
+<Step>
+
+### Write the beat list and stop
+
+One row for each beat: the time, the one sentence the viewer takes away, what builds on screen, and the cut out. Each beat has one thing that changes. If narration exists, each beat start is a word boundary from the timings, not a guess.
+
+</Step>
+<Step>
+
+### Build the page and draft
+
+Draw diagrams as SVG in the page and build them with CSS `@keyframes` or `element.animate()` (a line draws itself with `stroke-dashoffset`). Count numbers with a `[[f, v]]` table and `kf(t, table, ease)` from `core/motion/springs.js`, so the count is a pure function of time.
+
+```bash
+bin/vawe dev films/fsync/page.html
+```
+
+</Step>
+</Steps>
+
+## Narration and captions
+
+Narration is an `<audio src="vo.mp3" data-at="0" data-role="vo">` tag that you supply. `data-role="vo"` ducks the <Term id="bed">bed</Term>. Put music under it at a lower gain. Read [Audio](/docs/audio).
+
+Captions are one `<p>` for each line, timed with the same table as the narration. The `caption-karaoke` and `caption-editorial` moves are built versions. Do not write an em dash on screen.
+
+The agent cannot hear the narration it rendered. Write "pronunciation not checked by the model" in the hand-off, and have a person listen once.
+
+## Pitfalls from the taste digest
+
+- **Show real things working** (`show-real-thing`). The viewer watches the thing work. A value changes and the output updates. A word in a box is not a beat.
+- **Text breathing** (`text-breathing`). Readable text fills at most 84 percent of a film. Leave one or two beats with no words.
+- **Read lines** (`readable-hold`). A caption holds for max(1.2 s, words / 3). A diagram that finishes building in 300 ms was not seen.
+- **Every claim is backed** (`claim-backed`). Show each number in the same beat that states it.
+- **One thread** (`thread`). Keep one palette and one accent, for the thing explained right now.
+
+A formula with a glyph the font lacks renders a box, so check the glyphs. A count that ends on a rounded number lies: count to the sourced value. Captions and diagram must not share the caption band.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| A bullet slide | The beat says the thing instead of showing it | Draw the mechanism |
+| A diagram appears at once | No build | Draw it over 1.2 s or more |
+| The voice and the picture drift | Beat starts were guessed | Take each start from the timings file |
+
+## What to read next
+
+<Cards>
+  <Card title="Data story" href="/docs/data-story">An explainer built on numbers.</Card>
+  <Card title="Key frames and the board" href="/docs/key-frames">Plan each beat before motion.</Card>
+  <Card title="Audio" href="/docs/audio">Voice, bed and cues.</Card>
+  <Card title="Critique and fix" href="/docs/critique">Fresh eyes on the draft.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  9 s to 3 min, over 60 s director's brief, inputs, facts list, structure, build 1-4, gotchas, narration caveat: prompts/story-explainer.md
+  30 s 16:9 default: prompts/story-explainer.md Questions 4
+  chapter file per agent: AGENTS.md "Over 60 seconds"
+  scene-budget numbers: taste/rules/scene-budget.md
+  hook-payoff 3 s and 77 to 90 percent: taste/rules/hook-payoff.md
+  kf, springs.js: core/motion/springs.js line 63
+  data-role="vo" ducks the bed: AGENTS.md "Audio"
+  text-breathing 84 percent: taste/rules/text-breathing.md
+  other rules: taste/build/DIGEST.md
+  caption moves: prompts/moves/caption-karaoke.md, caption-editorial.md
+  new flags: bin/vawe new --help
+*/}
