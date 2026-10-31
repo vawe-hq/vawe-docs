@@ -1,0 +1,147 @@
+---
+title: Logo sting
+description: Make a short unnarrated motion unit under 10 s, such as a logo reveal, a stat hit or a moving title.
+icon: Sparkles
+---
+
+At the end of this page you have a <Term id="film">film</Term> of 3 to 8 s in which motion is the message: a logo reveal, a stat hit or a moving title. A sting has no narration.
+
+You need a vawe checkout and a name for the brand. If the brand does not exist, invent it. The example film `films/examples/colour-sting` does this.
+
+## What this film needs
+
+A request is a sting when it is under 10 s and motion carries the message (`guides/ROUTING.md`, row 9). A 6 s logo reveal for a real brand is still a sting. A film "from this site" with no length is a [launch video](/docs/launch-video).
+
+A sting has one <Term id="beat">beat</Term> or a few. Under 15 s most films are one continuous action, so plan the thread first: one object, type line, colour or rhythm that stays through every cut. The `thread` rule asks for it.
+
+Put the <Term id="spectacle">spectacle</Term> in the middle. In `colour-sting` the page sets `<meta name="spectacle" content="2.75">` in a 5 s film: the ring lands as the "o" of the name. Quiet comes before it.
+
+Two recipes in `prompts/moves/RECIPES.md` are 5 s stings:
+
+| Recipe | Led by | Thread |
+|---|---|---|
+| 1 Brand sting | graphic or colour | the name: a window, then a rider on the colour block, then the lockup word |
+| 2 Brand sting | type | a rhythm: one pulse every 0.48 s (125 bpm); every landing and cut is on it |
+
+Each recipe has an `invent` row. Do not copy it. Design that beat from the brand's own mark, colour or name.
+
+<Diagram
+  label="Three boxes in a row: the mark lands, the word opens, the lockup keeps moving to the last frame. The word opening holds the spectacle."
+  caption="A logo sting in three parts. Something on the lockup still moves in the last second."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>Mark lands</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">frame 0 shows it</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>Word opens</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">spectacle</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Lockup moves</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">to the end</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Mark lands</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">frame 0 shows it</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>Word opens</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">spectacle</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Lockup moves</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">to the end</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the brief with the beat sheet
+
+```bash
+bin/vawe new onsen --from prompts/beat-sheet.md --length 5 --aspect 16:9
+```
+
+`beat-sheet.md` is the template for a sting: one table with one row for each shot. When no template fits, `new` takes a sting by default (`bin/vawe new --help`). Fill the Shots, Words and Objects tables in `brief.md` before the page. Each Shots row has one focal action. The slowest row is at least 3 times the fastest.
+
+</Step>
+<Step>
+
+### Check the first frame
+
+```bash
+bin/vawe frames films/onsen/page.html
+```
+
+The `first-frame` rule says the subject shows by 0.1 s. Nothing arrives into an empty frame. Read the stills at full size.
+
+</Step>
+<Step>
+
+### Draft and read the cuts
+
+```bash
+bin/vawe dev films/onsen/page.html
+bin/vawe strip films/onsen/page.html --cuts
+```
+
+Read [Draft](/docs/draft) and [Motion pass](/docs/motion-pass). In a 5 s film each seam matters, so look at every one.
+
+</Step>
+<Step>
+
+### Add sound last, and keep it small
+
+A sting takes a few <Term id="cue">cues</Term>, placed 30 ms before their frame. Do not add a synth <Term id="bed">bed</Term>. Read [Audio](/docs/audio).
+
+</Step>
+</Steps>
+
+## Pitfalls from the taste digest
+
+- **Frame 0 has a subject** (`first-frame`). A black open for 0.5 s fails the hook.
+- **End on motion** (`moving-tail`). A wordmark may land and hold, but one part of the lockup moves in the last second. A camera push does not count.
+- **Use the sheen band once** (`no-tells`). The `logo-sting` move and the `mark-trace` move each carry a stock device. Take one of them, not both.
+- **Exits are faster than entrances** (`exits-shorter`). A 5 s film has little time to waste on a slow exit.
+- **The logo is large enough** (`logo-prominence`): at least 5 percent of the frame height, about 7 percent in practice.
+- **Choose the hero from the direction**, not from the attractor list (`attractors`): a glowing orb, a dusk sun, a lens streak, an accent bar. A disc needs a light source and a surface.
+
+Two traps from recipe 1 cost time. Swap shots under the colour block, never before it. Start `logo-sting` when the trailing block passes the centre, or the mark lands under the block.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The mark lands under another layer | The move starts before the block clears | Start the move when the block passes the centre |
+| The tail freezes | The push runs a fixed time | Set the push to the time left |
+| The sting reads as a template | A recipe followed 1:1 | Change at least two moves and design the `invent` beat |
+
+## What to read next
+
+<Cards>
+  <Card title="Motion" href="/docs/motion">Pick a move by its job.</Card>
+  <Card title="Recipes" href="/docs/recipes">The two sting chains in full.</Card>
+  <Card title="Kinetic type" href="/docs/kinetic-type">A sting made of words.</Card>
+  <Card title="Loops" href="/docs/loops">A sting that repeats.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  sting under 10 s, row 9, beat-sheet.md, ambiguities: guides/ROUTING.md lines 25, 36-38
+  3 to 8 s: guides/ROUTING.md line 48 ("sting 3 to 8 s")
+  default sting: bin/vawe new --help (--from)
+  colour-sting meta duration 5, spectacle 2.75, ring lands as the o: films/examples/colour-sting/page.html lines 5-8; brief.md "Task"
+  recipes 1 and 2, 0.48 s pulse, invent row: prompts/moves/RECIPES.md
+  slowest row at least 3x the fastest, cues 30 ms early: prompts/beat-sheet.md lines 24-27, 74
+  first-frame, moving-tail, logo-prominence, attractors: taste/rules, taste/build/DIGEST.md
+  stock device once per film: prompts/moves/logo-sting.md, mark-trace.md
+  recipe 1 traps: prompts/moves/RECIPES.md recipe 1
+  strip --cuts, frames: bin/vawe --help
+*/}

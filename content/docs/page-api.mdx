@@ -1,0 +1,136 @@
+---
+title: Page API
+description: What the renderer gives a page and what it reads from a page, from window.vawe to meta tags and data attributes.
+icon: Braces
+blog:
+  - slug: page-contract
+    title: "HTML to video format: the page contract"
+---
+
+This page lists the <Term id="page-api">page API</Term>: what the renderer sets before your scripts run, and what it reads from your markup. The sources are `harness/media/render-page.mjs`, `core/engine/page-seek.js`, `core/engine/page-api.js` and `harness/media/page-audio.mjs`. For the idea behind it, read [The page](/docs/the-page) and [Time and seek](/docs/time-and-seek).
+
+## window.seek
+
+Define `window.seek(t)` when the page paints in script. `t` is the film time in seconds and can be fractional. Paint frame `t` as a pure function of `t`. A promise that you return is awaited, so a texture can decode before the screenshot (`core/engine/page-seek.js`).
+
+For each seek, the renderer does these steps in order:
+
+1. Wait for the page to be ready: no image decode, `fetch` or font load is pending.
+2. Set the <Term id="virtual-clock">virtual clock</Term> to `t`.
+3. Call `window.seek(t)` if the page defines it.
+4. Pause every CSS, Web Animation and SVG animation and set its time to `t`.
+5. Call every `vawe.onFrame` hook.
+
+## window.vawe
+
+The renderer sets these before any page script runs (`installPageFrame`, `core/engine/page-seek.js`).
+
+| Name | Type | What it is |
+|---|---|---|
+| `vawe.aspect` | string | The aspect of this render, for example `"16:9"` |
+| `vawe.width`, `vawe.height` | number | The CSS viewport in px. Always the full aspect size, also in a draft |
+| `vawe.fps` | number or undefined | The value of `<meta name="fps">`. It is the rate of your frame table, not the render rate |
+| `vawe.duration` | number or undefined | The value of `<meta name="duration">`. For `auto`, the length that the render measured |
+| `vawe.onFrame(fn)` | function | Register a hook `fn(t)` that runs after each seek. It may return a promise |
+| `vawe.animationEnd()` | function | `{ endS, infinite }`: the end of the last animation. The renderer uses it to size an `auto` page |
+
+One extra module adds more. Import it as a module script:
+
+```html
+<script type="module">
+import '../../../core/engine/page-api.js';
+</script>
+```
+
+It adds these names to `window.vawe` (`core/engine/page-api.js`):
+
+| Name | What it does |
+|---|---|
+| `vawe.value(row, t)` | Sample one timing row `{ at, dur, from, to, ease }` as a number. `ease` is a CSS keyword or a name in `core/motion/easings.js`. An unknown name throws and lists the valid ones |
+| `vawe.assert(t, fn, message)` | The renderer runs `fn` after it seeks to `t`, at `dev` and `ship`. A falsy or throwing `fn` stops the render with exit 2, the time and `message` |
+| `vawe.clock` | The virtual clock, `window.__pageClock` |
+| `vawe.three` | The three.js helpers `studio`, `extrude` and `material` from `core/three/index.js` |
+
+## CSS variables and the html element
+
+| Name | Set on | What it is |
+|---|---|---|
+| `data-aspect` | `<html>` | The aspect of this render. Use it in selectors, for example `[data-aspect="9:16"] h1` |
+| `--vw` | `:root` | The viewport width as a length, such as `1920px` |
+| `--vh` | `:root` | The viewport height as a length, such as `1080px` |
+| `--ease-<name>` | `:root` | The named eases as CSS `linear()` curves |
+
+`--vw` and `--vh` hold a unit. Write `calc(var(--vh) * 0.11)`, never `* 0.11px`. The named eases are `land`, `land-soft`, `settle`, `swap`, `glide`, `carry`, `leave`, `launch`, `pop` and `nudge` (`EASE_HANDLES` in `core/motion/presets.js`). A plain browser does not set them, so a page that uses them shows its end state there.
+
+The canvas sizes are `16:9` 1920x1080, `9:16` 1080x1920, `1:1` 1080x1080, `4:5` 1080x1350 and `4:3` 1440x1080. Any other ratio fits the long edge to 1920 (`core/layout/aspects.js`). See [Aspect ratios](/docs/aspect-ratios).
+
+## Meta tags
+
+The renderer reads these before the page loads, from the file. `harness/lib/page-meta.mjs` finds `<meta name="..." content="...">`.
+
+| Meta | Value | What it does |
+|---|---|---|
+| `duration` | seconds, or `auto` | The <Term id="duration">length</Term>. `auto` is the end of the last finite move plus a hold. See `harness/media/page-duration.mjs` |
+| `aspect` | `W:H` | The aspect when no `--aspect` flag is given. Default 16:9 |
+| `fps` | number | The rate of your frame table. The render rate is separate: 30 for a draft, 60 for a final |
+| `message` | text | The <Term id="message">one thing to remember</Term>. The text checks read it |
+| `spectacle` | seconds | The second of the one big moment, the <Term id="spectacle">spectacle</Term>. Put quiet before it |
+| `signature` | `band=...; ease=...; stagger=...; seam=...; palette=...; thread=...` | The six dials of the film. The motion presets read the dials you choose (`harness/lib/signature.mjs`) |
+| `loudness` | LUFS number | Normalise the mix to this target. Without it, the mix is as written (`harness/media/page-audio.mjs`) |
+| `loop` | `true` | The `loop-seam` check compares the last frame with the first (`quality/gates/page-check.mjs:378`) |
+| `blank` | `0-0.4, 4.8-5` | Declare the seconds where an empty frame is intended. `data-blank` on `<html>` does the same (`render-page.mjs:665`) |
+
+## data attributes
+
+### On the page
+
+| Attribute | On | What it does |
+|---|---|---|
+| `data-world="<id>"` | an element | Marks one <Term id="world">world</Term>. Lowercase id. `frames`, `strip --cuts`, the checks and `data-on` read it |
+| `data-chrome` | an element | Text inside is product UI shown as texture. The cap floor is 2.5% and it has no read hold |
+| `data-ui` | an element | Text inside is UI that is the subject. It has its own cap-height floor |
+| `data-texture="<why>"` | an element | Real texture, with a reason. The reason needs a minimum number of characters (`harness/lib/draft-check.mjs:18`) |
+| `data-look="product"` | `<html>` | The motion lint treats the page like `data-chrome`: uniform motion (`harness/lib/motion-lint.mjs:53`) |
+
+Text inside `aria-hidden="true"` is also texture, and the text checks skip it.
+
+### On an audio tag
+
+`page-audio.mjs` reads these from every `<audio>` element. The mix is offline and as written. See [Audio](/docs/audio) and [Fonts and sounds](/docs/fonts-and-sounds).
+
+| Attribute | What it does |
+|---|---|
+| `src` | The file, relative to the page. A `<source>` child also works |
+| `loop` | Marks the music <Term id="bed">bed</Term> (role `music`) |
+| `data-synth="<name>"` | A built-in <Term id="voice">voice</Term> instead of a file |
+| `data-at="<s>"` | The second where the <Term id="cue">cue</Term> starts. Default 0 |
+| `data-on="world:<id>"` | `data-at` counts from the first second world `<id>` shows. It needs the page seek |
+| `data-gain="<dB>"` | The absolute level. It replaces the default of a voice |
+| `data-fade-in`, `data-fade-out` | Fade seconds. Default 0 |
+| `data-trim`, `data-trim-end` | Play the seconds `data-trim` to `data-trim-end` of the file |
+| `data-role="vo"` | A voice-over. It <Term id="duck">ducks</Term> the music by 18 dB while it plays |
+| `data-length="<s>"` | The seconds of the move, for the voices `air` and `swoosh-long` |
+| `data-duck` | A duck level in dB for this track |
+
+## What a page may not do
+
+The virtual clock owns `Date`, `performance.now`, `requestAnimationFrame`, `setTimeout`, `setInterval` and `Math.random`. Each one is a function of the seek time. `Math.random` restarts from the seek time on every seek, so the same `t` gives the same numbers (`core/engine/page-clock.js`). Keep no state between frames. See [Determinism](/docs/determinism).
+
+A module-level `await` of anything but an image decode, a `fetch` or `document.fonts.ready` is not tracked. Frame 0 can paint before your `vawe.onFrame` exists. Await those three, or register the hook first and await inside it.
+
+A rule that you break on purpose goes into `<script type="application/json" id="authoring">`. See [Waivers](/docs/waivers).
+
+{/* sources (vawe 4d9a5acb4):
+  seek order: core/engine/page-seek.js:6-28
+  vawe.aspect/width/height/fps/duration/onFrame/animationEnd: core/engine/page-seek.js:111-135
+  data-aspect, --vw, --vh, --ease-*: core/engine/page-seek.js:136-140
+  value, assert, clock, three: core/engine/page-api.js:1-10, 54-72
+  eases list: core/motion/presets.js:32-43, 55
+  canvas sizes: core/layout/aspects.js
+  metas: harness/cli/new.mjs:25-33 (starter), harness/media/page-duration.mjs:1-20, harness/media/render-page.mjs:12-19, 665, harness/media/page-audio.mjs:13, quality/gates/page-check.mjs:22, 378
+  signature dials: harness/lib/signature.mjs:32
+  data-chrome 2.5%: AGENTS.md "The page contract"; data-ui: harness/lib/judge-prompt.mjs:26; data-texture: harness/lib/draft-check.mjs:124
+  audio attributes: harness/media/page-audio.mjs:1-18, 71-82
+  clock: core/engine/page-clock.js:1-14
+  tracked waits: skills/vawe-page/SKILL.md rule 11, core/engine/page-seek.js:80-100
+*/}

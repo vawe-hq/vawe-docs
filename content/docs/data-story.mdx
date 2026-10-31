@@ -1,0 +1,133 @@
+---
+title: Data story
+description: Make a film where one number or one chart is the claim, with the data in the page and the source on screen.
+icon: ChartColumn
+---
+
+At the end of this page you have a <Term id="film">film</Term> that proves one claim with numbers. The numbers on screen equal the numbers in your data.
+
+You need a vawe checkout and a data set with a source. The data is yours to bring. vawe does not read a data file by itself (see [Batch from data](/docs/batch-from-data)).
+
+## What this film needs
+
+A data story has one claim and one figure that proves it. The claim comes first, and every beat confirms it. Recipe 12 in `prompts/moves/RECIPES.md` is the proof film of 20 s: a number rolls up, a chart builds to the same figure, and a wall of names says who counts it.
+
+Choose the template by who gains. If the film explains the data and nothing is sold, take `story-explainer.md`. If a real product is behind the data and the film markets it, take `brand-launch-from-url.md` (`guides/ROUTING.md`, ambiguities). Use the same chain of moves in both cases.
+
+Two moves carry most of the film. `count-up` rolls each digit on a wheel, so digits never change width. `chart-build` draws the gridlines, raises all the bars in grey, then turns the newest bar to the accent and pops its value tag. Only one bar and one number are bright, so the chart says one thing.
+
+The <Term id="spectacle">spectacle</Term> is the last bar turning accent, after about 1.35 s of silence. Place `<meta name="spectacle">` on that second.
+
+<Diagram
+  label="Three boxes in a row: the number, the chart, the source. The chart holds the spectacle, when the last bar turns to the accent."
+  caption="The same figure appears in every box."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>The number</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">rolls up, then reads</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>The chart</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">last bar turns accent</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>The source</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">named on screen</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>The number</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">rolls up, then reads</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>The chart</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">last bar turns accent</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>The source</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">named on screen</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Write the facts down first
+
+List each number with its source and the line it comes from. Mark what you could not verify. Use one unit and one data set across the number, the chart and the sparkline. The sparkline ends where the last bar ends.
+
+</Step>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new renders-proof --from prompts/story-explainer.md --length 20
+```
+
+Put the numbers in the Words and Objects tables. Read [Write the brief](/docs/brief).
+
+</Step>
+<Step>
+
+### Keep the data as a literal in the page
+
+Every tunable number is a literal in the page (`AGENTS.md`). Write the data as a `[[f, v]]` table or an array, and drive the count with `kf(t, table, ease)` from `core/motion/springs.js`. The count is then a pure function of time. Count to the sourced value, not to a rounded one.
+
+</Step>
+<Step>
+
+### Draft and check each figure
+
+```bash
+bin/vawe dev films/renders-proof/page.html
+bin/vawe frames films/renders-proof/page.html
+```
+
+Read the final frame of each beat and compare every figure with the facts list.
+
+</Step>
+</Steps>
+
+## Pitfalls from the taste digest
+
+- **Every claim is backed** (`claim-backed`). "26 looks" needs 26 looks on screen. Cut a number you cannot show.
+- **One accent** (`accent-share`). Put the accent on the one thing the beat is about: the number, then the last bar, then the line, then the button. In recipe 12 the chart's tag is white and the chip drops its accent.
+- **Read lines** (`readable-hold`). A chart holds about 3.2 s, because axis labels and a title are words that read at words / 3 s.
+- **A hold keeps one part alive** (`live-hold`). Recipe 12 drifts the card, so the chart hold is never a still.
+- **Text breathing** (`text-breathing`). Give one beat to the chart alone, with no words.
+
+An invented wall of logos uses invented marks at one visual weight, never real brands. Exit the wall together with its line, and exit the `count-up` container, not its wheels.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The number and the chart disagree | Two data sets in one page | Read both from one literal |
+| The final number is rounded | The count ends on a display value | Count to the sourced value |
+| The chart reads as decoration | No claim in the beat | Name the claim in the caption |
+
+## What to read next
+
+<Cards>
+  <Card title="Explainer" href="/docs/explainer">Facts first, then the picture.</Card>
+  <Card title="Recipes" href="/docs/recipes">Recipe 12 in full.</Card>
+  <Card title="Batch from data" href="/docs/batch-from-data">Many films from one page.</Card>
+  <Card title="Motion" href="/docs/motion">The count-up and chart-build moves.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  recipe 12 proof film 20 s, traps (one unit, accent order, 3.2 s chart hold, invented marks): prompts/moves/RECIPES.md recipe 12
+  template choice: guides/ROUTING.md ambiguities (lines 34-41); prompts/story-explainer.md
+  count-up wheels, chart-build behaviour, 1.35 s: prompts/moves/count-up.md, chart-build.md (Sound line)
+  literal tables: AGENTS.md "The page contract"; kf: core/motion/springs.js line 63
+  count to the sourced value: prompts/story-explainer.md gotchas
+  claim-backed: taste/rules/claim-backed.md; live-hold: taste/rules/live-hold.md
+  accent-share: taste/rules/accent-share.md
+  text-breathing: taste/rules/text-breathing.md
+*/}

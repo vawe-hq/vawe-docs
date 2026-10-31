@@ -1,0 +1,83 @@
+---
+title: Templates
+description: Every template in prompts/, the film type it serves and the command that starts it.
+icon: LayoutTemplate
+---
+
+A <Term id="template">template</Term> is a file in `prompts/` for one film type. Its inputs section becomes the `brief.md` that `bin/vawe new` writes. This page lists the files of `prompts/` and the film-type table of `guides/ROUTING.md`. See [Write the brief](/docs/brief) for the brief itself.
+
+## Start from a template
+
+Give `new` the ask in your own words. It picks the template from the first matching row of the routing table:
+
+```bash
+bin/vawe new my-launch --request "a 20 s launch film for our CLI"
+```
+
+Or name the template yourself with `--from`:
+
+```bash
+bin/vawe new my-launch --from prompts/brand-launch-from-url.md --length 20
+```
+
+`new` prints the details it needs first and writes nothing. Answer with `--answers <file>` or `--detail key=value`, or add `--defaults` to guess. See [CLI](/docs/cli) for these flags. With no template that fits, `new` takes `beat-sheet.md`.
+
+## The film types
+
+The routing table has nine rows. The first row that fits wins. Two rows fit: the shorter film wins. Match the film the ask wants, not a word it uses.
+
+| # | Film type | Use it when | Template | Command |
+|---|---|---|---|---|
+| 1 | Reference rebuild | A reference mp4 must be matched: its light, pacing, type and curves | `reference-rebuild.md` | `bin/vawe new <name> --ref <ref.mp4>` |
+| 2 | Brand launch | You market or show a real product, company or site from a URL, with its own kit and real captures | `brand-launch-from-url.md` | `bin/vawe new <name> --from prompts/brand-launch-from-url.md` |
+| 3 | UI morph | One element becomes 8 to 12 UI states on a beat grid and loops | `ui-morph-loop.md` | `bin/vawe new <name> --from prompts/ui-morph-loop.md` |
+| 4 | Story or explainer | You explain a topic, an article or data with invented visuals and sell nothing | `story-explainer.md` | `bin/vawe new <name> --from prompts/story-explainer.md` |
+| 5 | Music video | A song exists. Every cut lands on a downbeat, with one spectacle at the drop | `music-video-beat-synced.md` | `bin/vawe new <name> --from prompts/music-video-beat-synced.md` |
+| 6 | Long form | The film runs over 60 s or needs more than one session or agent | `directors-brief-long-form.md` | `bin/vawe new <name> --from prompts/directors-brief-long-form.md` |
+| 7 | App or game capture | A mechanism as an explorable model, then a scripted tour of it | `interactive-lab-capture.md` | `bin/vawe new <name> --from prompts/interactive-lab-capture.md` |
+| 8 | Showreel | You have no brief: a taste probe, or learn the defaults of an agent and ban them | `showreel-one-liner.md` | `bin/vawe new <name> --from prompts/showreel-one-liner.md` |
+| 9 | Sting | A short unnarrated unit under 10 s: a logo reveal, a stat hit, a moving title | `beat-sheet.md` | `bin/vawe new <name> --from prompts/beat-sheet.md` |
+
+The `--ref` flag writes `films/recreations/<name>` with `SPEC.md`. See [Match a reference film](/docs/match-a-reference).
+
+### How the table breaks ties
+
+- A site with nothing to sell (no product, no call to action) is a reference rebuild. The reference is the subject.
+- A sting cut from a captured site is still a sting when it is under 10 s and motion is the message. "Make a video from this site" with no length is a brand launch.
+- An invented product, with nothing real to capture, is never a brand launch. Take `beat-sheet.md`.
+- Data with a real product behind it is a brand launch when the ask is to market it. It is an explainer only when nothing is sold.
+- A song plus a product is a music video. The song owns the cuts.
+
+## Special templates
+
+These two take a row of their own before the table.
+
+| Template | Use it when |
+|---|---|
+| `production-brief-acceptance.md` | A client, a launch or a claim that someone other than the author must sign off. It adds inputs and rights, shots and states, and three acceptance gates |
+| `pixel-art-sprite.md` | The look is a 16-bit sprite loop on a logical canvas. It sets the logical resolution, a fixed palette and a state machine |
+
+## Reference files
+
+These files sit in `prompts/` but are not film types. They help you write or choose.
+
+| File | What it is |
+|---|---|
+| `ANATOMY.md` | The sections of a measured brief in order: task, look, keep and swap, spec, acceptance, gates, pitfalls, deliver |
+| `skill-combos.md` | The named combinations of ui-skills for the rungs of the [design kit](/docs/design-kit): proven, rejected and untested |
+
+`prompts/moves/` holds the moves to copy. See [Motion](/docs/motion) and [Recipes](/docs/recipes).
+
+## What a template contains
+
+Each file in `prompts/` has a header (`when`, `answers`), the template itself, a question bank, the gotchas and a `source:` line. The question bank has at most five questions, ordered by how much each changes the film, each with its reason and its default. The brief fills the answers in. An unanswered question takes its default and is marked `[unanswered: default taken]`.
+
+Every template stops before code at least once. Honour the stop: fill the spec tables of the brief before you write the page.
+
+{/* sources (vawe 4d9a5acb4):
+  film-type table, ties, special cases, template anatomy: guides/ROUTING.md
+  files and their when/answers: head of each prompts/*.md (ls prompts/: 13 files)
+  new flags: bin/vawe new --help
+  default beat-sheet and --from handling: harness/cli/new.mjs:459-465
+  --ref writes films/recreations: bin/vawe new --help; docs cli.mdx
+*/}

@@ -1,0 +1,144 @@
+---
+title: Batch from data
+description: Render many films from one page, with a --param for each row of your data.
+icon: Layers3
+---
+
+At the end of this page you have one page and a list of films, one for each row of your data. Each film has its own file name.
+
+You need a vawe checkout and a page that works as one film.
+
+## What vawe does and does not do
+
+vawe has no verb or flag that reads a CSV or JSON file. It has one input for a page: the <Term id="param">param</Term>. A param is a `key=value` pair that you pass on the command line. The page reads it. Your script reads the rows of your data and runs the verb once for each row.
+
+The `--param` flag exists on four verbs: `dev`, `ship`, `still` and `sheet`. It is repeatable, with a different key each time. The same key twice stops the verb with the error `--param look is given twice: a page reads one value per key`. A flag without an equals sign stops it with `--param needs key=value`.
+
+A param is part of the <Term id="render-key">render key</Term>. The default output name also carries it, so two rows do not overwrite each other. For `--param look=riso` on the page `films/card/page.html`, the draft is `out/card-look-riso-draft.mp4`.
+
+<Diagram
+  label="Three boxes in a row: one page, one render for each param, one film for each row."
+  caption="The page stays the same. Only the param changes."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>One page</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">reads its params</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>--param per row</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">your script loops</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>N films</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">one name each</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>One page</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">reads its params</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>--param per row</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">your script loops</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>N films</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">one name each</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Read the param in the page
+
+The page reads `location.search`. Give each param a default, so the page also renders with no param.
+
+```html
+<h1 id="name"></h1>
+<script>
+  const params = new URLSearchParams(location.search);
+  document.getElementById('name').textContent = params.get('name') ?? 'Hello';
+</script>
+```
+
+The script runs before the first frame. It reads only the query string, so the page keeps its <Term id="determinism">determinism</Term>: the same page and the same param give the same frames. Read [Determinism](/docs/determinism).
+
+</Step>
+<Step>
+
+### Look at one row
+
+```bash
+bin/vawe still films/card/page.html --at 2 --param name="Ada Lovelace"
+```
+
+`still` writes a PNG of the frame with the param applied. Check one row of each kind before you render all of them: the longest name, the shortest name, and a name with a character your font lacks.
+
+</Step>
+<Step>
+
+### Draft each row
+
+```bash
+bin/vawe dev films/card/page.html --param name="Ada Lovelace" --silent
+bin/vawe dev films/card/page.html --param name="Grace Hopper" --silent
+```
+
+Write the loop in your own script. It reads your CSV or JSON and starts one `dev` for each row. In an agent session, call the verb once for each row with literal arguments: `AGENTS.md` says a call with a `for` loop or `$(...)` is refused in a worktree.
+
+</Step>
+<Step>
+
+### Ship each row
+
+```bash
+bin/vawe ship films/card/page.html --param name="Ada Lovelace"
+bin/vawe ship --status --wait
+```
+
+`ship` runs in the background. It is refused until a fresh review of the page and the owner's approval exist. The same flags work with `--aspect`, so one row and one aspect make one file. Read [Ship](/docs/ship).
+
+</Step>
+</Steps>
+
+## What to keep in mind
+
+- **A param is a string.** The page converts it. Parse numbers in the page and give them a default.
+- **The layout must fit the longest value.** The checks run on the rows you render. Draft the extremes.
+- **A param goes to a page only.** `still`, `sheet` and the other verbs refuse `--param` for an mp4 input.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| `--param needs key=value, got "..."` | No equals sign | Write `--param key=value` |
+| `--param look is given twice` | Two values for one key | Render the two values in two calls |
+| The page shows its default | The key in the page differs from the flag | Match the key name exactly |
+| `--param goes to a page` | The input is an mp4 | Pass the `page.html` path |
+
+## What to read next
+
+<Cards>
+  <Card title="CLI" href="/docs/cli">The flags of each verb.</Card>
+  <Card title="Render flags" href="/docs/render-flags">The flags for a render.</Card>
+  <Card title="Vertical social" href="/docs/vertical-social">One page, more than one aspect.</Card>
+  <Card title="Data story" href="/docs/data-story">A film built on data.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  --param on dev, ship, still, sheet: ran `bin/vawe <verb> --help` for dev ship still sheet frames strip critique check see storyboard; only the four list --param
+  flag text, render key, output name -look-riso: bin/vawe dev --help (--param)
+  errors "needs key=value", "given twice": harness/lib/page-params.mjs paramsQuery; the "given twice" message ran on bin/vawe still
+  "goes to a page": harness/cli/verbs.mjs needsPage (line 70-71)
+  default name out/card-look-riso-draft.mp4: harness/lib/page-params.mjs paramsFilm; ran bin/vawe dev on tests/fixtures/pages/param-look.html and got out/param-look-look-riso-draft.mp4
+  no CSV or JSON input: grep of harness/cli, harness/lib, bin found no csv reader; bin/vawe --help --all lists no batch verb
+  fixture page: tests/fixtures/pages/param-look.html
+  ship refusal: bin/vawe ship --help
+  loop refused in a worktree: AGENTS.md "Shell" (line 62)
+*/}

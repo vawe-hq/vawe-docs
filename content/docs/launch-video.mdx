@@ -1,0 +1,153 @@
+---
+title: Launch video
+description: Make a product or brand launch film from a real site, with its own colours, type and captures.
+icon: Rocket
+blog:
+  - slug: product-launch-video-from-url
+    title: Product launch video generator from a website URL
+---
+
+At the end of this page you have a launch <Term id="film">film</Term> of 9 to 40 s that shows a real product doing real things. Every screen in it is a capture of the real site or app, and every colour comes from the site.
+
+You need a vawe checkout, the URL of the product, and the one line the film must prove.
+
+## What this film needs
+
+A launch film has one message. The `brand-launch-from-url` <Term id="template">template</Term> asks for the message in under 12 words and for 3 to 5 moments in the product worth showing. Each moment is one <Term id="beat">beat</Term> with one real capture that proves it.
+
+The length is 9 to 40 s (`prompts/brand-launch-from-url.md`). Under 9 s, use one continuous action instead. A complete launch film of 20 to 30 s follows one of the chains in `prompts/moves/RECIPES.md` (recipes 9 to 14).
+
+The rhythm is a hook, then one move for each beat, then the name. Cuts are not all equal. The `shot-length-varies` rule asks for punchy beats of 0.8 to 1.5 s next to breathing beats of 2 to 3 s, and the payoff holds longest.
+
+The one big moment is the <Term id="spectacle">spectacle</Term>. Put it where `<meta name="spectacle">` says. Leave about 1.5 s of quiet before it: no sound, no travel, nothing arriving.
+
+<Diagram
+  label="Three boxes in a row: the hook, the proof beats, and the name. The proof beats hold the spectacle second."
+  caption="The spectacle sits in the proof. The quiet before it is part of the proof beat."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={50} />
+      <DiagramText x={16} y={30}>Hook</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">the promise</DiagramText>
+      <DiagramBox x={0} y={85} w={360} h={50} accent />
+      <DiagramText x={16} y={115}>Proof beats</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">real captures</DiagramText>
+      <DiagramBox x={0} y={170} w={360} h={50} />
+      <DiagramText x={16} y={200}>Name</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">still moving</DiagramText>
+      <DiagramArrow points={[[180, 51], [180, 84]]} />
+      <DiagramArrow points={[[180, 136], [180, 169]]} />
+    </svg>
+  }
+>
+  <svg viewBox="0 0 681 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Hook</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">the promise</DiagramText>
+    <DiagramArrow points={[[201, 40], [239, 40]]} />
+    <DiagramBox x={240} y={0} w={200} h={80} accent />
+    <DiagramText x={256} y={30}>Proof beats</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">real captures</DiagramText>
+    <DiagramArrow points={[[441, 40], [479, 40]]} />
+    <DiagramBox x={480} y={0} w={200} h={80} />
+    <DiagramText x={496} y={30}>Name</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">still moving</DiagramText>
+  </svg>
+</Diagram>
+
+## Steps
+
+<Steps>
+<Step>
+
+### Build the kit from the site
+
+```bash
+node scripts/brand/kit.mjs https://example.com mybrand --init
+```
+
+The script writes `assets/brands/mybrand/kit.json` with the site's own palette, fonts and favicon. It also runs the doctor first. Use nothing else for colour and type. Do not improve the palette.
+
+</Step>
+<Step>
+
+### Write the brief
+
+```bash
+bin/vawe new mybrand-launch --from prompts/brand-launch-from-url.md --length 16 --aspect 16:9
+```
+
+The verb asks for the missing details and writes `films/mybrand-launch/page.html` and `brief.md`. Read [Write the brief](/docs/brief) for the answer files and `--defaults`. Fill the Shots, Words and Objects tables before you write the page.
+
+</Step>
+<Step>
+
+### Capture the real product
+
+Put each capture in `films/mybrand-launch/assets/`. A real page worked by a cursor is one mp4, not screenshots:
+
+```bash
+bin/vawe shot https://example.com --tour steps.json --w 1280 --out films/mybrand-launch/assets/tour.mp4
+```
+
+The steps file is a JSON list of `{ t, move | click | scrollTo | scroll, dur }`. Every frame of the tour is made at its exact second.
+
+</Step>
+<Step>
+
+### Draft, then read every cut
+
+```bash
+bin/vawe dev films/mybrand-launch/page.html
+```
+
+Then do the [motion pass](/docs/motion-pass) and the [critique](/docs/critique) in a session that did not write the page. Read [Draft](/docs/draft) for the flags.
+
+</Step>
+</Steps>
+
+## Pitfalls from the taste digest
+
+These rules from `taste/build/DIGEST.md` hit a launch film most.
+
+- **Show real things working** (`show-real-thing`). A word in a box is not a beat. A feature you did not see on the site must not appear.
+- **Style, not content** (`style-not-content`). Take a reference's grammar and light, never its text, logos or photos.
+- **Read lines** (`readable-hold`). Cap height is 6 percent of the frame or more. A line holds for max(1.2 s, words / 3).
+- **Exits are faster than entrances** (`exits-shorter`). Exit on `EASE.launch`.
+- **No tells** (`no-tells`). No gradient text, glow on UI, bursts or RGB split unless the brief asks.
+- **The logo is prominent early and late**, not only on the last beat (`logo-prominence`: at least 5 percent of the frame height).
+- **End on motion** (`moving-tail`). The last second keeps one part moving, such as a caret.
+
+A capture scaled below 0.6 loses its type, so crop it instead. A brand accent on a dark surface can fail contrast: the kit says which pair to use.
+
+## Common mistakes
+
+| What you see | Why | What to do |
+|---|---|---|
+| The film looks like a template | Three cuts in the same direction | Change axis or direction at each cut (recipes list the order) |
+| A beat shows a slogan on black | No capture proves the beat | Add the real capture or cut the beat |
+| A recipe copied beat for beat | `dev` prints a recipe-echo advice | Replace the `invent` row with a moment of your own |
+
+## What to read next
+
+<Cards>
+  <Card title="Recipes" href="/docs/recipes">Chains of moves for common films.</Card>
+  <Card title="Motion" href="/docs/motion">The built moves and their eases.</Card>
+  <Card title="Brand reflection" href="/docs/brand-reflection">Match the brand in the lens.</Card>
+  <Card title="Ship" href="/docs/ship">Make the final.</Card>
+</Cards>
+
+For the same page in other shapes, see [Vertical social](/docs/vertical-social), [UI demo](/docs/ui-demo) and [Logo sting](/docs/logo-sting).
+
+{/* sources (vawe 4d9a5acb4):
+  length 9 to 40 s, message under 12 words, 3 to 5 moments, kit.mjs --init: prompts/brand-launch-from-url.md lines 12, 17-22
+  kit.mjs usage and doctor: scripts/brand/kit.mjs lines 7-10
+  new flags --from --length --aspect: bin/vawe new --help
+  shot --tour: bin/vawe shot --help; build step 3 in prompts/brand-launch-from-url.md
+  rhythm 0.8 to 1.5 and 2 to 3 s: taste/rules/shot-length-varies.md
+  quiet 1.5 s before the spectacle: prompts/moves/RECIPES.md "Complete videos"
+  recipes 9 to 14: prompts/moves/RECIPES.md
+  pitfalls: taste/build/DIGEST.md; logo-prominence, moving-tail: taste/rules
+  capture scale 0.6, accent contrast: prompts/brand-launch-from-url.md pitfalls
+  recipe-echo advice: prompts/moves/RECIPES.md header (harness/lib/recipe-echo.mjs)
+*/}

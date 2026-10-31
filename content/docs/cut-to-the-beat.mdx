@@ -1,0 +1,115 @@
+---
+title: Cut to the beat
+description: Read a music track as a beat grid, check each cut of a page against it, and move the cuts that are off.
+icon: AudioWaveform
+blog:
+  - slug: beat
+    title: 'Cut video to beat: sync cuts to music with code'
+---
+
+At the end of this page you have a table that says which <Term id="cut">cuts</Term> of a page land on a beat of your music, and the second to move each of the others to. An agent cannot hear a track. `bin/vawe sound` reads the track as numbers instead.
+
+vawe does not make music and does not move cuts for you. It measures the track, compares the cuts of the page with it, and prints the fix. You edit the numbers in the page.
+
+## What you need
+
+- A music file that you have the right to use (`mp3`, `m4a`, `wav`, or an mp4 with audio).
+- A page with one `data-world` element for each beat of the story. The element start times are the cut times. See [Worlds](/docs/worlds).
+- The track in the page as a looped `<audio>` tag. See [Audio](/docs/audio).
+
+A track with no clear pulse has no grid. The verb says so and checks nothing. It does not invent a grid (`core/beats/detect.js`).
+
+## Steps
+
+<Steps>
+<Step>
+
+### Read the track alone
+
+```bash
+bin/vawe sound assets/music.mp3
+```
+
+The verb prints the tempo, the time of the first beat, the strongest hits and a beat grid. The grid lists each beat with its half and quarter beats, in seconds and in frames at 30 and 60 fps. Put a cut or a cue on the `attack` of a hit, where the sound starts.
+
+For a click track at 120 BPM the verb printed:
+
+```text
+Tempo 120 BPM, confidence 183.5 (strong); one beat is 0.50 s = 15.0 frames at 30 fps, 30.0 at 60 fps.
+Beat phase: the first beat is at 0.50 s (frame 15 at 30 fps, 30 at 60 fps); bars of 4 beats, bar 1 starts at 0.50 s.
+```
+
+</Step>
+<Step>
+
+### Compare the cuts of the page
+
+```bash
+bin/vawe sound assets/music.mp3 --cuts films/my-film/page.html
+```
+
+The verb reads the worlds from the DOM and prints one row per cut. The test film `colour-sting` against the same click track gave:
+
+```text
+| cut | at s | frame | nearest hit s | nearest line | offset ms | offset f | verdict |
+| 1 | 0.03 | 1 | 0.50 (-466 ms) | beat 1.1 0.50 (-466 ms) | -466 | -14 | off |
+| 2 | 0.73 | 22 | 0.50 (+234 ms) | half beat 0.75 (-16 ms) | -16 | -0.5 | on beat |
+| 3 | 1.03 | 31 | 1.00 (+34 ms) | beat 1.2 1.00 (+34 ms) | +34 | +1 | near |
+...
+```
+
+A cut is on beat within 1 frame of a hit, a beat line or a half-beat line. It is near within 3 frames, and off beyond that. The verdict uses 30 fps. The table ends with advice that names the second to move each off cut to, for example "move it to 0.50 s (frame 15 at 30 fps)".
+
+</Step>
+<Step>
+
+### Move the cuts
+
+Each beat start is a <Term id="literal">literal</Term> in the page: a keyframe stop, a `[[f, v]]` table or a `:root` custom property. Change that number to the second in the advice. Name each beat once, for example `--beat-3: 5.42s`, and read it in every delay of that beat, so one edit moves the beat.
+
+</Step>
+<Step>
+
+### Draft and read the table again
+
+```bash
+bin/vawe dev films/my-film/page.html
+```
+
+The draft reads the same table. It prints a `cut-off-beat` line with the count of cuts within one frame of a hit or beat line, and names the verb for the fix. `bin/vawe check page-check <page>` also warns when a cut is early or late against the grid, and says how many frames.
+
+</Step>
+</Steps>
+
+## The beat-synced template
+
+For a film that is built around a song, start from the template:
+
+```bash
+bin/vawe new my-music-film --from prompts/music-video-beat-synced.md
+```
+
+The template asks you to measure the song first and write `films/<name>/beats.md`: the BPM, the offset of the first downbeat, the energy per bar and the time of the drop. It sets the drop as the one <Term id="spectacle">spectacle</Term> of the film. It computes the beat index in `window.seek(t)` as `floor((t - offset) * BPM / 60)`, so the page stays deterministic. It places each cue 30 ms early, by its measured peak. A lyric-video variant sets one line per bar.
+
+## Limits
+
+- The grid is a measurement of one track. A track with a tempo change or a swing feel can give a grid that fits some bars and not others. Look at the hits table, not only the grid.
+- A cut on the beat can still feel flat. Read [Transitions](/docs/transitions) for what carries the eye across it.
+- `check page-check` and the draft line advise. They never stop a render.
+
+<Cards>
+  <Card title="Audio" href="/docs/audio">The tags that bring the track into the film.</Card>
+  <Card title="Loudness and the mix" href="/docs/loudness-and-the-mix">The level of the track under the cuts.</Card>
+  <Card title="Transitions" href="/docs/transitions">What carries the eye across a cut.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  sound verb, --cuts, output: bin/vawe sound --help; run 2026-10-31 on a generated 120 BPM click track (aevalsrc 1 kHz, 6 s) against films/examples/colour-sting/page.html; output trimmed
+  on beat 1 frame, near 3 frames, verdict at 30 fps: harness/lib/sound-read.mjs:28-29 (ON_BEAT_FRAMES, NEAR_FRAMES), :24 FRAMES; sound.md "Cuts against the sound"
+  no grid without a pulse: harness/lib/sound-read.mjs:26 TEMPO_USABLE 1.6, :121; core/beats/detect.js header
+  worlds give cut times: bin/vawe sound --help (--cuts: exact worlds from the DOM)
+  draft line cut-off-beat: harness/lib/sound-read.mjs:215
+  page-check warn: quality/gates/page-check.mjs:17, :294
+  template: prompts/music-video-beat-synced.md (grid, spectacle, floor((t - offset) * BPM / 60), 30 ms early, lyric variant)
+  beat names in CSS: skills/vawe-page/SKILL.md; docs page audio
+*/}

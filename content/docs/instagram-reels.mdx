@@ -1,0 +1,103 @@
+---
+title: Instagram Reels
+description: Render a 9:16 film for Instagram Reels, with the Meta and Instagram limits, an estimated safe zone and the vawe commands.
+icon: Instagram
+blog:
+  - slug: html-video-aspect-ratios
+    title: 'HTML video aspect ratio: 16:9, 9:16 and 1:1'
+---
+
+At the end of this page you have a 1080 x 1920 film for a Reel. Instagram publishes more numbers for Reels ads than for Reels posts, and this page says which is which.
+
+## The limits
+
+The sourced table is in [Video specs by platform](/docs/platforms). Read on 2026-10-31:
+
+- Reels ad (Meta Ads Guide): 9:16, 1440 x 2560, up to 15 minutes, up to 4 GB, MP4 or MOV, stereo AAC at 128 kbps or more, a fixed frame rate.
+- Reel post (Instagram): Instagram recommends Reels of 3 minutes or less to people who do not follow you. The feature page says you can record 20 minutes.
+- Instagram publishes no loudness target.
+- The Instagram help page for Reel sizes did not load text. Its ratio, frame-rate and resolution numbers are not on this page.
+
+## Safe zone
+
+Meta states the safe zone for Reels ads: keep text, logos and key elements out of 14% from the top, 35% from the bottom and 6% from each side. The source is the Meta Ads Guide page for Reels video. For a Reel post, Instagram publishes no pixel values, so treat these numbers as an estimate for posts too.
+
+| Edge | Share | Pixels at 1080 x 1920 |
+|---|---|---|
+| Top | 14% | 269 |
+| Bottom | 35% | 672 |
+| Each side | 6% | 65 |
+
+## Make the film
+
+<Steps>
+<Step>
+
+### Start a 9:16 page
+
+```bash
+bin/vawe new my-reel --request "a 20 second teaser with captions" --aspect 9:16 --length 20
+```
+
+The page gets `<meta name="aspect" content="9:16">` and `<meta name="duration" content="20">`.
+
+</Step>
+<Step>
+
+### Check the frame against the safe zone
+
+```bash
+bin/vawe still films/my-reel/page.html --at 2 --aspect 9:16
+```
+
+Open the PNG in `out/still/`. Text must sit between 269 px and 1248 px from the top (1920 minus 672), and 65 px from each side.
+
+</Step>
+<Step>
+
+### Add the music
+
+Add a music file with an `<audio>` tag:
+
+```html
+<audio src="assets/music.mp3" loop data-at="0" data-fade-out="0.4"></audio>
+```
+
+See [Audio](/docs/audio). To land the cuts on the beat, read [Cut to the beat](/docs/cut-to-the-beat).
+
+</Step>
+<Step>
+
+### Draft, then ship
+
+```bash
+bin/vawe dev films/my-reel/page.html --aspect 9:16
+bin/vawe ship films/my-reel/page.html --aspect 9:16
+bin/vawe ship --status --wait
+```
+
+The final is H.264 with stereo AAC audio. Check the loudness with `bin/vawe sound films/my-reel/page.html --waveform`.
+
+</Step>
+</Steps>
+
+## Limits
+
+- `ship` renders 60 fps and has no fps flag. The Meta ad page asks for a fixed frame rate and gives no number. A vawe final has a fixed rate.
+- The ad guide lists 1440 x 2560. A vawe 9:16 final is 1080 x 1920, the same ratio at a smaller size. `ship` has no size flag.
+- The vawe final audio is AAC at 192 kbps, 48 kHz: above the 128 kbps minimum on the ad page.
+
+<Cards>
+  <Card title="Video specs by platform" href="/docs/platforms">All six platforms, with sources.</Card>
+  <Card title="Cut to the beat" href="/docs/cut-to-the-beat">Land cuts on music.</Card>
+  <Card title="Loudness and the mix" href="/docs/loudness-and-the-mix">Set and measure the level.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  ad row and safe zone: https://www.facebook.com/business/ads-guide/update/video/instagram-reels read 2026-10-31 (text came back in Hindi; values 9:16, 1440x2560, 0 s to 15 min, 4 GB, MP4/MOV, AAC stereo 128 kbps+, fixed frame rate, 14/35/6)
+  3 minutes: https://creators.instagram.com/faq?locale=en_US ; 20 minutes: https://about.instagram.com/features/reels
+  Reel size help page did not load: https://help.instagram.com/1038071743007909
+  AAC 192k 48 kHz: harness/media/page-audio.mjs mixAndMux (-b:a 192k, RATE 48000)
+  commands: bin/vawe new|still|dev|ship|sound --help
+  1920-672 = 1248
+*/}
