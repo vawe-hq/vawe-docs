@@ -1,0 +1,137 @@
+---
+title: Fonts and sounds
+description: The free font faces and the synth voices that vawe carries, and how a page picks one.
+icon: Library
+---
+
+This page lists the output of two verbs: `bin/vawe fonts` and `bin/vawe sound` with no argument. For the rules of text and sound, read [Text and fonts](/docs/text-and-fonts) and [Audio](/docs/audio).
+
+## Fonts
+
+`bin/vawe fonts` prints the free faces (OFL) that vawe carries. Each line is the family, the weight and the file in `assets/fonts/`.
+
+| Family | Weight | File |
+|---|---|---|
+| Anybody | variable 100-900 | `Anybody.woff2` |
+| Archivo | variable 100-900 | `Archivo.woff2` |
+| Big Shoulders | variable 100-900 | `BigShoulders.woff2` |
+| Bricolage Grotesque | variable 100-900 | `BricolageGrotesque.woff2` |
+| Caveat | variable 100-900 | `Caveat.woff2` |
+| Fraunces | variable 100-900 | `Fraunces.woff2` |
+| Geist | variable 100-900 | `Geist.woff2` |
+| Geist Mono | variable 100-900 | `GeistMono.woff2` |
+| Hanken Grotesk | variable 100-900 | `HankenGrotesk.woff2` |
+| IBM Plex Mono | 400 | `IBMPlexMono-400.woff2` |
+| IBM Plex Mono | 500 | `IBMPlexMono-500.woff2` |
+| Instrument Serif | 400 italic | `InstrumentSerif-Italic.woff2` |
+| Instrument Serif | 400 | `InstrumentSerif-Regular.woff2` |
+| Inter | variable 100-900 | `InterVariable.woff2` |
+| JetBrains Mono | variable 100-900 | `JetBrainsMono.woff2` |
+| Manrope | variable 100-900 | `Manrope.woff2` |
+| Plus Jakarta Sans | variable 100-900 | `PlusJakartaSans.woff2` |
+| Space Grotesk | 500 | `space-500.woff2` |
+| Space Grotesk | 700 | `space-700.woff2` |
+| Unbounded | variable 100-900 | `Unbounded.woff2` |
+
+If a listed file is missing from `assets/fonts`, run `node generators/media/fonts.mjs`.
+
+### How a page picks a font
+
+A page picks a font with `@font-face`. The file lives in the folder of the film, so the film carries its own files.
+
+<Steps>
+<Step>
+
+### Copy the file
+
+```bash
+cp assets/fonts/Geist.woff2 films/my-film/assets/Geist.woff2
+```
+
+`bin/vawe new` does this for the starter face.
+
+</Step>
+<Step>
+
+### Declare the face
+
+```css
+@font-face { font-family: "Geist"; src: url("assets/Geist.woff2") format("woff2"); font-weight: 100 900; }
+body { font-family: "Geist", sans-serif; }
+```
+
+The `src` path is relative to `page.html`.
+
+</Step>
+</Steps>
+
+Two errors tell you the face is wrong. A face that does not load stops the render: `font <family> failed to load: fix its src or remove the @font-face`. Text in a family that no `@font-face` declares raises the `font-fallback` finding of `page-check`, because the browser paints a substitute. See [Checks](/docs/quality-gates).
+
+### System fonts
+
+`bin/vawe fonts --system` lists the faces installed on this machine, each with its `local()` name:
+
+```css
+@font-face { font-family: "Mine"; src: local("American Typewriter"); }
+```
+
+The film renders only where the face is installed. Never copy or commit the font file: it is licensed to the machine.
+
+## Sounds
+
+`bin/vawe sound` with no argument lists the synth voices. A page picks a <Term id="voice">voice</Term> with `data-synth` on an `<audio>` tag, and the second with `data-at`:
+
+```html
+<audio data-synth="whoosh" data-at="2.4"></audio>
+<audio data-synth="tap" data-on="world:s4" data-at="0.1"></audio>
+```
+
+Without `data-gain`, the cue plays at the default gain of its voice. `data-gain` is absolute and replaces that default. The voices `air` and `swoosh-long` also read `data-length`, the seconds of the move they sit under.
+
+| Voice | Default gain | Tail |
+|---|---|---|
+| `pluck` | -6 dB | 0.78 s |
+| `chime` | -6 dB | 2.20 s |
+| `sparkle` | -6 dB | 1.24 s |
+| `droplet` | -6 dB | 1.39 s |
+| `bloom` | -6 dB | 3.56 s |
+| `success` | -6 dB | 1.70 s |
+| `ready` | -6 dB | 1.10 s |
+| `whoosh` | -4 dB | 1.56 s |
+| `riser` | -4 dB | 1.75 s |
+| `drop` | -2 dB | 4.20 s |
+| `impact` | -2 dB | 0.83 s |
+| `swell` | -4 dB | 0.89 s |
+| `tap` | -3 dB | 0.49 s |
+| `tick` | -5 dB | 0.24 s |
+| `air` | -5 dB | 0.83 s |
+| `swoosh-long` | -5 dB | 2.09 s |
+| `shimmer` | -7 dB | 2.24 s |
+| `glass` | -7 dB | 2.20 s |
+| `sub-thump` | -5 dB | 1.08 s |
+
+A name that is not in the list stops the render and prints the valid voices. The names `bed`, `pad`, `drone`, `hum`, `chord`, `swell-soft` and `braam` are banned: a synth bed is not allowed. Use a real music file with `<audio loop src="...">`, or no bed (`harness/media/page-audio.mjs`).
+
+### Other sound commands
+
+| Command | What it does |
+|---|---|
+| `bin/vawe sound <track>` | The beat grid and hits of a music file |
+| `bin/vawe sound <page>` | The bed, the synth cues and the cuts of a page |
+| `bin/vawe sound <page> --at 0.8,2.75` | The cues that sound at those seconds, with the level of each in dB |
+| `bin/vawe sound <page> --waveform` | A PNG of the mixed waveform. Prints LUFS and true peak |
+| `bin/vawe sound <file> --sfx --film <page>` | Trim, pitch, fade and level an effect file into `assets/sfx/` of the film and print the `<audio>` line |
+| `bin/vawe sound --lab` | Render every synth voice to `out/sound-lab/*.wav` and open the lab to listen |
+
+The verb is `sound`. A call to `bin/vawe sounds` exits with `unknown verb`.
+
+{/* sources (vawe 4d9a5acb4):
+  font list: bin/vawe fonts (20 rows)
+  --system: bin/vawe fonts --help and output
+  font load error: harness/media/render-page.mjs fontProblems; font-fallback: quality/gates/page-check.mjs:21, 177
+  starter copies the face: harness/cli/new.mjs:472-473
+  voice list, gains, tails: bin/vawe sound
+  data-synth, data-on, data-length, banned names, unknown voice error: harness/media/page-audio.mjs:1-12, 33, 93-97
+  other sound commands: bin/vawe sound --help
+  bin/vawe sounds: "unknown verb sounds" (run on vawe 4d9a5acb4)
+*/}

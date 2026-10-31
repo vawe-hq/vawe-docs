@@ -1,0 +1,142 @@
+---
+title: Render flags
+description: The flags of dev, still, frames, strip and ship that change what the renderer draws, with defaults and examples.
+icon: SlidersHorizontal
+---
+
+This page lists the flags that change a render. The list comes from `bin/vawe <verb> --help` for `dev`, `still`, `frames`, `strip` and `ship`. A wrong flag exits 2 and prints the valid ones. For the other verbs, see [CLI](/docs/cli).
+
+Four flags work the same way in more than one verb:
+
+- `--aspect <W:H>` sets the <Term id="aspect">aspect</Term>. It overrides the page `aspect` meta. The page sees it as it sees the meta. The default output name gets it (`-2x1`), so two aspects do not overwrite each other. See [Aspect ratios](/docs/aspect-ratios).
+- `--param key=value` passes an option to the page. The page reads it with `new URLSearchParams(location.search)`. The flag is repeatable. It is part of the <Term id="render-key">render key</Term>, and the default output name gets it (`-look-riso`). A repeated key exits with an error, because a page reads one value per key (`harness/lib/page-params.mjs`). See <Term id="param">param</Term>.
+- `--from <s>` and `--to <s>` render a window of the film.
+- `--out <path>` sets the output file or folder.
+
+## dev
+
+The <Term id="draft">draft</Term>: half size, 30 fps. It also writes a key-frame sheet PNG next to the mp4. See [Draft](/docs/draft).
+
+| Flag | What it does | Default | Example |
+|---|---|---|---|
+| `--from <s>` | Start second. A window is silent | none | `--from 2` |
+| `--to <s>` | End second | none | `--to 6` |
+| `--aspect <W:H>` | Set the aspect | the page meta, else 16:9 | `--aspect 9:16` |
+| `--param <key=value>` | Pass an option to the page | none | `--param look=riso` |
+| `--silent` | Leave the audio tags out of the mix. Faster | off | `--silent` |
+| `--small` | Encode about 5 times smaller, for a file to post such as an `og:video` loop (x264 preset fast, CRF 24) | off | `--small` |
+| `--lock-length` | Write the found length of a `duration="auto"` page into its meta | off | `--lock-length` |
+| `--out <path>` | Output file | `out/<name>-draft.mp4`, or `out/<name>-draft-<from>-<to>.mp4` for a window | `--out out/a.mp4` |
+| `--fast` | Run only the fast checks | off | `--fast` |
+| `--full` | Also run the ship-tier checks: per-frame box motion lint, object tracks, loudness and peak | off | `--full` |
+| `--taste` | Also print the taste lines. They are always in `out/<name>.dev.md` | off | `--taste` |
+| `--no-judge` | Skip the stills judge that `dev` runs once per change of `directions.html` or its brief lines (about 25 s) | off | `--no-judge` |
+
+```bash
+bin/vawe dev films/my-film/page.html --from 2 --to 6
+```
+
+## still
+
+One exact full-size frame as a PNG. The input is a page, an mp4 or an https mp4 URL.
+
+| Flag | What it does | Default | Example |
+|---|---|---|---|
+| `--at <s>` | The film second to write. A second past the last frame moves to the last frame, and the output says so | none | `--at 4.2` |
+| `--size <WxH>` | PNG size. A page only. The ratio must match the aspect of the page, or the verb refuses | the aspect at 1920 on the long edge | `--size 1200x630` |
+| `--aspect <W:H>` | Set the aspect | the page meta, else 16:9 | `--aspect 1200:630` |
+| `--param <key=value>` | Pass an option to the page | none | `--param look=riso` |
+| `--out <path>` | The PNG path | `out/still/<name>-<s>s.png` | `--out /tmp/f.png` |
+
+```bash
+bin/vawe still films/card/page.html --at 0 --aspect 1200:630 --size 1200x630
+```
+
+## frames
+
+One still per `data-world` element and a contact sheet. See [Key frames](/docs/key-frames).
+
+| Flag | What it does | Default | Example |
+|---|---|---|---|
+| `--full` | Full-size stills as `out/<name>-frames/<id>-full.png`. No sheet and no `frames.html` | off | `--full` |
+| `--zoom` | Also shoot a full-size still per world (about 5 s more), so a click in `frames.html` opens it sharp | off | `--zoom` |
+| `--world <id>` | Only this world. A comma list or a repeated flag. No sheet and no `frames.html`. Each still is at the time of its own world | none | `--world s3,s5` |
+| `--looks` | Show a page frame under every named lens look, and as is, one labelled grid per second. The page is not edited | off | `--looks` |
+| `--at <s,s>` | With `--looks`: comma-separated film seconds | none | `--at 4.5,9` |
+| `--only <look,look>` | With `--looks`: the look names. All when left out | none | `--only anamorphic,crt` |
+| `--out <path>` | With `--looks`: the folder for the grids | `out/looks-<film>` | `--out out/looks` |
+
+`frames` takes no `--aspect`, `--param`, `--from` or `--to`. A normal run writes `out/<film>-frames/<id>.png`, the sheet `out/<film>-frames.png` and `films/<film>/frames.html` (`harness/media/frames.mjs:4`).
+
+## strip
+
+The frames through one moment or every cut, with motion numbers. The input is a rendered mp4, a page (the verb uses its last draft, so run `dev` first) or a reference id from `bin/vawe refs list`. See [Critique and fix](/docs/critique).
+
+| Flag | What it does | Default | Example |
+|---|---|---|---|
+| `--at <s>` | The second to centre the strip on | none | `--at 8.4` |
+| `--cuts` | One strip per world change (page or mp4) or per shot cut (reference). The strip is centred on the cut | off | `--cuts` |
+| `--span <s>` | Seconds of film in the strip, the onion or the velocity window | 1 (`--onion` 0.3) | `--span 0.6` |
+| `--fps <n>` | Frames per second of film in the strip. At most the fps of the video read. A grid holds 9 frames | 8 | `--fps 15` |
+| `--onion` | Blend several frames of the move at `--at` into one image: spacing, path and overshoot | off | `--onion` |
+| `--n <n>` | With `--onion`: frames blended, 2 to 12 | 5 | `--n 6` |
+| `--velocity` | Graph the speed and scale of page elements around `--at`. Reads a page only | off | `--velocity` |
+| `--sel <css>` | With `--velocity`: graph every element the selector matches. A canvas painted in `window.seek` has no element, so pass this | the 4 elements that move most | `--sel .hero` |
+| `--ids <a,b>` | With `--velocity`: element ids instead of `--sel` | none | `--ids title,logo` |
+| `--out <path>` | The folder for the grids or the PNG | `out/strip/<film>` (`--onion` `out/onion/<film>`, `--velocity` `out/velocity`) | `--out out/s` |
+
+```bash
+bin/vawe strip films/my-film/page.html --at 2.75 --velocity
+```
+
+## ship
+
+The <Term id="final">final</Term>: 60 fps, <Term id="motion-blur">motion blur</Term>, audio mixed, then a final check and a fresh judge. It runs in the background. The verb refuses until a fresh review of the page and the owner approval exist. See [Ship](/docs/ship).
+
+| Flag | What it does | Default | Example |
+|---|---|---|---|
+| `--aspect <W:H\|all>` | Set the aspect, or `all` for one file per aspect | the page meta, else 16:9 | `--aspect all` |
+| `--param <key=value>` | Pass an option to the page | none | `--param look=riso` |
+| `--out <path>` | Output file. It does not combine with `--aspect all` | `out/<name>.mp4` | `--out out/b.mp4` |
+| `--wait` | Block until the render ends. With `--status`: wait up to 3.5 minutes, one progress line per minute | off | `--wait` |
+| `--status` | Print the progress or the result of a background render | off | `--status` |
+| `--profile` | Print a cost table: frames, subframes, screenshots, capture and encode seconds, the 5 costliest seconds | off | `--profile` |
+
+The argument is a page, or with `--status` a page or a job id. The default job is the newest one.
+
+```bash
+bin/vawe ship films/my-film/page.html --aspect all
+bin/vawe ship --status --wait
+```
+
+A final also writes a small web copy beside the master, `<name>.web.mp4` (`harness/media/render-page.mjs:10`, `:988`).
+
+## What the verbs fix
+
+`bin/vawe` does not expose these values as flags. The renderer sets them.
+
+| Value | Draft | Final | Source |
+|---|---|---|---|
+| Output size | half of the aspect size, at device scale 0.5 | the aspect size | `resolveFrame` |
+| Frame rate | 30 | 60 | `render-page.mjs:1233` |
+| Subframes of motion blur per frame | 1 | up to 32 | `render-page.mjs:1235` |
+| Frame capture | JPEG, quality 92 | PNG | `frameFormat` |
+
+The CSS viewport is always the full aspect size, so a draft lays out exactly like the final. The environment variable `VAWE_WORKERS` sets how many browser pages capture at once.
+
+## Related pages
+
+- [CLI](/docs/cli) lists every verb.
+- [Aspect ratios](/docs/aspect-ratios) explains `--aspect` and the five common sizes.
+- [Files and outputs](/docs/files-and-outputs) lists what each verb writes.
+
+{/* sources (vawe 4d9a5acb4):
+  dev, still, frames, strip, ship flags and defaults: bin/vawe <verb> --help
+  --param repeated key refused: harness/lib/page-params.mjs paramsQuery
+  frames outputs: harness/media/frames.mjs:4-8
+  web copy: harness/media/render-page.mjs:10, :988
+  draft 0.5 scale, final 1: harness/media/render-page.mjs resolveFrame
+  fps 30/60, blur 1/32: harness/media/render-page.mjs:1233-1235
+  frame capture format: harness/media/render-page.mjs:148-151
+  VAWE_WORKERS: harness/media/render-page.mjs:121
+*/}

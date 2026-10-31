@@ -1,0 +1,86 @@
+---
+title: FAQ
+description: Short answers to the first questions about vawe, from license and agents to hardware, length, sound, aspect and determinism.
+icon: CircleHelp
+---
+
+Each answer names the file it comes from. For a longer answer, follow the link.
+
+## What is the license?
+
+vawe uses the Apache License 2.0 (`LICENSE`, `package.json` field `license`). The `NOTICE` file lists the third-party code and assets. Each of them keeps its own license.
+
+## What do I need to install?
+
+You need Node 22 or newer, git, and ffmpeg with libx264 and drawtext. Tesseract is optional, for OCR. Chrome comes from `npx puppeteer browsers install chrome`. Run `bin/vawe doctor` to check each tool. It prints the install line for your system (macOS, Linux or Windows) for each missing one (`README.md`, "Install"). See [Install](/docs/install).
+
+## Which agents can use it?
+
+Any agent that reads files and runs shell commands. Claude Code reads `CLAUDE.md`, which points to `AGENTS.md`. Codex, Cursor and other agents read `AGENTS.md` directly. The skills in `skills/` install with `npx skills add vawe-hq/skills` (`README.md`, "Use it from your agent"). See [Use with an agent](/docs/agents).
+
+## Does vawe call an AI model?
+
+The render does not. Two steps start a separate headless Claude session through the `claude` CLI: `bin/vawe judge --fresh`, and the fresh judge that `ship` runs on the final. The judge advises and never blocks (`harness/media/judge-fresh.mjs:1-5`). `VAWE_SHIP_JUDGE=0` skips the judge in `ship` (`harness/media/ship-job.mjs:14`). A page, a draft and a final need no API key of their own.
+
+## Do I need a GPU?
+
+No. A final captures with software rendering (`frameFormat` and `runShards` in `harness/media/render-page.mjs`). A draft uses the GPU raster, except for a page with an SVG filter, which also renders in software. Output can differ between hosts that rasterise on a different GPU or Chrome version (`README.md`, "Install").
+
+## How long can a film be?
+
+The renderer has no maximum length. The cost grows with the length. A final that needs more than 8000 subframes prints advice with an estimate: 19200 subframes took 15 to 23 minutes when measured. Lower the blur or shorten the fast moves (`render-page.mjs:129-130`, `:871`). A film over 60 s or more than one session takes one chapter file per agent (`AGENTS.md`, "The loop"). See [Ship](/docs/ship).
+
+## Can a film have sound?
+
+Yes. Put `<audio>` tags in the page. The renderer never plays them. It mixes them offline with ffmpeg and adds the mix to the film (`harness/media/page-audio.mjs`). The mix is as written, with a -1 dBTP safety limiter. Add `<meta name="loudness">` to normalise to a target. A music bed must be a real file: synth beds are banned. See [Audio](/docs/audio) and [Fonts and sounds](/docs/fonts-and-sounds).
+
+## Which aspects does it render?
+
+The five common ones are `16:9`, `9:16`, `1:1`, `4:5` and `4:3`. Any other ratio of whole numbers works: it fits the long edge to 1920 (`core/layout/aspects.js`). One page can render all five: `bin/vawe ship <page> --aspect all`. See [Aspect ratios](/docs/aspect-ratios).
+
+## What frame rate does it use?
+
+A draft renders at 30 fps. A final renders at 60 fps (`render-page.mjs:1233`). The meta `fps` is only the rate of your own frame table. It does not set the render rate (`core/engine/page-seek.js`, `vawe.fps`). See [Render flags](/docs/render-flags).
+
+## Is the output the same on every render?
+
+On one machine, yes. Every frame is a pure function of its seek time. A <Term id="virtual-clock">virtual clock</Term> owns `Date`, timers, `requestAnimationFrame` and `Math.random`, so the same time gives the same values (`core/engine/page-clock.js`). Two machines with a different GPU or Chrome version can give different pixels. See [Determinism](/docs/determinism).
+
+## Can I use GSAP?
+
+Yes. GSAP runs on a ticker that follows the real clock, so create the timeline paused and drive it from `window.seek`:
+
+```js
+const tl = gsap.timeline({ paused: true });
+window.seek = (t) => { tl.time(t); };
+```
+
+The seek awaits only a native Promise, because a GSAP timeline has a `then()` that never settles (`core/engine/page-seek.js:8-9`). The blog post "GSAP to MP4" shows a full page.
+
+## Can I use three.js?
+
+Yes. Pose the scene from `t` in `window.seek` or in a `vawe.onFrame` hook, and render one frame. Do not read a `THREE.Clock`. Import `core/engine/page-api.js` to get `vawe.three` with the helpers `studio`, `extrude` and `material` (`core/engine/page-api.js`). The example `films/examples/three-star` does this. See [Page API](/docs/page-api). The blog post "Three.js to MP4" shows a full page.
+
+## How is it different from screen recording?
+
+A screen recording captures what the browser shows in real time, so a slow frame is a dropped frame and two takes differ. vawe never plays the page. It sets the page to time `t`, waits for fonts and image decodes, takes a screenshot and goes to the next frame. A heavy frame only takes longer to render. The film has no dropped frames. The draft and the final lay out the same, because the CSS viewport is always the full aspect size (`harness/media/render-page.mjs:12-24`). See [Time and seek](/docs/time-and-seek).
+
+## Can I use setTimeout, Date or Math.random?
+
+Yes, but they do not run on the real clock. They follow the seek time. `setTimeout` fires when the seek passes its due time, and `Math.random` restarts from the seek time on each seek (`core/engine/page-clock.js:5-8`). Keep no state between frames. See [The page](/docs/the-page).
+
+{/* sources (vawe 4d9a5acb4):
+  license: LICENSE line 1-2, package.json:25, NOTICE
+  install: README.md "Install", "Quickstart"; bin/vawe doctor (ok, 7 checks)
+  agents: README.md "Use it from your agent"; CLAUDE.md
+  model calls: harness/media/judge-fresh.mjs:1-5, 259; harness/media/ship-job.mjs:11-14
+  GPU: harness/media/render-page.mjs:148-151, 411; README.md "Install"
+  length: harness/media/render-page.mjs:129-130, 871; AGENTS.md "The loop"
+  audio: harness/media/page-audio.mjs:1-17; BANNED_SYNTH :32
+  aspects: core/layout/aspects.js
+  fps: harness/media/render-page.mjs:1233; core/engine/page-seek.js:117-120
+  determinism: core/engine/page-clock.js:1-14
+  GSAP: core/engine/page-seek.js:8-9; site/content/blog/gsap-to-mp4.md
+  three.js: core/engine/page-api.js:1-10; films/examples/three-star/page.html:23
+  screen recording: harness/media/render-page.mjs:12-24
+*/}
