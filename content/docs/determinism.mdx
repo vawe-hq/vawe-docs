@@ -2,6 +2,15 @@
 title: Determinism
 description: Why a frame is a function of the seek time, what the virtual clock owns, and how to check your page.
 icon: Fingerprint
+blog:
+  - slug: determinism
+    title: 'Headless Chrome screenshots differ between runs: 6 fixes'
+  - slug: page-clock
+    title: 'Seed Math.random and freeze Date.now in JavaScript'
+  - slug: puppeteer-to-mp4
+    title: 'Puppeteer video: screenshots to MP4 with ffmpeg'
+  - slug: render-html-to-mp4
+    title: 'HTML to MP4: render a page with headless Chrome'
 ---
 
 The same page must give the same frames on every run. The renderer does not wait for your page to play. It seeks to a time `t`, takes a picture, and moves on. Frame 400 never needs frame 399.

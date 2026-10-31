@@ -5,6 +5,10 @@ icon: Volume2
 blog:
   - slug: page-contract
     title: 'HTML to video format: the page contract'
+  - slug: audio-as-written
+    title: 'LUFS for video: set a loudness target in code'
+  - slug: beat
+    title: 'Cut video to beat: sync cuts to music with code'
 ---
 
 Audio is `<audio>` tags in the page. The renderer never plays them live. It reads them and mixes one ffmpeg graph onto the video (`harness/media/page-audio.mjs`). This page lists each attribute that the mixer reads, the <Term id="voice">voices</Term> that you can name, and the rules of the mix.

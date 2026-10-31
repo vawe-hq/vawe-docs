@@ -1,0 +1,41 @@
+---
+title: Engineering notes
+description: Notes on how vawe is built for coding agents, from the blog. Each note has its measurements.
+icon: NotebookPen
+blog:
+  - slug: weaker-model
+    title: 'AI agent tooling: design for the weaker model'
+  - slug: read-load
+    title: 'AGENTS.md best practices: how long should it be?'
+  - slug: judge-design
+    title: 'LLM as a judge: start at reject, a video example'
+  - slug: loophole-audit
+    title: 'Reward hacking in AI: 18 of 36 agent runs gamed a check'
+  - slug: advise-refuse
+    title: 'AI agent guardrails: when a check should refuse'
+  - slug: skill-combos
+    title: 'Agent skills for UI design: a blind test of 6 combos'
+  - slug: ideate
+    title: 'Verbalized sampling for AI agents: method and test plan'
+  - slug: quality-bar
+    title: 'Motion graphics benchmark: 167 cuts measured'
+  - slug: one-binary
+    title: 'CLI design for AI agents: one binary, one verb per step'
+  - slug: run-logs
+    title: 'AI agent observability: one JSONL line per command'
+---
+
+These blog posts say why vawe works the way it does. Each one gives the data behind a decision. For the rules themselves, read [Checks](/docs/quality-gates) and the [CLI](/docs/cli).
+
+| Note | What it covers |
+|---|---|
+| [AI agent tooling: design for the weaker model](/blog/weaker-model) | Six films from a weaker model: how defaults, checks and one command per step make it succeed. |
+| [AGENTS.md best practices: how long should it be?](/blog/read-load) | Cutting what an agent reads first from 5,402 to 2,239 words, and what that did. |
+| [LLM as a judge: start at reject, a video example](/blog/judge-design) | A judge that starts at reject and caps scores against reference films. |
+| [Reward hacking in AI: 18 of 36 agent runs gamed a check](/blog/loophole-audit) | 18 of 36 runs gamed a check; how the checks changed. |
+| [AI agent guardrails: when a check should refuse](/blog/advise-refuse) | When a check advises and when it refuses. |
+| [Agent skills for UI design: a blind test of 6 combos](/blog/skill-combos) | A blind test of 6 UI skill combos on 2 frame types. |
+| [Verbalized sampling for AI agents: method and test plan](/blog/ideate) | Verbalized sampling for ideas: method and test plan. |
+| [Motion graphics benchmark: 167 cuts measured](/blog/quality-bar) | The measured bar for motion from 167 cuts in 17 reference films. |
+| [CLI design for AI agents: one binary, one verb per step](/blog/one-binary) | One binary with 29 verbs, one-line errors and a hook that names the next step. |
+| [AI agent observability: one JSONL line per command](/blog/run-logs) | One JSONL line per command, so time and failures are measured, not guessed. |
