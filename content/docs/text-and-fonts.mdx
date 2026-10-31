@@ -55,6 +55,14 @@ Write sizes with `--vh`, so the text keeps its share of the frame in every <Term
 
 `--vh` is the frame height in pixels, with the unit. The draft check advises when a text is taller than the frame or under 0.2% of it. This is the sign of a size that reads `--vh` as `1vh`.
 
+<Figure
+  src="page/fig-text.webp"
+  alt="The same line of text at two sizes: a cap height of 6% of the frame, and 2.6%."
+  caption="Cap height as a share of the frame height. At 6% the line reads on a phone. At 2.6% it is under the floor."
+  width={1920}
+  height={1080}
+/>
+
 ## The text checks
 
 The `bin/vawe dev` draft check samples the text of the page every 0.5 s (10 to 40 samples). It reads each visible line: a line shows when it has no `visibility: hidden`, its opacity is above 0.5 and it is inside the frame.

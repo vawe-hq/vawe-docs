@@ -93,6 +93,30 @@ bin/vawe dev  films/<name>/page.html --aspect 2:1     # any whole W:H
 
 `bin/vawe still <page> --size 1200x630` writes a PNG of that size. The size must have the ratio of the aspect, so pass `--aspect 1200:630` with it.
 
+<Figure
+  src="page/fig-aspect-16x9.webp"
+  alt="The page at 16:9: the title on the left, three lanes in a row on the right."
+  caption="One page at 16:9. The layout comes from CSS, not from a crop."
+  width={1920}
+  height={1080}
+/>
+
+<Figure
+  src="page/fig-aspect-1x1.webp"
+  alt="The same page at 1:1: the title on top, the three lanes under it."
+  caption="The same page at 1:1."
+  width={1080}
+  height={1080}
+/>
+
+<Figure
+  src="page/fig-aspect-9x16.webp"
+  alt="The same page at 9:16: the title and the lanes in one column."
+  caption="The same page at 9:16. A max-aspect-ratio query moves the lanes into a column."
+  width={1080}
+  height={1920}
+/>
+
 ## Sizes
 
 | aspect | final size |
