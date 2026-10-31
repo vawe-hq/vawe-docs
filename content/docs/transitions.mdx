@@ -1,0 +1,209 @@
+---
+title: Transitions
+description: Plan the seam between two beats. Name the handoff that carries the eye, pick one of twelve families, time it, and check that the film does not read as a slideshow.
+icon: ArrowLeftRight
+blog:
+  - slug: transitions
+    title: 'Motion graphics transitions: 12 types, 10 mistakes'
+---
+
+At the end of this page every <Term id="cut">cut</Term> of your film has a named <Term id="handoff">handoff</Term>: the one thing that leaves beat A and starts beat B. Or the cut is a hard cut, chosen on purpose.
+
+A model asked to join two beats writes the same few: a crossfade, a whip pan, a slide-up and a scale-in. Used on every cut, one of them says nothing ten times. The fix is to choose a seam for a reason.
+
+## The prime rule
+
+A seam must serve the relationship between the two beats, or the feeling across the seam. If it serves neither, the seam is a hard cut. A hard cut is the default, and in professional edits it is the great majority of seams. The rule `hard-cut-default` puts hard cuts at 50 to 95 percent of seams: the high end for a kinetic film, the low end for a calm one. "It looks smoother" is not a reason.
+
+<Diagram
+  label="Four questions for each seam. Does the seam need to exist? What must the viewer feel? What is the relationship between the beats? What does the seam mean? If none has an answer, cut."
+  caption="Ask in this order, at every seam. Most seams stop at the first question."
+  narrow={
+    <svg viewBox="0 0 361 311">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Must the seam exist?</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} />
+      <DiagramText x={16} y={110}>What must the viewer feel?</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>What is the relationship?</DiagramText>
+      <DiagramArrow points={[[180, 221], [180, 239]]} />
+      <DiagramBox x={0} y={240} w={360} h={60} accent />
+      <DiagramText x={16} y={270}>Name the handoff, or cut</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 881 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Needed?</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">else hard cut</DiagramText>
+    <DiagramArrow points={[[201, 40], [219, 40]]} />
+    <DiagramBox x={220} y={0} w={200} h={80} />
+    <DiagramText x={236} y={30}>Feeling?</DiagramText>
+    <DiagramText x={236} y={56} kind="mono">time, shock, link</DiagramText>
+    <DiagramArrow points={[[421, 40], [439, 40]]} />
+    <DiagramBox x={440} y={0} w={200} h={80} />
+    <DiagramText x={456} y={30}>Relation?</DiagramText>
+    <DiagramText x={456} y={56} kind="mono">morph, match, rhyme</DiagramText>
+    <DiagramArrow points={[[641, 40], [659, 40]]} />
+    <DiagramBox x={660} y={0} w={220} h={80} accent />
+    <DiagramText x={676} y={30}>Handoff</DiagramText>
+    <DiagramText x={676} y={56} kind="mono">family: object</DiagramText>
+  </svg>
+</Diagram>
+
+## Choose a seam for each cut
+
+<Steps>
+<Step>
+
+Write one line for the cut: what changes (place, state, scale, time, a reveal, a payoff) and what carries over. Name the handoff object, with its screen position, scale, direction and speed on both sides. If nothing carries over, the cut is a hard cut and you write why: on a beat, for shock, or for a tonal flip.
+
+</Step>
+<Step>
+
+Pick a family from the table below. Write it in the `handoff (family: object)` column of the cut table in the brief, for example `type-driven: the word "ship" becomes the ground`.
+
+</Step>
+<Step>
+
+Open the move for the family. Copy its snippet and keep its numbers. See [Moves](/docs/moves).
+
+</Step>
+<Step>
+
+Time the seam with the ranges below. Round to the frame. A final renders at 60 fps, so count frames at 60.
+
+</Step>
+<Step>
+
+Check the whole film.
+
+```bash
+bin/vawe check transitions films/<name>/page.html
+bin/vawe check slideshow films/<name>/page.html
+```
+
+</Step>
+</Steps>
+
+An agent can run this procedure from the `vawe-transitions` <Term id="skill">skill</Term>. It makes the choice on purpose for every cut.
+
+## The twelve families
+
+A family names what carries the viewer across the seam.
+
+| family | what carries the eye | moves to copy |
+|---|---|---|
+| graphic match | Two shots share a shape, colour or line. | [`match-cut`](https://vawe.dev/video-components/match-cut), [`type-match-cut`](https://vawe.dev/video-components/type-match-cut), [`underline-road`](https://vawe.dev/video-components/underline-road) |
+| action match | Motion continues at the same direction and speed. | [`cut-on-motion`](https://vawe.dev/video-components/cut-on-motion), [`swipe-continues`](https://vawe.dev/video-components/swipe-continues), [`drop-and-land`](https://vawe.dev/video-components/drop-and-land) |
+| object to object | One thing becomes another and the change carries the meaning. | [`shape-trace-morph`](https://vawe.dev/video-components/shape-trace-morph), [`cta-morph-press`](https://vawe.dev/video-components/cta-morph-press), [`avatar-world`](https://vawe.dev/video-components/avatar-world) |
+| position lock | An anchor stays at one screen spot while the world changes. | [`toggle-horizon`](https://vawe.dev/video-components/toggle-horizon), [`progress-timeline`](https://vawe.dev/video-components/progress-timeline), [`highlight-sweep`](https://vawe.dev/video-components/highlight-sweep) |
+| container transform | An element grows into the container of the next beat. | [`clip-expand`](https://vawe.dev/video-components/clip-expand), [`thumbnail-grid`](https://vawe.dev/video-components/thumbnail-grid), [`cursor-spotlight`](https://vawe.dev/video-components/cursor-spotlight) |
+| shared axis | Both beats move along one axis, so the cut reads as travel. | [`chain-beats`](https://vawe.dev/video-components/chain-beats), [`pan-stations`](https://vawe.dev/video-components/pan-stations), [`direction-wipe`](https://vawe.dev/video-components/direction-wipe) |
+| colour or light flood | A full-frame colour or glow fills the screen and reveals the next beat. | [`light-leak-transition`](https://vawe.dev/video-components/light-leak-transition), [`exposure-flash`](https://vawe.dev/video-components/exposure-flash), [`glow-record`](https://vawe.dev/video-components/glow-record) |
+| type-driven | A letter or word is the mask, the wipe or the object that becomes the next beat. | [`type-fill-transition`](https://vawe.dev/video-components/type-fill-transition), [`text-as-mask`](https://vawe.dev/video-components/text-as-mask), [`word-portal`](https://vawe.dev/video-components/word-portal) |
+| camera through | The camera pushes into a hole, a screen or a letter and exits in another world. | [`zoom-through`](https://vawe.dev/video-components/zoom-through), [`parallax-dive`](https://vawe.dev/video-components/parallax-dive), [`caret-door`](https://vawe.dev/video-components/caret-door), [`counter-dive`](https://vawe.dev/video-components/counter-dive) |
+| invisible cut | The join hides behind a blur peak or an object that wipes out. | [`push-blur`](https://vawe.dev/video-components/push-blur), [`whip-pan`](https://vawe.dev/video-components/whip-pan), [`smear-stretch`](https://vawe.dev/video-components/smear-stretch) |
+| sound bridge | The audio leads (a J cut) or trails (an L cut) the picture. | The sound row of the Board. It pairs with any move. |
+| deliberate cut | A hard cut chosen on purpose: on a beat, for shock, for a tonal flip. | [`exit-fast`](https://vawe.dev/video-components/exit-fast), [`speed-ramp-freeze`](https://vawe.dev/video-components/speed-ramp-freeze), [`cut-on-motion`](https://vawe.dev/video-components/cut-on-motion) |
+
+Three limits apply to the families:
+
+- No family on two adjacent cuts.
+- No family more than twice in a film. A deliberate cut is exempt from both limits.
+- The strongest family, "camera through", appears once in a film.
+
+## Time the seam
+
+The ranges are in `taste/rules/seam-timing.md`. A seam is felt, not measured: round to the frame.
+
+| seam | duration |
+|---|---|
+| match on action (overlap) | 0.06 to 0.16 s |
+| whip | 0.27 to 0.40 s, fast and blurred |
+| quick dissolve | 0.40 to 0.50 s |
+| standard slide, push or dissolve | 0.50 to 1.0 s |
+| zoom | 0.50 to 0.85 s |
+| fade to black | 0.66 to 1.33 s |
+| handoff where the last pose of one element is the first pose of the next | 0.8 to 1.0 s on `EASE.carry` or `EASE.glide` |
+
+A whip that is not fast and blurred reads as a slow slide. A hard wipe edge reads as a slide deck, and a feathered edge reads as graded.
+
+### Speed
+
+The seam is the verb and the timing is the adverb. A seam with no speed profile reads flat. Write a ramp with an `EASE` name from `core/motion/presets.js`.
+
+| profile | curve | use it on |
+|---|---|---|
+| ramp | slow, fast, slow | any thrown seam: whips, zooms, squeezes |
+| rush | `EASE.launch` | an exit: the beat leaves faster than it arrived |
+| brake | `EASE.land` | an entrance |
+| smooth | `EASE.glide` | a calm dissolve or fade |
+| pop | `EASE.pop` | a chip or a badge that lands. Rare. |
+
+Give the whole film one velocity personality. Calm films decelerate in, branded films use ramps, and hype is snappy.
+
+### Align the beats to the seam
+
+The outgoing beat ends at the seam and the incoming beat starts at it. If both beats are on screen across the cut, a blend mixes two nearly identical stages and the copy turns into an unreadable double. A morph element is the exception: it spans the cut.
+
+Do not let the frame go empty across a joint. Several frames of emptiness mean the outgoing beat left before the incoming one arrived. Overlap the beats by 0.2 to 0.4 s.
+
+Put the next headline where the eye already is. Read the focal point of the frame before the cut, and put the incoming subject at or near that point.
+
+## The ten slideshow tells
+
+`bin/vawe check slideshow <page>` scores the film out of 10 and prints each tell that fired, with its second and its fix. It is advice, never a failing exit.
+
+| tell | the fix |
+|---|---|
+| Every world enters and exits the same way. | Change the way in or out for each world. Exits are shorter than entrances. |
+| A fade or crossfade between every world. | Carry one handoff object across the cut. |
+| A hard cut plus a fade in on every world. | Open each world with the carried object landing. |
+| A full-frame ground swap at every cut with no carried element. | Name a handoff object that leaves A and starts B. |
+| World B starts only after world A has left. | Overlap by 0.2 to 0.4 s. |
+| All elements of a world enter at once. | Stagger by 30 to 80 ms. |
+| One centred line of text for each world on a still ground. | Give each world a part that moves while the line is read. |
+| Equal shot lengths. | Vary them: one under 0.4 s and one over 0.9 s. |
+| A static camera and static content in a hold. | Put element motion inside every hold. |
+| The same entrance for every element. | Use different moves for hero, support and detail. |
+
+The thresholds are repeat counts: 3 or more cuts, 5 or more elements, a 75 percent share. One crossfade for a time jump is a choice, not a tell.
+
+## Waive a check with a reason
+
+Both checks advise. To keep a seam that a check names, declare a <Term id="waiver">waiver</Term> in the page with a reason that names a second and a measured value. See [Waivers](/docs/waivers).
+
+```html
+<script type="application/json" id="authoring">{"allow": ["transitions"], "_why": {"transitions": "the cut at 7.8 s is a plain fade: 1.1 s of calm between two held frames"}}</script>
+```
+
+## Troubleshooting
+
+| what you see | why | what to do |
+|---|---|---|
+| `transitions` names a cut with no planned handoff. | The Board column is empty for that cut. | Write `family: object` in the `handoff` column, or write `deliberate cut: why`. |
+| One family on adjacent cuts. | Two cuts use the same family. | Change one family, or make one cut a hard cut. |
+| A planned handoff measures as a hard cut. | The move starts too late, or too small. | Raise the handoff object above both beats. Check the frames with `bin/vawe strip <page> --cuts`. |
+| The copy is a double at the seam. | Both beats show text across the cut. | End the outgoing text at the seam. |
+| Two seams in a row move the same way. | The axis repeats. | Change the axis or direction. The `seam-variety` check names it. |
+
+<Cards>
+  <Card title="Moves" href="/docs/moves">The Change between shots group.</Card>
+  <Card title="Motion pass" href="/docs/motion-pass">Read every cut as a strip.</Card>
+  <Card title="Motion blur" href="/docs/motion-blur">The streak that hides a seam.</Card>
+  <Card title="Cut to the beat" href="/docs/cut-to-the-beat">Cut on the beat of a music track.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  prime rule, taxonomy, twelve families table and moves, ten slideshow tells with fixes and thresholds, align the beats, eye at a cut, speed profiles: taste/craft/transitions.md
+  hard cuts 50 to 95 percent of seams: taste/rules/hard-cut-default.md
+  seam durations: taste/rules/seam-timing.md (range line)
+  seam-variety: taste/rules/seam-variety.md
+  procedure, handoff (family: object) column, ledger limits (adjacent, twice, deliberate exempt, camera through once), check names: skills/vawe-transitions/SKILL.md "Per cut", "Check"
+  check transitions and check slideshow advise, never fail, waive code: quality/gates/transitions.mjs:1-8 and quality/gates/slideshow.mjs:1-8
+  bin/vawe check lists transitions and slideshow (ran: bin/vawe check)
+  strip --cuts: AGENTS.md loop table row 7
+*/}

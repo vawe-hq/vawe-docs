@@ -1,0 +1,203 @@
+---
+title: Image to particles
+description: Sample a photo into a seeded point cloud with imagePoints, then gather, light and film the points in three.js as a pure function of the seek time.
+icon: Sparkles
+---
+
+At the end of this page you have a film beat in which a photo gathers out of scattered points, holds, and breathes. The points keep the colour and the detail of the photo. The beat is <Term id="determinism">deterministic</Term>: the same inputs give the same cloud.
+
+`imagePoints` in `core/surfaces/image-points.js` is the part vawe adds. It turns an image into positions, colours, normals and depth for each point. You write the three.js scene yourself. The clip of the finished effect is the move [`photo-particles`](https://vawe.dev/video-components/photo-particles).
+
+## Before you start
+
+- A photo with detail that a hand-modelled shape cannot give: veins, scales, fibres, filaments. A dark ground works best, because dark pixels get no points.
+- A page that uses three.js. See [Three.js and canvas](/docs/three-and-canvas).
+- A licence for the photo. See [Backgrounds and images](/docs/backgrounds-and-images).
+
+Sampling a photo into a designed particle form is in scope for vawe. Cutting a captured image into depth layers or tracking footage is not.
+
+## Steps
+
+<Steps>
+<Step>
+
+Put the photo in `films/<name>/assets/`. Decode it inside the frame hook, not with a top-level `await`. The renderer seeks the first frame before a module that waits has finished, and that frame is black.
+
+</Step>
+<Step>
+
+Sample the photo. The result is plain typed arrays.
+
+```js
+import { imagePoints } from '../../core/surfaces/image-points.js';
+
+async function build() {
+  const img = new Image();
+  img.src = 'assets/nebula.jpg';
+  await img.decode();
+  const cloud = imagePoints(img, { count: 120000, seed: 7, threshold: 0.03, gamma: 1.0, edgeBoost: 0.6, depthScale: 0.35 });
+  // steps 3 and 4 go here, and the function returns { points, material, scene, camera, renderer, cam }
+}
+```
+
+The code of steps 3 and 4 runs inside `build`. Create the renderer, the scene and the camera there as on the [Three.js and canvas](/docs/three-and-canvas) page. The hook of step 5 calls `build` once.
+
+`cloud.positions` holds x, y, z for each point. The longer side of the image spans -1 to 1, y points up, and z is `(depth - 0.5) * depthScale`. `cloud.colors` holds r, g, b from 0 to 1. `cloud.normals` holds unit vectors tilted by the luma gradient, so you can light a point with `dot(normal, light)`. `cloud.luma` holds 0 to 1 and `cloud.size` the image size in px.
+
+</Step>
+<Step>
+
+Give each point a start position and a delay, both from `rng(seed)`. This is the scatter that the points gather from. A seeded generator keeps it the same on every render.
+
+```js
+import { rng } from '../../core/motion/springs.js';
+
+const random = rng(11);
+const start = new Float32Array(cloud.count * 3), delay = new Float32Array(cloud.count);
+for (let i = 0; i < cloud.count; i++) {
+  const a = random() * Math.PI * 2, r = 1.2 + random() * 1.6;
+  start.set([Math.cos(a) * r * 1.6, Math.sin(a) * r, (random() - 0.5) * 3], i * 3);
+  delay[i] = random();
+}
+```
+
+</Step>
+<Step>
+
+Build the geometry and a shader material. The vertex shader gathers by the delay, lights by the normal and breathes on the seek time.
+
+```js
+import * as THREE from 'three';
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('position', new THREE.BufferAttribute(cloud.positions, 3));
+geometry.setAttribute('a_color', new THREE.BufferAttribute(cloud.colors, 3));
+geometry.setAttribute('a_normal', new THREE.BufferAttribute(cloud.normals, 3));
+geometry.setAttribute('start', new THREE.BufferAttribute(start, 3));
+geometry.setAttribute('delay', new THREE.BufferAttribute(delay, 1));
+
+const material = new THREE.ShaderMaterial({
+  vertexShader: VERT, fragmentShader: FRAG,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: { u_progress: { value: 0 }, u_time: { value: 0 }, u_size: { value: innerHeight * 0.009 }, u_key: { value: new THREE.Vector3(-0.5, 0.6, 0.7) } },
+});
+const points = new THREE.Points(geometry, material);
+points.frustumCulled = false;
+```
+
+The core of the vertex shader:
+
+```glsl
+float u = clamp((u_progress - delay * 0.4) / 0.6, 0.0, 1.0);
+vec3 p = mix(start, position, u);
+float lit = 0.2 + 0.75 * max(dot(normalize(a_normal), normalize(u_key)), 0.0);
+v_color = a_color * lit;
+```
+
+</Step>
+<Step>
+
+Drive the uniforms from `t` in one hook. Never add to a value from the last frame.
+
+```js
+import { easeFn } from '../../core/motion/presets.js';
+
+const land = easeFn('land');
+let stage = null;
+vawe.onFrame(async (t) => {
+  stage ??= await build();
+  const { material, scene, camera, renderer } = stage;
+  material.uniforms.u_progress.value = land(Math.min(1, t / 1.5));
+  material.uniforms.u_time.value = t;
+  renderer.render(scene, camera);
+});
+```
+
+The points gather over 1.5 s and then hold, breathing on `u_time`.
+
+</Step>
+<Step>
+
+Film the points through the lens, so bloom and halation light the dense areas. See [Lens and effects](/docs/lens-and-effects).
+
+```js
+import { lens, canvasSource } from '../../core/surfaces/lens.js';
+
+// in build(): const cam = lens(canvasSource(renderer.domElement), { look: 'film-halation', grain: 0 });
+// in the hook, after renderer.render(scene, camera):
+await stage.cam.draw(t);
+```
+
+</Step>
+<Step>
+
+Draft the beat and look at the frames.
+
+```bash
+bin/vawe dev films/<name>/page.html --from 0 --to 3
+```
+
+</Step>
+</Steps>
+
+## The options of `imagePoints`
+
+Point density follows `weight = max(0, luma - threshold)^gamma * (1 + edgeBoost * edge) * mask`. Here `edge` is the Sobel magnitude, scaled to 1 at the strongest edge. A point is a seeded draw from the cumulative weight.
+
+| option | default | what it does |
+|---|---|---|
+| `count` | 300000 | The number of points. |
+| `seed` | 1 | The same inputs and seed give the same cloud. |
+| `threshold` | 0.04 | Pixels darker than this get no point. |
+| `gamma` | 1.6 | How strongly bright areas pull points. Use 1.0 so faint filaments keep points. |
+| `edgeBoost` | 0.5 | More points on strong luma edges, so silhouettes stay crisp. |
+| `jitter` | 0.6 | Spreads a point off its pixel centre, in image px. |
+| `mask` | none | A second image. Its alpha limits the points when it has any transparent pixel, otherwise its luma does. |
+| `depth` | none | A depth image, linear 0 (near) to 1 (far) in the red channel. Without it, depth is the luma. |
+| `depthScale` | 0.5 | The z span. |
+| `normalStrength` | 6 | How much the luma gradient tilts the normal. |
+
+`mask` and `depth` may have another size than the photo.
+
+### Move parts apart
+
+`regions(labelImage, labels, cloud)` returns, for each point, the index of the label colour under it. Paint a flat label image at the aspect of the photo, with one colour for each part. Then move the parts differently in the shader: the lid and the iris of an eye, or the wings and the body of a manta.
+
+```js
+import { regions } from '../../core/surfaces/image-points.js';
+const part = regions(labelImage, ['#ff0000', [0, 0, 255]], cloud);   // a Uint8Array, one label index for each point
+```
+
+Colours are sRGB, as stored in the photo, so a shader that outputs them directly shows the photo colour. At most 256 labels are allowed.
+
+## Cost
+
+- 1,000,000 points from a 2048 by 1536 image take about 0.5 s.
+- The demo builds its cloud on the first seek of each page. Every render slice pays about 1 s once.
+- Additive blending sums overlapping points. On a dense photo, lower the point size or the light gain, or the filaments burn to white.
+
+## Troubleshooting
+
+| what you see | why | what to do |
+|---|---|---|
+| The first frame is black. | The page loads the photo with a top-level `await`. | Decode the image inside the hook, on the first call. |
+| `imagePoints: no pixel has weight` | Every pixel is under `threshold`, or outside the mask. | Lower `threshold`, or check the mask. |
+| The dense areas burn to white. | Additive blending sums the overlap. | Lower `u_size` or the light gain. |
+| The points flicker between renders. | The scatter uses `Math.random`. | Use `rng(seed)`. |
+| The faint parts have no points. | `gamma` is too high for the photo. | Use `gamma` 1.0 and a low `threshold`. |
+
+<Cards>
+  <Card title="Three.js and canvas" href="/docs/three-and-canvas">Pose a scene from the seek time.</Card>
+  <Card title="Lens and effects" href="/docs/lens-and-effects">Film the points like a camera.</Card>
+  <Card title="Moves" href="/docs/moves">The photo-particles clip.</Card>
+  <Card title="Backgrounds and images" href="/docs/backgrounds-and-images">Licences and image treatment.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  imagePoints options, defaults, weight formula, output arrays, mask/depth rules, seeded draw, error text: core/surfaces/image-points.js:1-20, :104-128, :62-71 (the "no pixel has weight" throw)
+  regions, 256 labels: core/surfaces/image-points.js:130-144
+  steps, shader core, hook, lens look film-halation: prompts/moves/demo/photo-particles.html:19-99 and prompts/moves/photo-particles.md
+  cost 1,000,000 points 0.5 s, 1 s per render slice, load inside the frame hook, additive burn: prompts/moves/photo-particles.md "Options" and the notes below it
+  scope (a photo as content, sampling into particles is in scope): prompts/moves/README.md lines 8-12
+  the assembled page was not run; the demo page is the tested source
+*/}

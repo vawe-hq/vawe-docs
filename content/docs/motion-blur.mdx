@@ -1,0 +1,164 @@
+---
+title: Motion blur
+description: How the final adds motion blur by blending up to 32 subframes for each frame, and how to add a streak of your own to a push, a whip or a zoom.
+icon: Wind
+blog:
+  - slug: motion-blur
+    title: 'CSS motion blur for video: blend 1 to 32 subframes'
+---
+
+At the end of this page you know what <Term id="motion-blur">motion blur</Term> the renderer adds without your help, what it costs, and how to add a streak of your own to a fast move in the page.
+
+## What you get without any work
+
+A browser has no shutter, so CSS cannot blur a fast move in a video. The renderer does it by capture. For each output frame it seeks the page at several times inside the frame, takes a screenshot at each time, and blends the screenshots into one frame.
+
+- A <Term id="draft">draft</Term> has no blur. A draft is 30 fps, half size.
+- A <Term id="final">final</Term> has up to 32 subframes for each frame. `bin/vawe ship` renders the final.
+- The shutter is 180 degrees. The blur spans half of the frame interval (`SHUTTER = 0.5` in `harness/media/render-page.mjs`).
+- A still frame gets one subframe. A fast frame gets enough subframes that neighbours sit at most 3 px apart.
+
+You do not turn this on. It has no flag on `ship`. To judge the blur you must look at a final, or at a render of a short window.
+
+<Diagram
+  label="For each output frame the renderer measures how far things move, picks a count of 1 to 32 subframes, captures them inside half of the frame interval, and blends them into one frame."
+  caption="Slow frames cost one capture. Fast frames cost up to 32."
+  narrow={
+    <svg viewBox="0 0 361 311">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Measure travel in px</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} accent />
+      <DiagramText x={16} y={110}>Pick 1, 2, 4 ... 32</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>Capture inside half a frame</DiagramText>
+      <DiagramArrow points={[[180, 221], [180, 239]]} />
+      <DiagramBox x={0} y={240} w={360} h={60} />
+      <DiagramText x={16} y={270}>Blend into one frame</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 881 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Measure</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">travel in px</DiagramText>
+    <DiagramArrow points={[[201, 40], [219, 40]]} />
+    <DiagramBox x={220} y={0} w={200} h={80} accent />
+    <DiagramText x={236} y={30}>Pick a count</DiagramText>
+    <DiagramText x={236} y={56} kind="mono">1, 2, 4 ... 32</DiagramText>
+    <DiagramArrow points={[[421, 40], [439, 40]]} />
+    <DiagramBox x={440} y={0} w={200} h={80} />
+    <DiagramText x={456} y={30}>Capture</DiagramText>
+    <DiagramText x={456} y={56} kind="mono">half a frame</DiagramText>
+    <DiagramArrow points={[[641, 40], [659, 40]]} />
+    <DiagramBox x={660} y={0} w={220} h={80} />
+    <DiagramText x={676} y={30}>Blend</DiagramText>
+    <DiagramText x={676} y={56} kind="mono">one frame</DiagramText>
+  </svg>
+</Diagram>
+
+## How the renderer counts
+
+The function `subframesForTravel(px, cap)` starts at one subframe. It doubles the count while the swept distance for each subframe (`travel * 0.5 / k`) is above 3 px, up to the cap. The counts are powers of two. In a final the cap is 32.
+
+| travel in one frame | subframes | gap between neighbours |
+|---|---|---|
+| 4 px | 1 | 2.0 px |
+| 12 px | 2 | 3.0 px |
+| 48 px | 8 | 3.0 px |
+| 200 px | 32 | 3.1 px |
+
+The travel comes from the page, before any screenshot.
+
+- **A page with CSS or Web Animations.** A pre-pass reads the bounding boxes of the paused animations at consecutive frame times. It takes the largest move or resize of any animated element.
+- **A page driven by `window.seek` or `vawe.onFrame`.** The pass finds no boxes to read. It falls back to the mean pixel difference between small frames. A still frame gets 1, a medium frame gets up to 4, and a fast frame gets up to 16. The fallback cannot tell a 16 frame from a 32 frame, so a canvas or three.js page tops out at 16.
+
+## Add a streak of your own
+
+The final blurs by time. It does not know which direction a thing moves, and it makes no streak in a draft. A transition often needs a directional streak that you can see in a draft too. Four moves do this in plain page code:
+
+| move | how it makes the streak |
+|---|---|
+| [`push-blur`](https://vawe.dev/video-components/push-blur) | An SVG `feGaussianBlur` on a panel. `vawe.onFrame` sets `stdDeviation` to half of one frame's travel, on x only. |
+| [`whip-pan`](https://vawe.dev/video-components/whip-pan) | The same filter on a strip of two shots. The blur is 0.4 of the travel per frame. |
+| [`crash-zoom`](https://vawe.dev/video-components/crash-zoom) | 16 copies of the frame at scales fanned across half of one frame's change, stacked at opacities 1, 1/2, 1/3 and so on. The streaks point at the detail. |
+| [`smear-stretch`](https://vawe.dev/video-components/smear-stretch) | Shot A stretches into streaks on an ease-in, and shot B snaps back from the streak. |
+
+The idea in `push-blur` is the pattern to copy. An SVG filter cannot be keyframed, so the hook sets it for each frame. It takes the slope of the same curve that moves the panel.
+
+```html
+<svg width="0" height="0" style="position: absolute"><filter id="motion" x="-30%" width="160%"><feGaussianBlur id="mb" stdDeviation="0 0"/></filter></svg>
+<div class="panel" style="filter: url(#motion)">in</div>
+<script type="module">
+import '../../core/engine/page-api.js';
+import { EASE, easeFn } from '../../core/motion/presets.js';
+
+const land = easeFn('land');
+const panel = document.querySelector('.panel'), blur = document.getElementById('mb');
+const t0 = 0.1, dur = 0.7, travel = 0.6 * window.innerWidth;
+panel.animate([{ translate: `${travel}px 0` }, { translate: '0 0' }],
+  { duration: dur * 1000, delay: t0 * 1000, easing: EASE.land, fill: 'both' });
+vawe.onFrame((t) => {
+  const u = Math.min(1, Math.max(0, (t - t0) / dur)), du = 1 / 240;
+  const slope = (land(Math.min(1, u + du)) - land(u)) / du;
+  const pxPerFrame = (slope / dur) * travel / 60;
+  blur.setAttribute('stdDeviation', `${(u > 0 && u < 1 ? pxPerFrame * 0.5 : 0).toFixed(2)} 0`);
+});
+</script>
+```
+
+A still panel gets a blur of 0. A moving panel blurs along its motion, never across it. The filter region is wider than the panel (`x="-30%" width="160%"`), so the blur is not cut at the edges. For a vertical push, swap the two `stdDeviation` numbers and the translate axis.
+
+## When to blur
+
+The rule `blur-follows-motion` says that a still thing never blurs.
+
+- Blur fast moves of shapes, panels and whole shots.
+- Do not blur a slow drift, or small body text that holds still in the middle of a move. Blur makes it hard to read.
+- For a word that moves fast, echo the outline of the glyph in a second colour under the type instead of blurring it.
+- A blur-resolve entrance runs from about 24 px to 0 over about 0.4 s.
+- A blur is not a lens effect. For depth blur, see [Lens and effects](/docs/lens-and-effects).
+
+## The cost
+
+Each subframe is a seek, a settle (fonts, image decode, two paints) and a screenshot. A final with more than 8,000 subframes prints advice with the count and an estimate of 1,000 subframes a minute. One measurement stands behind that estimate: 19,200 subframes took 15 to 23 minutes. For one 5 s three.js film, a cap of 16 made 4,017 subframes and a cap of 32 made 7,805.
+
+To see the cost, run `ship` with `--profile`. It prints frames, subframes, screenshots, capture and encode seconds, and the five costliest seconds.
+
+```bash
+bin/vawe ship films/<name>/page.html --profile
+```
+
+The owner approves the draft before you ship. See [Ship](/docs/ship).
+
+To cut the cost, shorten the fastest moves, or make fewer frames move fast at the same time. Two subframes with the same animation state reuse one screenshot.
+
+## Troubleshooting
+
+| what you see | why | what to do |
+|---|---|---|
+| The draft has no blur. | A draft never has motion blur. | Look at the final, or add a streak of your own. |
+| A fast object shows separate copies in the final. | Too few subframes for the travel. A canvas or three.js page is capped at 16. | Slow the move, or move less in one frame. |
+| Small text turns to a smear mid-move. | The text moves fast and gets blurred. | Hold the text still while the shot moves, or echo its outline. |
+| The final takes very long. | Many frames need 16 or 32 subframes. | Read the `--profile` table and shorten the fast seconds. |
+
+<Cards>
+  <Card title="Transitions" href="/docs/transitions">The whip and the push as seams.</Card>
+  <Card title="Moves" href="/docs/moves">The clips for each move above.</Card>
+  <Card title="Ship" href="/docs/ship">Render the final.</Card>
+  <Card title="Lens and effects" href="/docs/lens-and-effects">Depth blur and bloom.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  draft no blur, final up to 32 subframes, shutter 0.5, STEP_PX 3, subframesForTravel, powers of two, boxes pre-pass, pixel fallback bands [0.15, 1.5], mid 4, top 16: harness/media/render-page.mjs:1-12, :28-35, :321-356
+  default blur cap 32 in a final, 1 in a draft: harness/media/render-page.mjs:1235
+  count table (4, 12, 48, 200 px): site/content/blog/motion-blur.md "How many subframes a frame needs", run output printed there
+  more than 8,000 subframes advice, 1,000 a minute, 19,200 took 15 to 23 min: render-page.mjs:127-130 and :871
+  4,017 at 16, 7,805 at 32: render-page.mjs:349-350
+  same-state subframes reuse a capture: render-page.mjs:509
+  ship --profile: bin/vawe ship --help; ship has no blur flag: same help
+  push-blur snippet and filter region: prompts/moves/push-blur.md; whip-pan 0.4: prompts/moves/whip-pan.md; crash-zoom 16 copies: prompts/moves/crash-zoom.md; smear-stretch row: prompts/moves/README.md
+  blur-follows-motion, outline echo, 24 px to 0 over 0.4 s: taste/rules/blur-follows-motion.md
+  push-blur snippet uses a free variable land in the source file; the page here defines land = easeFn('land')
+*/}

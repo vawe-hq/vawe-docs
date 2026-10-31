@@ -1,0 +1,337 @@
+---
+title: Moves
+description: A move is a named piece of motion with a CSS or Web Animations snippet and a one-second clip, and the library has 130 of them in seven groups.
+icon: Blocks
+---
+
+A <Term id="move">move</Term> is a named piece of motion that you copy into your <Term id="page">page</Term>. Each move is one markdown file in `prompts/moves/` with a snippet of 10 to 40 lines, a note on when to use it, a `Sound:` line and a one-second clip. The library has 130 moves in seven groups.
+
+## Why they exist
+
+A model that writes motion from memory writes the same few moves: a fade up, a scale in, a slide. A move gives the page a proven version instead. Its numbers were tuned against a real clip, and its curve is an `EASE` name from `core/motion/presets.js`, never a hand-fitted `cubic-bezier()`.
+
+The clip is the first thing to read. Choose from the clip, not from the name.
+
+<Diagram
+  label="Four steps: pick a move from its clip, copy its snippet into the page, set the beat time, and draft only those seconds."
+  caption="A move is copied, not imported. The page owns the numbers after the copy."
+  narrow={
+    <svg viewBox="0 0 361 311">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Pick from the clip</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} />
+      <DiagramText x={16} y={110}>Copy the snippet</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>Add the beat time to each delay</DiagramText>
+      <DiagramArrow points={[[180, 221], [180, 239]]} />
+      <DiagramBox x={0} y={240} w={360} h={60} accent />
+      <DiagramText x={16} y={270}>Draft those seconds</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 841 81">
+    <DiagramBox x={0} y={0} w={190} h={80} />
+    <DiagramText x={16} y={30}>Pick</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">the clip</DiagramText>
+    <DiagramArrow points={[[191, 40], [219, 40]]} />
+    <DiagramBox x={220} y={0} w={190} h={80} />
+    <DiagramText x={236} y={30}>Copy</DiagramText>
+    <DiagramText x={236} y={56} kind="mono">the snippet</DiagramText>
+    <DiagramArrow points={[[411, 40], [439, 40]]} />
+    <DiagramBox x={440} y={0} w={190} h={80} />
+    <DiagramText x={456} y={30}>Shift</DiagramText>
+    <DiagramText x={456} y={56} kind="mono">delays + beat</DiagramText>
+    <DiagramArrow points={[[631, 40], [659, 40]]} />
+    <DiagramBox x={660} y={0} w={180} h={80} accent />
+    <DiagramText x={676} y={30}>Draft</DiagramText>
+    <DiagramText x={676} y={56} kind="mono">--from --to</DiagramText>
+  </svg>
+</Diagram>
+
+## Use a move in a page
+
+<Steps>
+<Step>
+
+Open the gallery at [vawe.dev/video-components](https://vawe.dev/video-components). Each card plays the clip. Pick the move whose clip shows the job you need.
+
+</Step>
+<Step>
+
+Read the move file `prompts/moves/<move>.md`. The first paragraph starts with "Use when" and says what the move is for and what it costs.
+
+</Step>
+<Step>
+
+Copy the snippet into the page. Keep its numbers. The snippet delays start at 0, so add the start time of your <Term id="beat">beat</Term> to each delay. Name the beat time once, as a custom property such as `--beat-2: 1.60s`.
+
+</Step>
+<Step>
+
+Copy the `Sound:` line too. It names a <Term id="voice">voice</Term> and the second to cue it, or says "none".
+
+</Step>
+<Step>
+
+Draft only the seconds you changed. See [Draft](/docs/draft).
+
+```bash
+bin/vawe dev films/<name>/page.html --from 2 --to 6
+```
+
+</Step>
+</Steps>
+
+The demo page that each clip came from is `prompts/moves/demo/<move>.html`. It links `demo/demo.css`, and the snippets name its classes. Copy the classes that you use, or write your own.
+
+### Two rules the snippets already follow
+
+Keep both when you change a snippet.
+
+- An exit keyframe has no `from`. A `from` fills backwards over the entrance and hides it.
+- `var()` never goes inside the `animation` shorthand. Write the longhands. Chromium drops the whole declaration otherwise.
+
+<Callout kind="note">
+A move animates designed things: type, shapes, UI, illustration and colour fields. A photo may be the content of a move, such as a card or a tile, and the move moves it whole. A move that only works by cutting a captured image into depth layers, or by tracking footage, is a footage technique. It is not part of vawe. Sampling a photo into a designed particle form is in scope. See [Image to particles](/docs/image-to-particles).
+</Callout>
+
+## The seven groups
+
+`prompts/moves/README.md` lists every move in seven groups, and a "Pick by job" table with one row per job. The group sizes are below.
+
+| group | moves | the job |
+|---|---|---|
+| Reveal a title | 25 | Type enters the frame. |
+| Change between shots | 38 | The seam between two beats. |
+| Point the eye | 7 | One word or one UI part gets attention. |
+| Move the camera | 16 | The camera, focus and exposure of a world. |
+| End a film | 10 | The last beat. |
+| Product moments | 21 | A product does one real thing. |
+| Grounds | 13 | A living ground, plus a few loops and photo effects. |
+
+Five moves are featured first in the gallery: `marquee-along-path`, `lens`, `counter-dive`, `ticker-takeover` and `shape-trace-morph`. Three blind reviewers scored every clip, and only clips with a median of 8 or more can be featured.
+
+## The moves
+
+Each name links to its clip and notes on the site.
+
+### Reveal a title
+
+Type enters the frame: a title, a command, a caption or a changing word.
+
+| move | what it does |
+|---|---|
+| [`mask-rise`](https://vawe.dev/video-components/mask-rise) | A line rises from under an invisible edge. |
+| [`tracking-collapse`](https://vawe.dev/video-components/tracking-collapse) | Letters converge from wide spacing while the word sharpens. |
+| [`caret-typing`](https://vawe.dev/video-components/caret-typing) | A command or name is typed, and the caret becomes the next element. |
+| [`letter-stagger`](https://vawe.dev/video-components/letter-stagger) | A word lands letter by letter, 45 ms apart. |
+| [`scale-punch`](https://vawe.dev/video-components/scale-punch) | The hero word hits from 1.4x and recoils. |
+| [`flap-resolve`](https://vawe.dev/video-components/flap-resolve) | Each letter is a tile that flips through glyphs and locks. |
+| [`word-swap-slot`](https://vawe.dev/video-components/word-swap-slot) | One word in a held sentence rolls through values and lands. |
+| [`blur-word-cascade`](https://vawe.dev/video-components/blur-word-cascade) | Copy resolves word by word from blur, with no mask. |
+| [`text-as-mask`](https://vawe.dev/video-components/text-as-mask) | The type is a window onto a moving picture. |
+| [`outline-fill`](https://vawe.dev/video-components/outline-fill) | A word arrives as an outline, then an accent fills each letter. |
+| [`strikethrough-replace`](https://vawe.dev/video-components/strikethrough-replace) | An old value is struck out and the new value rises beside it. |
+| [`grid-stagger-wave`](https://vawe.dev/video-components/grid-stagger-wave) | A title arrives with a wave of tiles around it. |
+| [`text-scramble-decode`](https://vawe.dev/video-components/text-scramble-decode) | A line of wrong glyphs locks, left to right, into the name. |
+| [`ticker-takeover`](https://vawe.dev/video-components/ticker-takeover) | The real answer crashes in over a cycling line. |
+| [`anchor-cycle`](https://vawe.dev/video-components/anchor-cycle) | One phrase stays pinned while a tape of words cuts beside it. |
+| [`lower-third`](https://vawe.dev/video-components/lower-third) | A name plate and a role line for a person on screen. |
+| [`liquid-displace`](https://vawe.dev/video-components/liquid-displace) | A title bent by moving water settles to sharp type. |
+| [`echo-trail`](https://vawe.dev/video-components/echo-trail) | One element flies in with five fading copies behind it. |
+| [`caption-karaoke`](https://vawe.dev/video-components/caption-karaoke) | The spoken word lifts to full ink and a pill glides along. |
+| [`caption-editorial`](https://vawe.dev/video-components/caption-editorial) | Key words in an italic serif, with one caption replacing the last. |
+| [`variable-weight-wave`](https://vawe.dev/video-components/variable-weight-wave) | Weight and width of a variable face crest letter by letter. |
+| [`text-on-path`](https://vawe.dev/video-components/text-on-path) | A line of words rides an SVG path. |
+| [`vertical-cut-reveal`](https://vawe.dev/video-components/vertical-cut-reveal) | Characters, words or lines rise from under hard clip edges. |
+| [`letter-swap`](https://vawe.dev/video-components/letter-swap) | A word rolls letter by letter, forward, back or in random order. |
+| [`letter-3d-swap`](https://vawe.dev/video-components/letter-3d-swap) | Each character is a cube that turns to the next face. |
+
+### Change between shots
+
+The seam between two beats. Each move names what carries the eye across the cut.
+
+| move | what it does |
+|---|---|
+| [`cut-on-motion`](https://vawe.dev/video-components/cut-on-motion) | A moving shape carries the eye across a hard cut. |
+| [`push-blur`](https://vawe.dev/video-components/push-blur) | A panel pushes in with a blur that follows its speed. |
+| [`exit-fast`](https://vawe.dev/video-components/exit-fast) | Arrive fast and land soft; leave faster and shorter. |
+| [`chain-beats`](https://vawe.dev/video-components/chain-beats) | Beats overlap and one element hands off. |
+| [`whip-pan`](https://vawe.dev/video-components/whip-pan) | A fast sideways pan hides the seam in blur. |
+| [`match-cut`](https://vawe.dev/video-components/match-cut) | One shape crosses the cut and changes meaning. |
+| [`iris-wipe`](https://vawe.dev/video-components/iris-wipe) | A circle closes on the mark and uncovers the next world. |
+| [`stack-cover`](https://vawe.dev/video-components/stack-cover) | The next panel slides over the last one. |
+| [`split-reveal`](https://vawe.dev/video-components/split-reveal) | Two halves part like doors onto the next shot. |
+| [`slice-shift`](https://vawe.dev/video-components/slice-shift) | Bands slide off in turn and uncover the next shot. |
+| [`type-fill-transition`](https://vawe.dev/video-components/type-fill-transition) | A word scales into one letter and its colour becomes the next ground. |
+| [`color-block-wipe`](https://vawe.dev/video-components/color-block-wipe) | A brand-colour block sweeps across the cut. |
+| [`zoom-through`](https://vawe.dev/video-components/zoom-through) | The camera dives into a UI part and the next shot comes out. |
+| [`speed-ramp-freeze`](https://vawe.dev/video-components/speed-ramp-freeze) | Story time slows to a near hold before a change. |
+| [`speed-ramp`](https://vawe.dev/video-components/speed-ramp) | Both sides of a cut move at the same speed. |
+| [`liquid-wipe`](https://vawe.dev/video-components/liquid-wipe) | A gooey edge floods the frame onto the next shot. |
+| [`grid-tile-flip`](https://vawe.dev/video-components/grid-tile-flip) | A wall of tiles flips in a wave to the next shot. |
+| [`luma-matte-dissolve`](https://vawe.dev/video-components/luma-matte-dissolve) | The next shot arrives through its own brightness. |
+| [`smear-stretch`](https://vawe.dev/video-components/smear-stretch) | Shot A stretches into streaks and shot B snaps back. |
+| [`shape-morph-wipe`](https://vawe.dev/video-components/shape-morph-wipe) | The next shot grows out of a shape on screen. |
+| [`spin-transition`](https://vawe.dev/video-components/spin-transition) | A 90 degree camera roll carries the cut. |
+| [`swipe-continues`](https://vawe.dev/video-components/swipe-continues) | A card swipe continues as the next world arrives. |
+| [`drop-and-land`](https://vawe.dev/video-components/drop-and-land) | An action in world A lands in world B. |
+| [`spin-rotation`](https://vawe.dev/video-components/spin-rotation) | A loading spinner hands over to the loaded screen. |
+| [`counter-dive`](https://vawe.dev/video-components/counter-dive) | The camera enters a title through the hole of an o. |
+| [`thumbnail-grid`](https://vawe.dev/video-components/thumbnail-grid) | The world shrinks into a thumbnail that is the next world. |
+| [`light-leak-transition`](https://vawe.dev/video-components/light-leak-transition) | Warm light layers swell over the cut. |
+| [`type-match-cut`](https://vawe.dev/video-components/type-match-cut) | One word holds its place while the frame cuts around it. |
+| [`cursor-spotlight`](https://vawe.dev/video-components/cursor-spotlight) | A click opens the next screen inside a growing circle. |
+| [`toggle-horizon`](https://vawe.dev/video-components/toggle-horizon) | A toggle track stretches into the horizon of the next world. |
+| [`progress-timeline`](https://vawe.dev/video-components/progress-timeline) | A progress bar stands up into the scrubber of a timeline. |
+| [`avatar-world`](https://vawe.dev/video-components/avatar-world) | A round avatar grows until its art is the next ground. |
+| [`glow-record`](https://vawe.dev/video-components/glow-record) | An alert badge floods the frame and becomes a live state. |
+| [`highlight-sweep`](https://vawe.dev/video-components/highlight-sweep) | A highlight grows into the ground of the next panel. |
+| [`shadow-handoff`](https://vawe.dev/video-components/shadow-handoff) | A card shadow darkens into the ground of the next world. |
+| [`word-portal`](https://vawe.dev/video-components/word-portal) | A typed word grows and the next world shows through its letters. |
+| [`underline-road`](https://vawe.dev/video-components/underline-road) | A headline underline bends down and becomes a route on a map. |
+| [`caret-door`](https://vawe.dev/video-components/caret-door) | The caret grows into a door that turns open on the next screen. |
+
+### Point the eye
+
+One word or one part of a UI gets the viewer's attention.
+
+| move | what it does |
+|---|---|
+| [`word-sweep`](https://vawe.dev/video-components/word-sweep) | The accent runs word by word and stays on the target. |
+| [`weight-morph`](https://vawe.dev/video-components/weight-morph) | One word gets heavier on a real variable-font axis. |
+| [`marker-highlight`](https://vawe.dev/video-components/marker-highlight) | A highlighter bar wipes behind one phrase. |
+| [`underline-draw`](https://vawe.dev/video-components/underline-draw) | A line draws under the key word. |
+| [`bracket-callout`](https://vawe.dev/video-components/bracket-callout) | Corner brackets snap onto a word or a UI part. |
+| [`spotlight-dim`](https://vawe.dev/video-components/spotlight-dim) | The frame dims around one target. |
+| [`hand-drawn-notes`](https://vawe.dev/video-components/hand-drawn-notes) | Margin notes: a circle, an arrow and an underline, drawn on. |
+
+### Move the camera
+
+The camera, the focus and the exposure of a whole world.
+
+| move | what it does |
+|---|---|
+| [`ui-focus-zoom`](https://vawe.dev/video-components/ui-focus-zoom) | Zoom onto one part of a captured UI. |
+| [`caret-follow`](https://vawe.dev/video-components/caret-follow) | The camera trails the typing caret on a soft spring. |
+| [`pull-back-reveal`](https://vawe.dev/video-components/pull-back-reveal) | Open tight on a detail and pull back to the whole. |
+| [`parallax-dive`](https://vawe.dev/video-components/parallax-dive) | The camera flies forward through layers at real depths. |
+| [`exposure-flash`](https://vawe.dev/video-components/exposure-flash) | A cut reads as over-exposure: three white frames. |
+| [`lens`](https://vawe.dev/video-components/lens) | A screen filmed as a real object. See Lens and effects. |
+| [`camera-moves`](https://vawe.dev/video-components/camera-moves) | Push, pull and whip for a whole world as one wrapper. |
+| [`depth-resolve`](https://vawe.dev/video-components/depth-resolve) | Far words resolve as the camera arrives. |
+| [`scale-through`](https://vawe.dev/video-components/scale-through) | Fly into a plain element and its colour is the next world. |
+| [`direction-wipe`](https://vawe.dev/video-components/direction-wipe) | A mask edge moves the way the last move went. |
+| [`arrival-spring`](https://vawe.dev/video-components/arrival-spring) | A small overshoot on one arrival in three, a big one on the key arrival. |
+| [`rack-focus`](https://vawe.dev/video-components/rack-focus) | Focus moves from one depth layer to another. |
+| [`drift-hold`](https://vawe.dev/video-components/drift-hold) | The line holds still while only the ground drifts. |
+| [`gradient-mesh-field`](https://vawe.dev/video-components/gradient-mesh-field) | Four soft colour pools drift behind a title. |
+| [`pan-stations`](https://vawe.dev/video-components/pan-stations) | The camera pans between stations on one wide canvas. |
+| [`crash-zoom`](https://vawe.dev/video-components/crash-zoom) | A 0.13 s slam to 2.6x with real zoom blur. |
+
+### End a film
+
+The last beat: a mark, a name, a call to action.
+
+| move | what it does |
+|---|---|
+| [`logo-sting`](https://vawe.dev/video-components/logo-sting) | The mark lands, a light band crosses it and the word opens. |
+| [`wordmark-cascade`](https://vawe.dev/video-components/wordmark-cascade) | Letters fall onto a rail and the full stop lands last. |
+| [`mark-trace`](https://vawe.dev/video-components/mark-trace) | A line mark draws itself with a riding tip. |
+| [`shape-trace-morph`](https://vawe.dev/video-components/shape-trace-morph) | An outline draws on, fills and morphs into the brand mark. |
+| [`calm-lockup`](https://vawe.dev/video-components/calm-lockup) | Logo and line settle slowly while two lights drift. |
+| [`cta-pop`](https://vawe.dev/video-components/cta-pop) | The call to action pops in under its line. |
+| [`thanks-sweep`](https://vawe.dev/video-components/thanks-sweep) | A closing line sweeps in on a soft mask edge. |
+| [`ui-strip-away`](https://vawe.dev/video-components/ui-strip-away) | The UI leaves layer by layer and the brand mark remains. |
+| [`logo-wall`](https://vawe.dev/video-components/logo-wall) | Three lanes of logo cells slide in as proof. |
+| [`cta-morph-press`](https://vawe.dev/video-components/cta-morph-press) | One plate becomes a button and a cursor presses it. |
+
+### Product moments
+
+A product doing one real thing: a click, a chart, an agent, a diff.
+
+| move | what it does |
+|---|---|
+| [`clip-expand`](https://vawe.dev/video-components/clip-expand) | A panel grows out of one point. |
+| [`cursor-click`](https://vawe.dev/video-components/cursor-click) | A cursor travels to a control and presses it. |
+| [`count-up`](https://vawe.dev/video-components/count-up) | Digit wheels roll to a number, then a delta chip and a sparkline. |
+| [`card-assemble`](https://vawe.dev/video-components/card-assemble) | A UI card builds part by part. |
+| [`notification-pop`](https://vawe.dev/video-components/notification-pop) | A banner drops in, holds and leaves faster. |
+| [`chart-build`](https://vawe.dev/video-components/chart-build) | Gridlines draw, bars rise and the newest bar turns accent. |
+| [`before-after-wipe`](https://vawe.dev/video-components/before-after-wipe) | One card in two states with a scan line between them. |
+| [`skeleton-reveal`](https://vawe.dev/video-components/skeleton-reveal) | Grey blocks shimmer, then resolve into real content. |
+| [`ai-stream-response`](https://vawe.dev/video-components/ai-stream-response) | A prompt is sent and the answer streams in chunks. |
+| [`overwhelm-collapse`](https://vawe.dev/video-components/overwhelm-collapse) | A flood of cards collapses into one fix. |
+| [`success-check`](https://vawe.dev/video-components/success-check) | A button resolves into a drawn check. |
+| [`integration-hub`](https://vawe.dev/video-components/integration-hub) | Tool logos land on a ring around the product mark. |
+| [`device-tilt-stage`](https://vawe.dev/video-components/device-tilt-stage) | The UI on a CSS 3D laptop that rises and settles. |
+| [`command-palette-summon`](https://vawe.dev/video-components/command-palette-summon) | A Cmd+K palette drops in, a query types and Enter runs. |
+| [`gooey-filter`](https://vawe.dev/video-components/gooey-filter) | Shapes that touch merge into one soft outline. |
+| [`agent-progress`](https://vawe.dev/video-components/agent-progress) | An agent works through steps that flip to checks. |
+| [`panel-live-sync`](https://vawe.dev/video-components/panel-live-sync) | An edit in a panel and its result in one frame. |
+| [`terminal-run`](https://vawe.dev/video-components/terminal-run) | A coding agent works in a terminal that steps, never eases. |
+| [`approval-gate`](https://vawe.dev/video-components/approval-gate) | The agent asks before it acts. |
+| [`model-picker`](https://vawe.dev/video-components/model-picker) | A pointer opens a model menu and picks one. |
+| [`diff-card`](https://vawe.dev/video-components/diff-card) | A pull request diff builds and the badge becomes Merged. |
+
+### Grounds
+
+A living ground for a held frame. The group also holds a few loops and photo effects.
+
+| move | what it does |
+|---|---|
+| [`aurora-drift`](https://vawe.dev/video-components/aurora-drift) | Three soft bands of light fold slowly in one shader. |
+| [`grain-field`](https://vawe.dev/video-components/grain-field) | A tonal ground with film grain seeded from the seek time. |
+| [`halftone-field`](https://vawe.dev/video-components/halftone-field) | A 45 degree dot screen whose dot size waves. |
+| [`ink-warp`](https://vawe.dev/video-components/ink-warp) | Marbled ink flows behind short, large copy. |
+| [`dot-grid-wave`](https://vawe.dev/video-components/dot-grid-wave) | A plain SVG dot grid with one travelling wave. |
+| [`light-pool`](https://vawe.dev/video-components/light-pool) | One soft pool of light wanders on a seeded path, in plain CSS. |
+| [`marquee-along-path`](https://vawe.dev/video-components/marquee-along-path) | Tiles ride one SVG path at an even gap. |
+| [`simple-marquee`](https://vawe.dev/video-components/simple-marquee) | Three rows of tiles slide for a whole beat. |
+| [`circling-elements`](https://vawe.dev/video-components/circling-elements) | Eight tiles orbit one point. |
+| [`css-box`](https://vawe.dev/video-components/css-box) | A cube of type turns to another face on a stiff spring. |
+| [`pixelate-svg-filter`](https://vawe.dev/video-components/pixelate-svg-filter) | A photo breaks into blocks and clears again. |
+| [`photo-particles`](https://vawe.dev/video-components/photo-particles) | A photo is sampled into lit points that gather. |
+| [`media-between-text`](https://vawe.dev/video-components/media-between-text) | A picture grows inside a line of type and the words part. |
+
+## From a move to a film
+
+A single move is one second. A film needs a chain. A <Term id="recipe">recipe</Term> joins moves into a short film, with a table of beats, the sound cues and the traps at each seam. `prompts/moves/RECIPES.md` has fifteen recipes: eight short films, six complete videos of 20 to 30 s, and one spectacle beat for any film. See [Recipes](/docs/recipes).
+
+Pick the recipe from the family of your direction (type-led, object- or product-led, graphic- or colour-led). Then change at least two moves. A film that follows a recipe almost 1:1 gets advice from `dev`.
+
+## Render a clip again
+
+The clips are not tracked as masters. The web copy of each clip is `site/public/moves/<move>.mp4`. To render the master of one move, run this in a vawe checkout.
+
+```bash
+bin/vawe moves --only weight-morph
+```
+
+The verb renders the clip to `prompts/moves/<move>.mp4` at 1280 px and 60 fps, and writes a 12-frame contact sheet to `out/moves/<move>-sheet.png`. Without `--only`, it renders the clips whose demo, `demo/demo.css` or imported `core/` files changed. `--all` renders every clip.
+
+## Limits
+
+- A move is a snippet. It does not check your page. The checks of `dev` do that.
+- A move earns its place with a real reference, an approved clip and a clear use. A clip that is not approved goes out of the library.
+- Some moves are "once per film": `logo-sting`, `wordmark-cascade`, `mark-trace`, `shape-trace-morph`, `calm-lockup`, `thanks-sweep`, `chain-beats`, `rack-focus` and `skeleton-reveal`. Each move file says so.
+
+<Cards>
+  <Card title="Recipes" href="/docs/recipes">Chains of moves for common films.</Card>
+  <Card title="Motion" href="/docs/motion">Springs, eases and the motion rules.</Card>
+  <Card title="Transitions" href="/docs/transitions">Choose the move for each cut.</Card>
+  <Card title="Lens and effects" href="/docs/lens-and-effects">The lens move and the looks.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  move file anatomy, snippet 10 to 40 lines, Sound: line, clip location, scope rule, EASE names, demo/, demo.css: prompts/moves/README.md lines 1-26
+  seven groups and sizes 25/38/7/16/10/21/13 = 130: row counts of the "## <group>" tables in prompts/moves/README.md; 132 *.md files minus README.md and RECIPES.md = 130 (ls prompts/moves/*.md)
+  featured five, blind score, median 8: prompts/moves/README.md "## Featured"
+  two snippet rules (no from on exit, no var() in animation shorthand): prompts/moves/README.md after the Product moments table
+  beat time shift, --beat-2, fifteen recipes, recipe-echo advice: prompts/moves/RECIPES.md lines 1-19
+  bin/vawe moves --only/--all, 1280 px, 60 fps, 12-frame sheet: bin/vawe moves --help
+  once per film: "use once per film" in the README rows of logo-sting, wordmark-cascade, mark-trace, shape-trace-morph, calm-lockup, thanks-sweep, chain-beats, rack-focus, skeleton-reveal
+  gallery and per-move route: site/app/video-components/MovesGallery.tsx:123
+*/}

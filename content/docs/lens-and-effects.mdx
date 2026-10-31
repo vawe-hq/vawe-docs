@@ -1,0 +1,225 @@
+---
+title: Lens and effects
+description: The lens films a flat page like a real camera, with depth of field, bloom, grain, blur and colour fringes made in image space, never with CSS fakes.
+icon: Aperture
+blog:
+  - slug: real-lens
+    title: 'Depth of field in CSS and WebGL: a measured test'
+---
+
+The <Term id="lens">lens</Term> is one WebGL2 camera in `core/surfaces/lens.js`. Your page draws a flat screen. The lens films that screen like a camera pointed at a real object: it tilts it, blurs it by depth, adds bloom, grain and colour fringes, and writes the result to a canvas. A <Term id="look">look</Term> is a named set of lens settings.
+
+## Why it exists
+
+A CSS `filter: blur()` or a radial-gradient glow looks like a drawing of an effect. A real lens spreads light: bright points bloom, the far side of a tilted screen goes soft, red and blue move apart at the frame edge. The rule `real-optics` says that every optical effect in a film is a lens effect, never a CSS fake. The lens makes those effects in one pass, with linear light, so they match what a camera does.
+
+The lens is also <Term id="determinism">deterministic</Term>. All its noise is hashed from `seed` and `floor(t * fps)`, so a frame is a pure function of `t` and two renders match byte for byte.
+
+## How it works
+
+<Diagram
+  label="The page draws a flat source. The lens uploads it as a texture, tilts it, blurs it by depth, then adds bloom and the other optical passes, and writes one canvas that sits under your sharp labels."
+  caption="The source is plain HTML or a canvas. Labels in HTML above the canvas stay sharp."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Source</DiagramText>
+      <DiagramText x={344} y={30} kind="mono" anchor="end">htmlSource, canvasSource</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} accent />
+      <DiagramText x={16} y={110}>Lens</DiagramText>
+      <DiagramText x={344} y={110} kind="mono" anchor="end">cam.draw(t)</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>Canvas</DiagramText>
+      <DiagramText x={344} y={190} kind="mono" anchor="end">cam.project(x, y, t)</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 841 81">
+    <DiagramBox x={0} y={0} w={240} h={80} />
+    <DiagramText x={16} y={30}>Source</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">htmlSource, canvasSource</DiagramText>
+    <DiagramArrow points={[[241, 40], [299, 40]]} />
+    <DiagramBox x={300} y={0} w={240} h={80} accent />
+    <DiagramText x={316} y={30}>Lens</DiagramText>
+    <DiagramText x={316} y={56} kind="mono">cam.draw(t)</DiagramText>
+    <DiagramArrow points={[[541, 40], [599, 40]]} />
+    <DiagramBox x={600} y={0} w={240} h={80} />
+    <DiagramText x={616} y={30}>Canvas</DiagramText>
+    <DiagramText x={616} y={56} kind="mono">cam.project(x, y, t)</DiagramText>
+  </svg>
+</Diagram>
+
+The steps of one frame:
+
+1. The renderer seeks the page and calls your `vawe.onFrame` hook with the time `t`.
+2. The hook calls `cam.draw(t)`. The lens reads each option at `t`, uploads the source as a texture, and draws the main pass (perspective, depth of field, palette, grid, aberration, tear).
+3. The lens runs the blur chains for bloom, halation, streaks, diffusion and soft focus, only for effects with a strength above 0.
+4. The final pass adds grain, vignette, exposure, lift and fade, and writes the canvas.
+
+The hook returns the promise of `draw`, and the seek waits for it. See [Time and seek](/docs/time-and-seek).
+
+## Turn the lens on
+
+A minimal page. The element `#screen` is plain HTML and CSS at the size of the frame.
+
+```html
+<div id="screen"> ... </div>
+<script type="module">
+import '../../core/engine/page-api.js';
+import { lens, htmlSource } from '../../core/surfaces/lens.js';
+
+const cam = lens(htmlSource(document.getElementById('screen'), { scale: 2 }), { look: 'film-halation' });
+vawe.onFrame((t) => cam.draw(t));
+</script>
+```
+
+- `htmlSource(element, { scale })` turns an element into a source. It inlines the computed styles, fonts, images and `url()` backgrounds into an SVG image and uploads it on every seek. `scale` is texture pixels per source pixel. Use 2 for small text. Scripts, iframes, video and counters do not carry over.
+- `canvasSource(canvas, { scale, depth })` takes a 2D canvas or a three.js canvas. `depth` is an optional depth map for the depth of field.
+- `lens(source, options)` needs WebGL2. It throws `lens: WebGL2 is not available` without it.
+
+Every option is a literal that the page can change: a number, an array or a function of the seek time. A function gives a move:
+
+```js
+const cam = lens(src, {
+  look: 'anamorphic',
+  zoom: (t) => 1 + 0.07 * Math.min(1, t / 3),
+  aberration: { amount: (t) => 3 + 5 * Math.min(1, t / 2) },
+});
+```
+
+### What is on by default
+
+`lens(source)` with no `look` starts from the "filmed screen" defaults: bloom, LED grid, colour fringes, depth of field, grain and vignette are all on. With `look: 'name'` the lens starts from a flat lens, applies the look, then your own options. The look names every effect it uses and nothing else is on. `OFF` is the flat lens: import it and spread it to turn on one effect at a time.
+
+```js
+import { lens, htmlSource, OFF } from '../../core/surfaces/lens.js';
+lens(src, { ...OFF, bloom: { strength: 0.9, radius: 42 } });
+```
+
+## The looks
+
+`LOOKS` in `core/surfaces/lens.js` has ten looks.
+
+| look | what it does |
+|---|---|
+| `clean` | A flat lens. Nothing is on. |
+| `dream-bloom` | Strong, wide bloom and a little soft focus. |
+| `film-halation` | A warm halo where a bright edge meets dark, light bloom and grain. |
+| `anamorphic` | Blue horizontal streaks from bright points, light bloom and fringe. |
+| `pro-mist` | A low, wide diffusion glow that lifts the blacks. |
+| `tilt-shift` | A sharp band with blur above and below it. |
+| `soft-focus` | The image mixed with a blurred copy. |
+| `vintage` | A warm palette, halation, heavy grain, gate weave and a strong vignette. |
+| `cyanotype` | A blue-grey palette with a cold halo and grain. |
+| `crt` | A phosphor grid, tear, fringe, bloom and vignette. |
+
+To compare looks before you choose, run `frames` with `--looks`. It writes one labelled grid for each second you name, and it does not edit the page.
+
+```bash
+bin/vawe frames films/<name>/page.html --looks --at 4.5,9 --only anamorphic,crt
+```
+
+An unknown look name throws an error that lists the valid names.
+
+## The effects
+
+Each effect is one option. A value of 0 turns the effect off.
+
+| option | what it does | main fields |
+|---|---|---|
+| perspective | Tilts and zooms the plane. The far side is smaller and softer by geometry. | `tiltX`, `tiltY`, `roll`, `zoom` (up to about 3), `aim`, `focal` |
+| `dof` | Depth of field. Blur grows with the distance to the focus. The bokeh has the shape of the aperture. | `blur`, `focus`, `max`, `bokeh`, `blades`, `rotation`, `roundness`, `catEye`, `soft` |
+| `palette` | Maps brightness through 2 to 8 colour stops. | `stops`, `amount`, `keepColor` |
+| `bloom` | A soft-knee threshold, then a six-level blur chain: a tight core and a wide tail. | `strength`, `radius`, `threshold`, `knee` |
+| `halation` | The warm halo of film at a bright edge. Off by default. Use 0.5 to 1.2. | `strength`, `radius`, `threshold`, `tint` |
+| `grid` | An LED or panel mask: one soft dot for each subpixel. | `amount`, `cell`, `layout` (`stripe`, `triad`, `dot`), `softness` |
+| `aberration` | Red and blue move apart toward the frame edge. | `amount` (px at the edge) |
+| `tear` | Rows slide sideways, seeded. | `amount`, `prob`, `band` |
+| `streaks` | Anamorphic streaks. Use 0.3 to 1. | `strength`, `length`, `threshold`, `tint` |
+| `diffusion` | A wide low-threshold glow. Use 0.2 to 0.5. | `strength`, `radius` |
+| `softFocus` | The image mixed with a blurred copy. Use `amount` 0.2 to 0.6. | `amount`, `radius` |
+| `tiltShift` | A sharp band with blur above and below it. | `center`, `width`, `blur` |
+| `distortion` | A radial remap: above 0 is barrel, below 0 is pincushion. Use -0.12 to 0.12. | `amount` |
+| `weave` | Gate weave: the whole image moves by up to `amount` px, with a new seeded offset each frame. | `amount` |
+| `grain`, `vignette`, `exposure`, `lift`, `fade` | The last pass. | one number each |
+
+The names `seed` and `fps` set the noise. The same `seed` and time give the same grain.
+
+### Blur
+
+The lens has three blurs, and each has a job:
+
+- `dof` blurs by depth. The far side of a tilted screen and anything away from `focus` goes soft. Pass a function as `focus` to follow a target.
+- `softFocus` keeps the detail and softens it, like a filter on a lens.
+- `tiltShift` blurs by screen row. A source with its own `depth` keeps that depth and gets the band blur as a floor.
+
+Blur from fast movement is a different thing. See [Motion blur](/docs/motion-blur).
+
+### Palettes
+
+`PALETTES` has seven sets of stops: `thermal`, `phosphor`, `amber`, `navy`, `paper`, `mono` and `cyanotype`. Set `keepColor` to a value up to 1 to leave saturated marks, such as a red lock box, in their own colour.
+
+```js
+lens(src, { palette: { stops: PALETTES.thermal, keepColor: 0.9 } });
+```
+
+## Camera views and moves
+
+`core/surfaces/lens-views.js` holds named poses for filming a screen as a product shot. A view is a pose of the plane in degrees. A move is a start pose and an end pose, drawn from seeded ranges.
+
+- `VIEWS`: `flat`, `side-angle`, `isometric`, `top-diagonal` and `reverse-isometric`.
+- `MOVES`: ten movements, from `focus-push` and `side-drift` to `isometric-reveal`.
+- `moveBetween(name, seed, { base, scale })` returns `{ from, to }`. The same name and seed give the same move. Rotation about x and y is clamped to 25 degrees.
+- `lensPose(pose)` turns a pose into the lens options `tiltX`, `tiltY`, `roll` and `zoom`.
+
+```js
+import { easeFn } from '../../core/motion/presets.js';
+import { moveBetween, lensPose } from '../../core/surfaces/lens-views.js';
+
+const { from, to } = moveBetween('side-drift', 7, { scale: 0.6 });
+const a = lensPose(from), b = lensPose(to);
+const glide = easeFn('glide');
+const at = (k) => (t) => a[k] + (b[k] - a[k]) * glide(Math.min(1, t / 4));
+const cam = lens(src, { tiltX: at('tiltX'), tiltY: at('tiltY'), roll: at('roll'), zoom: at('zoom') });
+```
+
+## Put a label on the screen
+
+`cam.project(x, y, t)` is the same camera on the CPU. It returns `{ x, y, scale, depth, visible }` in CSS pixels for a point of the source. Draw labels, brackets and links in HTML above the canvas (z-index above 0), and place them with `project`. They stay sharp and sit on real source coordinates. `cam.quad(t)` gives the four corners of the screen.
+
+## What `dev` tells you
+
+The draft prints lens lines. They are advice, not refusals.
+
+- `lens texel`: the focused region is drawn more than 1.05 times its source pixels, so text reads soft. Use a sharper source, a higher `scale`, or a smaller zoom.
+- `lens tilt`: the tilt in degrees for each world. A tilt over 10 degrees is hard to read, and 25 degrees is the clamp.
+
+## Limits
+
+- The lens needs WebGL2 and a source of fixed size. `htmlSource` reads the size of the element when you create it.
+- One frame costs about 17 ms on the GPU at 1080p, and about 12 ms in a draft.
+- Text in the source is a texture. Keep it large, or keep small text in HTML above the canvas.
+- The flat look is a valid choice. `real-optics` bans fake optics, not a clean frame.
+
+<Cards>
+  <Card title="Motion blur" href="/docs/motion-blur">Blur from fast movement, in the final.</Card>
+  <Card title="Three.js and canvas" href="/docs/three-and-canvas">Film a WebGL canvas through the lens.</Card>
+  <Card title="Product UI" href="/docs/product-ui">The screens that the lens films.</Card>
+  <Card title="Moves" href="/docs/moves">The lens move and its clip.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  one shader, six stages, options as literals or functions of t, OFF, project, htmlSource scale 2, 17 ms and 12 ms, cyanotype, halation/streaks/diffusion/softFocus/tiltShift/distortion/weave ranges: prompts/moves/lens.md
+  DEFAULTS (bloom, grid, aberration, dof, grain 0.05, vignette 0.4), OFF, ten LOOKS, PALETTES, merge order, unknown-look error, WebGL2 error, field names: core/surfaces/lens.js:12-100 and :662-690
+  look base = DEFAULTS over OFF over LOOKS[name]: core/surfaces/lens.js resolveOptions
+  draw order and blur chains only when strength > 0: core/surfaces/lens.js lens() draw
+  project, quad, measure: core/surfaces/lens.js lens() api
+  htmlSource inlines styles, fonts, img, url(); scripts, iframes, video, counters do not carry over; canvasSource depth: core/surfaces/lens-source.js:1-6
+  VIEWS, MOVES (10), CLAMP_DEG 25, lensPose, moveBetween: core/surfaces/lens-views.js (moveBetween ran in node with seed 7)
+  texel 1.05 advice, tilt advice READ_DEG 10: harness/lib/lens-advice.mjs:7, :19; lens-views.js:105
+  frames --looks --at --only: bin/vawe frames --help
+  real-optics: taste/rules/real-optics.md
+  seek awaits an onFrame promise: core/engine/page-seek.js seekTo
+*/}

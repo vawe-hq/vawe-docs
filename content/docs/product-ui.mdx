@@ -1,0 +1,181 @@
+---
+title: Product UI
+description: Show a product as a faithful copy of its real interface, and move each surface as the real one moves. A terminal steps and a large panel never overshoots.
+icon: AppWindow
+---
+
+A film about a product must show the product working. That means the real interface: a capture of it, or a faithful copy built as a page component. A grey window with a word in a box is not a beat. This page says how to build the screen, and how each kind of surface moves.
+
+## Why it exists
+
+The rule `show-real-thing` says that each beat shows a real artifact working. A hand-written mock fails in the same way every time. It has a grey window, small type and a sparse grid, because that is what "a UI" looks like in a model's memory. In a measured comparison, the reference films filled 0.71 of the frame with picture, and a first mock filled 0.17.
+
+A copy of a real interface also solves a second problem. The viewer knows how ChatGPT, GitHub or a terminal behaves. A copy that moves differently reads as fake, even when the viewer cannot say why.
+
+## Choose the source of the screen
+
+Take the first option that fits.
+
+1. **Capture the real product.** A capture of the real UI beats any mock. `bin/vawe shot <target> --tour <steps.json>` drives a drawn cursor through a route or URL with real mouse events and writes an mp4. Add `--scale 3` for a sharp close-up.
+2. **Copy a real interface as a component.** The Product moments group of the [moves](/docs/moves) library has faithful copies: `terminal-run`, `approval-gate`, `model-picker`, `diff-card`, `ai-stream-response`, `agent-progress`, `command-palette-summon` and more. Each copies one real surface at full size, with its real type, its real colours and its real behaviour.
+3. **Design an interface for an invented product.** Build it as a real interface: real-looking data, and controls that do something. Do not make functionless chrome.
+
+<Diagram
+  label="Three sources for a product screen, in order of preference: a capture of the real product, a faithful component copy, and a designed interface for an invented product."
+  caption="Go down the list only when the option above does not fit."
+  narrow={
+    <svg viewBox="0 0 361 221">
+      <DiagramBox x={0} y={0} w={360} h={60} accent />
+      <DiagramText x={16} y={30}>1. Capture the real product</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} />
+      <DiagramText x={16} y={110}>2. Copy a real interface</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>3. Design a real-looking one</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 881 81">
+    <DiagramBox x={0} y={0} w={270} h={80} accent />
+    <DiagramText x={16} y={30}>1. Capture</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">vawe shot --tour</DiagramText>
+    <DiagramArrow points={[[271, 40], [299, 40]]} />
+    <DiagramBox x={300} y={0} w={270} h={80} />
+    <DiagramText x={316} y={30}>2. Copy</DiagramText>
+    <DiagramText x={316} y={56} kind="mono">Product moments</DiagramText>
+    <DiagramArrow points={[[571, 40], [599, 40]]} />
+    <DiagramBox x={600} y={0} w={280} h={80} />
+    <DiagramText x={616} y={30}>3. Design</DiagramText>
+    <DiagramText x={616} y={56} kind="mono">the builder rung</DiagramText>
+  </svg>
+</Diagram>
+
+## Build an invented interface
+
+The <Term id="design-kit">design kit</Term> has a skill ladder with five rungs: `builder`, `type`, `colour`, `depth` and `frame`. The `builder` rung builds product UI as a real interface. The `frame` rung then removes web-page patterns such as a nav, a CTA button, a pill or an eyebrow. Use both: build the parts at the builder rung, and clean the frame at the frame rung. See [Design kit](/docs/design-kit).
+
+Rules for the screen (`taste/craft/show-dont-tell.md`):
+
+- One focal element for each screen: the prompt in an editor, the hero tile in a grid.
+- Fill most of the frame. Use display-size type, never web-size type.
+- Show real images whole. Set each cell to the aspect of its source, so `object-fit: cover` does not crop.
+- Take colour from theme tokens, with one accent.
+- Make every claim in the copy true.
+- Check the laid-out page, not the source. Read the real box of each element against the frame and the safe margin.
+
+A screen that is the subject of the film goes in an element with `data-ui`. Its text floor is 3 percent of the frame height as cap height, not 6 percent, because it is sized like a real screen. No text on a built screen is under 28 px at 1920 wide.
+
+```html
+<div data-ui class="app"> ... </div>
+```
+
+## Move a surface the way the real one moves
+
+A copy must move as the real surface moves. A product that animates nothing must not animate in the copy.
+
+| surface | how it moves | move that shows it |
+|---|---|---|
+| terminal | Every character, row and swap lands in whole steps on one frame. No ease, no fade, no scale. | `terminal-run`, `approval-gate` |
+| web page already loaded | The page is whole. State changes swap on one frame, such as a checks chip or a badge. | `diff-card` |
+| chat | The prompt types at a steady rate. The answer streams in chunks of 1 to 3 words. | `ai-stream-response` |
+| menu or dialog | A short fade and a small scale. The selection mark moves on one frame. | `model-picker`, `command-palette-summon` |
+| window or panel | Fades in with at most a few pixels of rise. No scale. | any move that uses `arrive` |
+
+Only the window arrives with an ease in a terminal clip, and that is clip framing, not the product. The text inside the window never eases.
+
+### No invented overshoot
+
+Overshoot is a snap on a small, fast arrival of 3 to 20 px. A large panel does not overshoot. Do not add a spring or a bounce where the real interface has none. The `overshoot-share` check compares a whole film with reference films, so use overshoot for the arrival that matters and not for the interface. See [Motion](/docs/motion).
+
+### The measured numbers
+
+`core/motion/ui.js` holds the timing of real product screens, in milliseconds, read from reference clips. `core/motion/presets.js` re-exports it as `UI`.
+
+```js
+import { UI, EASE } from '../../core/motion/presets.js';
+```
+
+| name | value | what it measured |
+|---|---|---|
+| `UI.typing` | 30 ms a character, 70 ms more after a space, 25 percent jitter | 20 to 27 characters a second with pauses at word gaps |
+| `UI.stream` | 55 to 110 ms between chunks, 200 ms fade | 15 to 25 words a second |
+| `UI.send` | spring `k` 500, `d` 25 | a sent bubble overshoots 11 to 14 percent |
+| `UI.panel` | 220 ms fade, 0.8vh rise | a window fades in with no scale |
+| `UI.row` | 300 ms fade, 70 ms stagger | rows 70 to 100 ms apart |
+| `UI.roll` | 150 ms out, 260 ms in | a digit rolls in its own clipped slot |
+| `UI.exit` | 300 ms, a 100 ms empty end | the window fades to the empty ground; frame 0 is the same ground |
+| `UI.snap` | overshoot 0.09 to 0.2 | a snap on small, fast arrivals |
+
+The presets are for surfaces that animate. A terminal steps, and only `UI.typing` and `UI.panel` apply to it. Seed the typing jitter with `rng`.
+
+## Build a product beat
+
+<Steps>
+<Step>
+
+Pick the source from the list above. For a real product, capture it with `bin/vawe shot`.
+
+```bash
+bin/vawe shot https://example.com/app --tour tour.json --w 1600 --scale 2 --out out/app-tour.mp4
+```
+
+</Step>
+<Step>
+
+Pick a Product moments move that matches the surface. Open `prompts/moves/<move>.md` and read the paragraph that starts with "Use when". It says which real surface the move copies.
+
+</Step>
+<Step>
+
+Copy the snippet. Keep the type, colours and timing of the copy. Change only the content: the prompt text, the file names, the numbers.
+
+</Step>
+<Step>
+
+Put the screen in one world with `data-world`, with the UI in a `data-ui` element. See [Worlds](/docs/worlds).
+
+</Step>
+<Step>
+
+Draft the beat and look at the frames. Check that the claim in the copy is true and that the click shows its result.
+
+```bash
+bin/vawe dev films/<name>/page.html --from 4 --to 9
+```
+
+</Step>
+</Steps>
+
+To film the screen as a physical object, with tilt, depth and bloom, give it to the lens. See [Lens and effects](/docs/lens-and-effects).
+
+## Troubleshooting
+
+| what you see | why | what to do |
+|---|---|---|
+| The screen looks like a web template: grey, small type, sparse. | A hand-written mock, with no builder rung. | Fill the frame, use display-size type, one focal element. Run the builder rung of the ladder. |
+| The copy looks fake, but the layout is right. | It moves differently from the real surface. | Compare with the table above. Remove the ease from a terminal and the scale from a panel. |
+| A click shows no result. | The next frames do not show what the click did. | Add the result state on the frame of the press. |
+| `readable-text-size` advice on UI labels. | The UI is the subject but has no `data-ui`. | Put the screen in a `data-ui` element, or raise the type. |
+| A copied move has too much overshoot. | The move uses a spring for a large panel. | Use `EASE.land` for the panel and keep the overshoot for a small snap. |
+
+<Cards>
+  <Card title="Moves" href="/docs/moves">The Product moments group.</Card>
+  <Card title="Design kit" href="/docs/design-kit">The skill ladder and the builder rung.</Card>
+  <Card title="Lens and effects" href="/docs/lens-and-effects">Film the screen like a real object.</Card>
+  <Card title="UI demo" href="/docs/ui-demo">A guide for a product demo film.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  show-real-thing, 28 px at 1920, fill 0.71 against 0.17, builder rung, "a word in a box is not a beat": taste/rules/show-real-thing.md
+  mock defaults, one focal element, fill the frame, whole images, theme tokens, true claims, laid-out check: taste/craft/show-dont-tell.md:76-86
+  data-ui 3 percent, 6 percent default: taste/rules/readable-text-size.md
+  five rungs, builder builds product UI, frame rung removes nav, CTA button, pill, eyebrow: content/docs/design-kit.mdx lines 39-52 (source: harness/live/stage-say.mjs RUNGS)
+  terminal never eases, only window arrives: prompts/moves/terminal-run.md first paragraph; approval-gate: prompts/moves/approval-gate.md
+  GitHub page whole, state swaps on one frame: prompts/moves/diff-card.md; model menu opens with short fade and scale, label swaps on one frame: prompts/moves/model-picker.md
+  UI presets table, terminal steps, panel no scale, large panel no overshoot, snap 3 to 20 px: core/motion/ui.js and core/motion/README.md "Product UI presets" (lines 136-158)
+  chunks of 1 to 3 words: prompts/moves/ai-stream-response row in prompts/moves/README.md
+  shot --tour, --scale: bin/vawe shot --help
+  Product moments group (21 moves): prompts/moves/README.md "## Product moments"
+  overshoot-share compares with reference films: content/docs/draft.mdx line 74 and glossary Overshoot
+*/}

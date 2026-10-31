@@ -1,0 +1,236 @@
+---
+title: Three.js and canvas
+description: Draw a canvas or a three.js scene as a pure function of the seek time, with seeded random and no live clock, so every render gives the same frames.
+icon: Box
+blog:
+  - slug: threejs-to-mp4
+    title: 'Three.js to MP4: render a scene frame by frame'
+  - slug: page-clock
+    title: Seed Math.random and freeze Date.now in JavaScript
+---
+
+A canvas, a WebGL canvas and a three.js scene all work on a vawe <Term id="page">page</Term>. The rule is the same for each: the page paints frame `t` as a pure function of `t`. The renderer calls your code once for each frame, in any order, and takes a picture.
+
+## Why the rule exists
+
+A normal canvas page runs a `requestAnimationFrame` loop and reads the real clock. The cube is then at a different angle each time a screenshot lands. In a test with a spinning cube that read `THREE.Clock`, 30 screenshots on one page and 30 on a fresh page gave 30 different pairs of hashes.
+
+The renderer fixes this in two ways. It seeks the page instead of playing it. And it replaces the clock, so code that reads the time still sees the seek time.
+
+## How the seek reaches your code
+
+For each frame, `core/engine/page-seek.js` runs these steps in order:
+
+1. Set the <Term id="virtual-clock">virtual clock</Term> to `t`.
+2. Call `window.seek(t)`, if the page defines it.
+3. Seek every CSS and Web Animation and every SVG animation.
+4. Call every `vawe.onFrame` hook with `t`.
+
+The renderer waits for a promise that `window.seek` or a hook returns. So a hook may decode a texture or build geometry before the picture is taken. See [Time and seek](/docs/time-and-seek).
+
+<Diagram
+  label="The renderer sets the clock, calls window.seek, seeks the animations, calls the onFrame hooks, then takes the picture."
+  caption="Both window.seek and onFrame receive the same t. Use one of them for the canvas."
+  narrow={
+    <svg viewBox="0 0 361 311">
+      <DiagramBox x={0} y={0} w={360} h={60} />
+      <DiagramText x={16} y={30}>Set the virtual clock</DiagramText>
+      <DiagramArrow points={[[180, 61], [180, 79]]} />
+      <DiagramBox x={0} y={80} w={360} h={60} accent />
+      <DiagramText x={16} y={110}>window.seek(t)</DiagramText>
+      <DiagramArrow points={[[180, 141], [180, 159]]} />
+      <DiagramBox x={0} y={160} w={360} h={60} />
+      <DiagramText x={16} y={190}>Seek CSS, WAAPI, SVG</DiagramText>
+      <DiagramArrow points={[[180, 221], [180, 239]]} />
+      <DiagramBox x={0} y={240} w={360} h={60} accent />
+      <DiagramText x={16} y={270}>vawe.onFrame hooks</DiagramText>
+    </svg>
+  }
+>
+  <svg viewBox="0 0 881 81">
+    <DiagramBox x={0} y={0} w={200} h={80} />
+    <DiagramText x={16} y={30}>Clock</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">set(t)</DiagramText>
+    <DiagramArrow points={[[201, 40], [219, 40]]} />
+    <DiagramBox x={220} y={0} w={200} h={80} accent />
+    <DiagramText x={236} y={30}>Canvas</DiagramText>
+    <DiagramText x={236} y={56} kind="mono">window.seek(t)</DiagramText>
+    <DiagramArrow points={[[421, 40], [439, 40]]} />
+    <DiagramBox x={440} y={0} w={200} h={80} />
+    <DiagramText x={456} y={30}>Animations</DiagramText>
+    <DiagramText x={456} y={56} kind="mono">CSS, WAAPI, SVG</DiagramText>
+    <DiagramArrow points={[[641, 40], [659, 40]]} />
+    <DiagramBox x={660} y={0} w={220} h={80} accent />
+    <DiagramText x={676} y={30}>Hooks</DiagramText>
+    <DiagramText x={676} y={56} kind="mono">vawe.onFrame(t)</DiagramText>
+  </svg>
+</Diagram>
+
+## The virtual clock and random
+
+`core/engine/page-clock.js` runs before any page script. It replaces these:
+
+| API | What the page sees |
+|---|---|
+| `Date`, `performance.now` | film time in milliseconds |
+| `requestAnimationFrame` | callbacks run once for each seek, with the film time |
+| `setTimeout`, `setInterval` | fire when a seek passes their due time, in due order |
+| `Math.random` | a mulberry32 generator, reseeded from `t` on every seek |
+
+`Math.random` is a function of the time. At the same `t` it gives the same sequence. But it gives a different sequence at the next frame. A particle that gets its position from `Math.random()` therefore jumps on every frame. Do not use it for a thing that must hold still.
+
+Use a seeded generator instead. `rng(seed)` in `core/motion/springs.js` returns a function with uniform numbers in [0, 1). The same seed gives the same sequence, in any render order. `noise1(x, seed)` gives smooth noise in [-1, 1].
+
+```js
+import { rng } from '../../core/motion/springs.js';
+
+const random = rng(7);
+const dots = Array.from({ length: 80 }, () => ({ x: random(), y: random(), r: 3 + random() * 9 }));
+```
+
+Build the list once, outside the seek. Pose it from `t` inside the seek.
+
+## A canvas 2D page
+
+```html
+<meta name="duration" content="4">
+<canvas id="c"></canvas>
+<script type="module">
+import { rng } from '../../core/motion/springs.js';
+
+const canvas = document.getElementById('c');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+const ctx = canvas.getContext('2d');
+const random = rng(7);
+const dots = Array.from({ length: 80 }, () => ({ x: random(), y: random(), r: 3 + random() * 9 }));
+
+window.seek = (t) => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#fff';
+  for (const d of dots) {
+    ctx.beginPath();
+    ctx.arc(d.x * canvas.width, ((d.y + t * 0.05 * d.r) % 1) * canvas.height, d.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+};
+</script>
+```
+
+Every dot is placed from `t` alone. Frame 400 does not need frame 399. For springs and tables, see [Motion](/docs/motion#a-canvas-in-windowseekt).
+
+## A three.js page
+
+Load the vendored three.js through an import map. `assets/vendor/` holds three.js r185 as an ES module, and its two files must sit side by side.
+
+```html
+<meta name="duration" content="3">
+<script type="importmap">{"imports":{"three":"/assets/vendor/three.module.min.js"}}</script>
+<canvas id="gl"></canvas>
+<script type="module">
+import * as THREE from 'three';
+window.THREE = THREE;
+import '/core/engine/page-api.js';
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(innerWidth, innerHeight, false);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 0, 6);
+vawe.three.studio(renderer, scene, { kind: 'metal' });
+
+const cube = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), vawe.three.material('chrome'));
+scene.add(cube);
+
+vawe.onFrame((t) => {
+  cube.rotation.set(0.4 + t * 0.5, t * 1.6, 0);
+  cube.position.y = Math.sin(t * 2.1) * 0.25;
+  renderer.render(scene, camera);
+});
+</script>
+```
+
+- `preserveDrawingBuffer: true` lets the capture read the canvas after the draw call. Without it the capture can read a cleared buffer.
+- `setPixelRatio(1)` fixes the frame size. A draft captures at device scale 0.5, but the CSS viewport is the same size as in the final.
+- `window.THREE = THREE` lets the `vawe.three` helpers find the library. They never import it themselves.
+- Import `core/engine/page-api.js` to get `vawe.three` and `vawe.value`. `vawe.onFrame` exists without that import.
+- Pose every object from `t`. Do not use `THREE.Clock`, `getDelta`, an `AnimationMixer` or `Math.random`.
+
+### The helpers
+
+| helper | what it does |
+|---|---|
+| `vawe.three.studio(renderer, scene, { kind })` | Adds one lighting rig of four lights and a procedural room. `kind` is `'metal'` (default) or `'glass'`. |
+| `vawe.three.extrude(pathD, { depth, bevel, scale })` | Makes a solid from an SVG path. It reads `M`, `L`, `H`, `V`, `C`, `Q` and `Z`, and throws on an arc. |
+| `vawe.three.material(preset)` | A tuned material: `chrome`, `iridescent`, `glass`, `frostedGlass`, `metal` or `matte`. |
+| `vawe.value(row, t)` | Samples a timing row `{ at, dur, from, to, ease }` as a number, so a 3D scale and an HTML transform share one timing. |
+
+## Mix canvas and HTML
+
+Put text in HTML above the canvas, not in the canvas. The text checks read only DOM text, and the fonts of the page load before the picture. See [Text and fonts](/docs/text-and-fonts). A `element.animate()` entrance seeks with the same clock as your canvas code, so one timing system drives both. `films/examples/three-star/page.html` does this: a star in three.js and one HTML word on a Web Animations entrance.
+
+To film the canvas like a real camera, give the canvas to the lens.
+
+```js
+import { lens, canvasSource } from '../../core/surfaces/lens.js';
+const cam = lens(canvasSource(renderer.domElement), { look: 'film-halation' });
+vawe.onFrame(async (t) => { renderer.render(scene, camera); await cam.draw(t); });
+```
+
+See [Lens and effects](/docs/lens-and-effects).
+
+## Load assets without a black first frame
+
+The renderer waits for image decodes, `fetch` calls and `document.fonts`. It waits for nothing else. A module-level `await` of another promise, such as a dynamic `import()`, lets the renderer paint frame 0 before your hook exists, and that frame is black.
+
+- Load an image with `img.decode()` and build the scene inside the first hook call.
+- Or register the hook first and `await` inside it.
+
+## Check the page
+
+```bash
+bin/vawe check anim-traps films/<name>/page.html
+```
+
+For a canvas page the gate reads the source and reports:
+
+- a `requestAnimationFrame` call, `performance.now()` or `Date.now()`
+- `THREE.Clock` or `.getDelta()`
+- an unseeded `Math.random()`
+- `setTimeout` or `setInterval`
+- a `WebGLRenderer` built without `preserveDrawingBuffer`
+- a page that draws WebGL and registers no `onFrame` hook
+
+Read [Determinism](/docs/determinism) for the other traps.
+
+## Limits
+
+- The checks cannot read text inside a canvas.
+- A scene that builds a large mesh pays for it on the first seek of each render slice. Build once, and reuse the object.
+- A fast three.js film costs more in the final, because motion blur adds subframes. See [Motion blur](/docs/motion-blur).
+
+<Cards>
+  <Card title="Determinism" href="/docs/determinism">What the virtual clock owns.</Card>
+  <Card title="Image to particles" href="/docs/image-to-particles">A photo as a three.js point cloud.</Card>
+  <Card title="Lens and effects" href="/docs/lens-and-effects">Film a canvas through the lens.</Card>
+  <Card title="The page API" href="/docs/page-api">window.seek, vawe.onFrame and more.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  seek order (clock, window.seek, animations, SVG, onFrame hooks), awaited native promises: core/engine/page-seek.js seekTo lines 6-24
+  virtual clock table, Math.random mulberry32 reseeded from t on set(t): core/engine/page-clock.js:5-8, :34-40, :70-76
+  rng(seed), noise1: core/motion/springs.js:147-160
+  vawe.three, vawe.value, page-api import: core/engine/page-api.js:1-8, :60-67
+  studio kinds metal/glass, extrude path commands, material presets: core/three/index.js:104-126 and the comment before svgExtrudeGeometry
+  three.js r185, both files side by side, no Clock/Mixer/Math.random: assets/vendor/README.md
+  importmap, preserveDrawingBuffer, setPixelRatio(1), window.THREE, vawe.three.studio/material, WAAPI word: films/examples/three-star/page.html:8-73
+  anim-traps list: quality/gates/anim-traps.mjs:153-171
+  module-level await rule: skills/vawe-page/SKILL.md "Page-code mistakes" item 11; render waits only for decode, fetch, fonts: core/engine/page-seek.js installPageReady
+  30 of 30 pairs differed with THREE.Clock: site/content/blog/threejs-to-mp4.md "Why not a render loop"
+  text checks read DOM only: content/docs/text-and-fonts.mdx:89
+  draft device scale 0.5, CSS viewport same: harness/media/render-page.mjs header lines 14-16
+  lens(canvasSource(...)): prompts/moves/demo/photo-particles.html:96
+  cube snippet: not run (the three-star example and the blog post are the tested sources)
+*/}
