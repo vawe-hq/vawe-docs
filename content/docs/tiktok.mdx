@@ -1,0 +1,88 @@
+---
+title: TikTok
+description: Render a 9:16 film for TikTok, with the post and ad limits, the safe-zone templates and the vawe commands.
+icon: Music2
+blog:
+  - slug: html-video-aspect-ratios
+    title: 'HTML video aspect ratio: 16:9, 9:16 and 1:1'
+---
+
+At the end of this page you have a 1080 x 1920 film for a TikTok post or ad. TikTok publishes limits for ads on `ads.tiktok.com` and for posts on `support.tiktok.com`. The two sets differ.
+
+## The limits
+
+The sourced table is in [Video specs by platform](/docs/platforms). Read on 2026-10-31:
+
+- In-feed ad: 9:16 at 540 x 960 or more is recommended. 16:9 needs 960 x 540 or more, and 1:1 needs 640 x 640 or more. Up to 10 minutes, 500 MB or less, formats `.mp4`, `.mov`, `.mpeg`, `.3gp` and `.avi`.
+- Post: MP4 or WebM, 720 x 1280 or more, up to 30 minutes, under 10 GB. `support.tiktok.com` answered 503 to a direct fetch, so these numbers come from a search excerpt of the English creator-tools page. Check the page before you rely on them. A Latvian TikTok page gives 10 minutes.
+- TikTok publishes no frame rate and no loudness target on the pages read.
+
+## Safe zone
+
+TikTok publishes safe-zone templates for ads, as downloadable files. The Ads help page says the zone depends on the dimension, the caption length and any added formats. It gives no pixel list. There are files for left-to-right regions, files for Arabic, and files that include anchors. Download the template that fits your ad from the TikTok Ads help page.
+
+For a post, TikTok publishes no pixels. As an estimate, use the Meta Reels numbers: 14% top, 35% bottom, 6% each side, which are 269 px, 672 px and 65 px on a 1080 x 1920 frame. These numbers come from Instagram ads and are not a TikTok rule.
+
+## Make the film
+
+<Steps>
+<Step>
+
+### Start a 9:16 page
+
+```bash
+bin/vawe new my-tiktok --request "a 15 second hook with captions" --aspect 9:16 --length 15
+```
+
+The page gets `<meta name="aspect" content="9:16">` and `<meta name="duration" content="15">`.
+
+</Step>
+<Step>
+
+### Look at the frame
+
+```bash
+bin/vawe still films/my-tiktok/page.html --at 2 --aspect 9:16
+```
+
+Compare the PNG in `out/still/` with the TikTok template for ads, or with the estimate above for posts.
+
+</Step>
+<Step>
+
+### Draft, then ship
+
+```bash
+bin/vawe dev films/my-tiktok/page.html --aspect 9:16
+bin/vawe ship films/my-tiktok/page.html --aspect 9:16
+bin/vawe ship --status --wait
+```
+
+`ship` needs a fresh critique and the owner approval. See [Ship](/docs/ship). The final is an `.mp4`, a format on both TikTok lists.
+
+</Step>
+</Steps>
+
+## Many films from one page
+
+To render one film per row of data, read [Batch from data](/docs/batch-from-data). `ship` takes `--param key=value` and puts it in the file name.
+
+## Limits
+
+- A final is 60 fps. `ship` has no fps flag. TikTok publishes no frame rate on the pages read.
+- The ad page lists a bitrate of 516 kbps or more. `ship` encodes with `-crf 16` and sets no bitrate, so check the bitrate of a final before you upload.
+- Loudness: TikTok publishes no target. See [Loudness and the mix](/docs/loudness-and-the-mix).
+
+<Cards>
+  <Card title="Video specs by platform" href="/docs/platforms">All six platforms, with sources.</Card>
+  <Card title="Vertical and square films" href="/docs/vertical-social">Lay out for 9:16.</Card>
+  <Card title="Batch from data" href="/docs/batch-from-data">One film per row.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  ad limits and safe zone text: https://ads.tiktok.com/help/article?aid=6669199281502552069 read 2026-10-31 (formats .mp4 .mov .mpeg .3gp .avi; 10 minutes; 500 MB; 516 kbps)
+  post limits: search excerpt of https://support.tiktok.com/en/using-tiktok/creating-videos/creator-tools-on-tiktok?lang=en ; fetch 503
+  14/35/6: Meta Ads Guide Reels video
+  --param in ship: bin/vawe ship --help
+  encode -crf 16: harness/media/render-page.mjs:580
+*/}

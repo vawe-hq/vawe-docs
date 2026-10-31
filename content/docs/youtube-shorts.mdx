@@ -1,0 +1,98 @@
+---
+title: YouTube Shorts
+description: Render a vertical film of up to 3 minutes for YouTube Shorts, with the limits, an estimated safe zone and the vawe commands.
+icon: Smartphone
+blog:
+  - slug: html-video-aspect-ratios
+    title: 'HTML video aspect ratio: 16:9, 9:16 and 1:1'
+---
+
+At the end of this page you have a 1080 x 1920 film of 180 seconds or less that YouTube files as a Short. The same page can also make the 16:9 film: see [Vertical and square films](/docs/vertical-social) for the layout and [YouTube](/docs/youtube) for the wide upload.
+
+## The limits
+
+The sourced table is in [Video specs by platform](/docs/platforms). Read from YouTube Help on 2026-10-31:
+
+- A video with a square or vertical aspect ratio, up to three minutes long, is a Short. YouTube states this for uploads from 2024-10-15.
+- The maximum Shorts resolution is 1080p. YouTube publishes no pixel size, no frame rate and no file size for Shorts.
+- YouTube states no loudness target.
+
+The vawe 9:16 final is 1080 x 1920, which is inside the 1080p limit.
+
+## Safe zone (estimate)
+
+YouTube publishes no pixel values for the Shorts interface.
+
+As an estimate, use the only official numbers for a vertical frame that this guide found: the Meta ad guide for Reels asks for 14% from the top, 35% from the bottom and 6% from each side. These numbers are for Instagram ads. They are not a YouTube rule. On a 1080 x 1920 frame they are:
+
+| Edge | Share | Pixels |
+|---|---|---|
+| Top | 14% | 269 |
+| Bottom | 35% | 672 |
+| Each side | 6% | 65 |
+
+Treat the box that remains as the place for text. Use `bin/vawe still` to look at the frame (see below).
+
+## Make the film
+
+<Steps>
+<Step>
+
+### Start a 9:16 page under 3 minutes
+
+```bash
+bin/vawe new my-short --request "a 30 second tip about the product" --aspect 9:16 --length 30
+```
+
+The verb writes `<meta name="aspect" content="9:16">` and `<meta name="duration" content="30">` into the page. Keep the duration at 180 or less.
+
+</Step>
+<Step>
+
+### Look at a vertical frame
+
+```bash
+bin/vawe still films/my-short/page.html --at 3 --aspect 9:16
+```
+
+Open the PNG in `out/still/` and check that the text sits inside the box above. Read [Aspect ratios](/docs/aspect-ratios): the page lays out with `--vw` and `--vh`, never with a crop.
+
+</Step>
+<Step>
+
+### Draft, then ship
+
+```bash
+bin/vawe dev films/my-short/page.html --aspect 9:16
+bin/vawe ship films/my-short/page.html --aspect 9:16
+bin/vawe ship --status --wait
+```
+
+`ship` needs a fresh critique and the owner approval. See [Ship](/docs/ship).
+
+</Step>
+</Steps>
+
+## Sound and captions
+
+The moves `caption-karaoke` and `caption-editorial` in `prompts/moves/` are two caption styles for words on screen. YouTube gives no loudness target, so the default mix is a safe start: it lands near -20 LUFS. See [Loudness and the mix](/docs/loudness-and-the-mix).
+
+## Limits
+
+- A final is 60 fps. `ship` has no fps flag, and YouTube publishes no frame rate for Shorts.
+- The Shorts upload help page says "vertical". The newer three-minute page says "square or vertical". This guide follows the newer page.
+- A film of exactly 180 seconds is at the limit. Leave a margin.
+
+<Cards>
+  <Card title="Video specs by platform" href="/docs/platforms">All six platforms, with sources.</Card>
+  <Card title="Vertical and square films" href="/docs/vertical-social">Lay out for 9:16.</Card>
+  <Card title="Aspect ratios" href="/docs/aspect-ratios">One page, many aspects.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  Shorts rule and date: https://support.google.com/youtube/answer/15424877 read 2026-10-31; 1080p and vertical: https://support.google.com/youtube/answer/10059070
+  14/35/6 safe zone: https://www.facebook.com/business/ads-guide/update/video/instagram-reels (Meta Ads Guide, ads only). Pixels: 0.14*1920=269, 0.35*1920=672, 0.06*1080=65
+  commands: bin/vawe new|still|dev|ship --help
+  caption moves: prompts/moves/caption-karaoke.md, caption-editorial.md
+  about -20 LUFS: taste/build/limits.json sound-level lufs_target -20; AGENTS.md
+*/}

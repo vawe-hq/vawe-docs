@@ -1,0 +1,84 @@
+---
+title: Loudness and the mix
+description: How vawe sums the audio tags into one track, what level that gives, and how to measure it or set a target.
+icon: Volume2
+blog:
+  - slug: audio-as-written
+    title: 'LUFS for video: set a loudness target in code'
+---
+
+vawe mixes the <Term id="cue">cues</Term> of a page as you write them. The level of the film is the sum of the gains you set. It does not normalise unless you ask. This page shows how to read that level and how to set a target. The tags and attributes are on [Audio](/docs/audio) and are not repeated here.
+
+## How the mix works
+
+One function, `mixAndMux` in `harness/media/page-audio.mjs`, builds the audio track for a draft and for a <Term id="final">final</Term>.
+
+1. The mixer reads each `<audio>` tag. A cue has a start (`data-at`), a gain in dB (`data-gain`) and optional fades (`data-fade-out`).
+2. It sums the tracks at their gains with an ffmpeg `amix` graph. The graph sets `normalize=0`, so adding a track does not lower the others.
+3. A `data-role="vo"` cue <Term id="duck">ducks</Term> the music by 18 dB, with a 0.05 s attack and a 0.3 s release. The attribute `data-duck` sets another amount.
+4. A safety limiter runs last. It lowers peaks and never raises a level.
+5. The result is encoded as AAC at 192 kbps and 48 kHz, and joined to the video.
+
+`data-gain` is absolute. It replaces the default gain of a voice. Leave it off unless you move one cue on purpose.
+
+## The default level
+
+A film with a few soft cues lands near -20 LUFS. The number is `lufs_target` in `taste/build/limits.json`. A draft or a final prints the real value:
+
+```text
+page-audio: mix as written: [level] LUFS, [peak] dBTP
+```
+
+The sound check advises when the mix is outside -24 to -16 LUFS or the peak is above -3 dBFS. `bin/vawe check review <page> --final` warns when the mix is quieter than -30 or louder than -12 LUFS.
+
+## Measure the level
+
+```bash
+bin/vawe sound films/my-film/page.html --waveform
+```
+
+The verb writes one PNG of the mixed waveform and the loudness curve, and prints the LUFS and the true peak. Add `--at 0.8,2.75` to read the cues that sound at those seconds. See [Audio](/docs/audio) for the checks.
+
+## Set a target
+
+Write a `loudness` meta in the page:
+
+```html
+<meta name="loudness" content="-14">
+```
+
+The value is in LUFS. The mixer then measures the mix and runs ffmpeg `loudnorm` (two passes, linear mode, true peak -1 dB) to that value, then the limiter. With no meta, no `loudnorm` runs. The number is yours: the platform pages that were read for [Video specs by platform](/docs/platforms) state no LUFS target for an upload, so vawe does not suggest one per platform.
+
+| Page has | The final audio |
+|---|---|
+| No `loudness` meta | The mix as written, with the safety limiter |
+| `<meta name="loudness" content="-14">` | Normalised to -14 LUFS, then the limiter |
+| No `<audio>` tag | No audio track |
+
+<Callout kind="rule">
+Change the gain of a cue to change the balance of the mix. Use the `loudness` meta only to set the level of the whole film.
+</Callout>
+
+## Limits
+
+- A draft with `--from` or `--to` is silent, so it has no level. Run a whole draft, or run `bin/vawe sound <page> --waveform`.
+- After you set the meta, run `bin/vawe sound <page> --waveform` and read the peak.
+- vawe measures integrated loudness (LUFS) and true peak. It does not measure short-term loudness.
+
+<Cards>
+  <Card title="Audio" href="/docs/audio">The tags, the voices and the checks.</Card>
+  <Card title="Video specs by platform" href="/docs/platforms">What each platform states.</Card>
+  <Card title="Cut to the beat" href="/docs/cut-to-the-beat">Cut on the music.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  mixAndMux, amix normalize=0, limiter, loudnorm, AAC 192k 48 kHz: harness/media/page-audio.mjs:203-207 normaliseFilter, :213-219 writeMix, :269-292 mixAndMux
+  VO duck -18, attack 0.05, release 0.3: harness/media/page-audio.mjs:35-37; data-duck: header line 3-17 and duckWindows
+  loudnorm TP -1: PEAK_LIMIT_DB harness/media/page-audio.mjs:42; limiter -1.5 dB LIMITER_DB :43
+  about -20 LUFS: taste/build/limits.json sound-level lufs_target; bands -24/-16, peak -3
+  review warns outside -30 to -12: harness/media/review.mjs:161
+  printed line format: harness/media/page-audio.mjs:292 ([level] and [peak] stand for the measured values)
+  sound --waveform, --at: bin/vawe sound --help
+  windowed draft silent: harness/media/render-page.mjs header lines 7-9
+  no short-term loudness: harness/lib/loudness.mjs measures I and TP only (ebur128 summary)
+*/}

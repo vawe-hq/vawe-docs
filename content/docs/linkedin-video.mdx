@@ -1,0 +1,93 @@
+---
+title: LinkedIn video
+description: Render a film for LinkedIn posts and ads, with the limits, the 30 fps gap for ads and the vawe commands.
+icon: Linkedin
+blog:
+  - slug: html-video-aspect-ratios
+    title: 'HTML video aspect ratio: 16:9, 9:16 and 1:1'
+---
+
+At the end of this page you have a film in a LinkedIn ratio and you know the one ad rule that vawe cannot meet today. LinkedIn video ads ask for less than 30 fps. A vawe final is 60 fps.
+
+## The limits
+
+The sourced table is in [Video specs by platform](/docs/platforms). Read from LinkedIn Help on 2026-10-31.
+
+For a video ad:
+
+- Ratios: 16:9 (640 x 360 to 1920 x 1080), 1:1 (360 x 360 to 1920 x 1920), 4:5 (360 x 450 to 1080 x 1350) and 9:16 (360 x 640 to 1080 x 1920).
+- Length: 3 seconds to 30 minutes. LinkedIn suggests 15 to 30 seconds for all placements. In-stream ads run up to 90 seconds.
+- File: MP4, H.264 or VP8, 75 KB to 500 MB, frame rate less than 30 fps, AAC or MPEG4 audio.
+- Captions: SRT, text only.
+
+For a post:
+
+- Resolution 256 x 144 to 4096 x 2304, aspect 1:2.4 to 2.4:1, 10 to 60 fps, 75 KB to 5 GB.
+- Length: 15 minutes on the video-sharing page and 10 minutes on the Page video page.
+- LinkedIn publishes no loudness target.
+
+## The 30 fps gap
+
+`bin/vawe ship` renders at 60 fps. Its help lists `--aspect`, `--param`, `--out`, `--wait`, `--status` and `--profile`, and no fps flag. A 60 fps final does not meet the ad rule of less than 30 fps. A 60 fps final is inside the post range of 10 to 60 fps.
+
+For an ad, vawe cannot make the file today. Convert the final to a lower frame rate with your own tool outside vawe. This is a known gap: `ship` needs an fps flag. A draft is 30 fps, which is not less than 30, and it is half size.
+
+## Make the film
+
+<Steps>
+<Step>
+
+### Pick the ratio
+
+Use `4:5` for a feed post, `1:1` for a square one and `16:9` for a wide one. `4:5` is the recommended vertical ratio in the ad table.
+
+```bash
+bin/vawe new my-post --request "a 20 second product update" --aspect 4:5 --length 20
+```
+
+</Step>
+<Step>
+
+### Draft
+
+```bash
+bin/vawe dev films/my-post/page.html --aspect 4:5
+```
+
+See [Draft](/docs/draft). A 4:5 final is 1080 x 1350, which is the maximum on the ad table.
+
+</Step>
+<Step>
+
+### Ship
+
+```bash
+bin/vawe ship films/my-post/page.html --aspect 4:5
+bin/vawe ship --status --wait
+```
+
+To make a 1:1 and a 16:9 from the same page, run `bin/vawe ship films/my-post/page.html --aspect all`. It writes five files, one per common aspect.
+
+</Step>
+</Steps>
+
+## Limits
+
+- Ads: the 60 fps final fails the frame-rate rule. See above.
+- Captions: LinkedIn takes captions as an SRT file. vawe draws captions inside the film and writes no SRT.
+- Loudness: LinkedIn publishes no target. See [Loudness and the mix](/docs/loudness-and-the-mix).
+
+<Cards>
+  <Card title="Video specs by platform" href="/docs/platforms">All six platforms, with sources.</Card>
+  <Card title="Aspect ratios" href="/docs/aspect-ratios">One page, many aspects.</Card>
+  <Card title="Ship" href="/docs/ship">Render the final.</Card>
+</Cards>
+
+{/* sources (vawe 4d9a5acb4):
+  ad limits: https://www.linkedin.com/help/lms/answer/a424737 read 2026-10-31
+  post limits: https://www.linkedin.com/help/linkedin/answer/a548372 (15 minutes, 5 GB) and /a1311816 (resolution, aspect, 10 to 60 fps, 10 minutes)
+  ship flags, no fps: bin/vawe ship --help (2026-10-31); 60 fps: same, and harness/media/render-page.mjs:8
+  draft 30 fps: bin/vawe dev --help
+  --aspect all: bin/vawe ship --help; core/layout/aspects.js
+  no SRT writer: grep -rli '.srt|webvtt' harness core bin found nothing (2026-10-31)
+*/}
