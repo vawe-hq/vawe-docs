@@ -9,7 +9,7 @@ blog:
 
 At the end of this page you have a 9:16 <Term id="film">film</Term> of 1080 x 1920 from the same page that makes the 16:9 film. The layout fits the tall frame, and nothing is cropped.
 
-You need a vawe checkout and a page with a `duration` meta. Read [Aspect ratios](/docs/aspect-ratios) for the contract. This page covers what vertical changes in the design.
+You need a page with a `duration` meta. Read [Aspect ratios](/docs/aspect-ratios) for the contract. This page covers what vertical changes in the design.
 
 ## What this film needs
 
@@ -120,10 +120,6 @@ bin/vawe ship films/teaser/page.html --aspect all
 ## Pitfalls from the taste digest
 
 - **Safe area** (`safe-margin`). Margins are 6 to 8 percent. For social, keep key content out of the outer 10 to 12 percent. A headline near the bottom collides with a caption band that looks empty in the draft.
-- **Read lines** (`readable-hold`). A line holds for max(1.2 s, words / 3), also on a short vertical film.
-- **Few text sizes** (`type-scale`). At most six sizes, each step 1.25 or more apart.
-- **Exits are faster than entrances** (`exits-shorter`).
-- **End on motion** (`moving-tail`). Keep one part of the end card moving in the last second.
 - **One action at the end** (`cta-last-short`). The end card is the shortest beat and carries one action.
 
 ## Common mistakes
@@ -151,7 +147,7 @@ bin/vawe ship films/teaser/page.html --aspect all
   safe-margin numbers and 9:16 hero upper-middle third: taste/rules/safe-margin.md
   text-margin check: harness/lib/layout-lint.mjs line 76
   phone sheet 360 px: content/docs/critique.mdx (lead-main harness/media critique)
-  first-frame, hook-payoff, type-scale, cta-last-short, moving-tail: taste/rules
+  first-frame, hook-payoff, cta-last-short: taste/rules
   ship needs review and approval: bin/vawe ship --help
   6 percent of 1920 = 115 px: arithmetic from taste/rules/readable-text-size.md (cap height 6 percent of frame height)
 */}

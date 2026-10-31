@@ -8,7 +8,7 @@ This page lists the flags that change a render. The list comes from `bin/vawe <v
 
 Four flags work the same way in more than one verb:
 
-- `--aspect <W:H>` sets the <Term id="aspect">aspect</Term>. It overrides the page `aspect` meta. The page sees it as it sees the meta. The default output name gets it (`-2x1`), so two aspects do not overwrite each other. See [Aspect ratios](/docs/aspect-ratios).
+- `--aspect <W:H>` sets the <Term id="aspect">aspect</Term>. It overrides the page `aspect` meta. The default output name gets it (`-2x1`), so two aspects do not overwrite each other. See [Aspect ratios](/docs/aspect-ratios).
 - `--param key=value` passes an option to the page. The page reads it with `new URLSearchParams(location.search)`. The flag is repeatable. It is part of the <Term id="render-key">render key</Term>, and the default output name gets it (`-look-riso`). A repeated key exits with an error, because a page reads one value per key (`harness/lib/page-params.mjs`). See <Term id="param">param</Term>.
 - `--from <s>` and `--to <s>` render a window of the film.
 - `--out <path>` sets the output file or folder.
@@ -30,7 +30,7 @@ The <Term id="draft">draft</Term>: half size, 30 fps. It also writes a key-frame
 | `--fast` | Run only the fast checks | off | `--fast` |
 | `--full` | Also run the ship-tier checks: per-frame box motion lint, object tracks, loudness and peak | off | `--full` |
 | `--taste` | Also print the taste lines. They are always in `out/<name>.dev.md` | off | `--taste` |
-| `--no-judge` | Skip the stills judge that `dev` runs once per change of `directions.html` or its brief lines (about 25 s) | off | `--no-judge` |
+| `--no-judge` | Skip the stills judge that `dev` runs on the three directions, once per change of `directions.html` or their brief lines (about 25 s) | off | `--no-judge` |
 
 ```bash
 bin/vawe dev films/my-film/page.html --from 2 --to 6
@@ -70,7 +70,7 @@ One still per `data-world` element and a contact sheet. See [Key frames](/docs/k
 
 ## strip
 
-The frames through one moment or every cut, with motion numbers. The input is a rendered mp4, a page (the verb uses its last draft, so run `dev` first) or a reference id from `bin/vawe refs list`. See [Critique and fix](/docs/critique).
+The frames through one moment or every cut, with motion numbers. The input is a rendered mp4, a page or a reference id from `bin/vawe refs list`. For a page, the verb reads its last draft, so run `dev` first. See [Critique and fix](/docs/critique).
 
 | Flag | What it does | Default | Example |
 |---|---|---|---|

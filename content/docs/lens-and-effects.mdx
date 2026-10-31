@@ -1,6 +1,6 @@
 ---
 title: Lens and effects
-description: The lens films a flat page like a real camera, with depth of field, bloom, grain, blur and colour fringes made in image space, never with CSS fakes.
+description: The lens films a flat page like a real camera, with depth of field, bloom, grain and colour fringes made in image space.
 icon: Aperture
 blog:
   - slug: real-lens
@@ -11,9 +11,9 @@ The <Term id="lens">lens</Term> is one WebGL2 camera in `core/surfaces/lens.js`.
 
 ## Why it exists
 
-A CSS `filter: blur()` or a radial-gradient glow looks like a drawing of an effect. A real lens spreads light: bright points bloom, the far side of a tilted screen goes soft, red and blue move apart at the frame edge. The rule `real-optics` says that every optical effect in a film is a lens effect, never a CSS fake. The lens makes those effects in one pass, with linear light, so they match what a camera does.
+A CSS `filter: blur()` or a radial-gradient glow looks like a drawing of an effect. A real lens spreads light: bright points bloom, the far side of a tilted screen goes soft, red and blue move apart at the frame edge. The rule `real-optics` says that every optical effect in a film is a lens effect, never a CSS fake. The lens works in linear light, so its effects match what a camera does.
 
-The lens is also <Term id="determinism">deterministic</Term>. All its noise is hashed from `seed` and `floor(t * fps)`, so a frame is a pure function of `t` and two renders match byte for byte.
+The lens is also <Term id="determinism">deterministic</Term>. All its noise is hashed from `seed` and `floor(t * fps)`. A frame is therefore a pure function of `t`, and two renders match byte for byte.
 
 ## How it works
 
@@ -54,7 +54,7 @@ The lens is also <Term id="determinism">deterministic</Term>. All its noise is h
 The steps of one frame:
 
 1. The renderer seeks the page and calls your `vawe.onFrame` hook with the time `t`.
-2. The hook calls `cam.draw(t)`. The lens reads each option at `t`, uploads the source as a texture, and draws the main pass (perspective, depth of field, palette, grid, aberration, tear).
+2. The hook calls `cam.draw(t)`. The lens reads each option at `t` and uploads the source as a texture. Then it draws the main pass: perspective, depth of field, palette, grid, aberration and tear.
 3. The lens runs the blur chains for bloom, halation, streaks, diffusion and soft focus, only for effects with a strength above 0.
 4. The final pass adds grain, vignette, exposure, lift and fade, and writes the canvas.
 
@@ -79,7 +79,7 @@ vawe.onFrame((t) => cam.draw(t));
 - `canvasSource(canvas, { scale, depth })` takes a 2D canvas or a three.js canvas. `depth` is an optional depth map for the depth of field.
 - `lens(source, options)` needs WebGL2. It throws `lens: WebGL2 is not available` without it.
 
-Every option is a literal that the page can change: a number, an array or a function of the seek time. A function gives a move:
+Each option is a number, an array or a function of the seek time. A function animates the option:
 
 ```js
 const cam = lens(src, {
@@ -165,13 +165,13 @@ Blur from fast movement is a different thing. See [Motion blur](/docs/motion-blu
 lens(src, { palette: { stops: PALETTES.thermal, keepColor: 0.9 } });
 ```
 
-## Camera views and moves
+## Camera views and paths
 
-`core/surfaces/lens-views.js` holds named poses for filming a screen as a product shot. A view is a pose of the plane in degrees. A move is a start pose and an end pose, drawn from seeded ranges.
+`core/surfaces/lens-views.js` holds named poses for filming a screen as a product shot. A view is a pose of the plane in degrees. A camera path in `MOVES` is a start pose and an end pose, drawn from seeded ranges.
 
 - `VIEWS`: `flat`, `side-angle`, `isometric`, `top-diagonal` and `reverse-isometric`.
-- `MOVES`: ten movements, from `focus-push` and `side-drift` to `isometric-reveal`.
-- `moveBetween(name, seed, { base, scale })` returns `{ from, to }`. The same name and seed give the same move. Rotation about x and y is clamped to 25 degrees.
+- `MOVES`: ten camera paths, from `focus-push` and `side-drift` to `isometric-reveal`.
+- `moveBetween(name, seed, { base, scale })` returns `{ from, to }`. The same name and seed give the same path. Rotation about x and y is clamped to 25 degrees.
 - `lensPose(pose)` turns a pose into the lens options `tiltX`, `tiltY`, `roll` and `zoom`.
 
 ```js

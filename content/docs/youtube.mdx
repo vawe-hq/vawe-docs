@@ -7,13 +7,13 @@ blog:
     title: 'HTML video aspect ratio: 16:9, 9:16 and 1:1'
 ---
 
-At the end of this page you have a 1920 x 1080 mp4 that meets the YouTube encoding page. For a vertical film under 3 minutes, read [YouTube Shorts](/docs/youtube-shorts).
+At the end of this page you have a 1920 x 1080 mp4 that follows the YouTube encoding page for codec, container and audio. For a vertical film under 3 minutes, read [YouTube Shorts](/docs/youtube-shorts).
 
 ## The limits
 
-The full table with sources is in [Video specs by platform](/docs/platforms). The rows that matter here, read from the YouTube Help pages on 2026-10-31:
+The full table with sources is in [Video specs by platform](/docs/platforms). The rows that matter here, read from the YouTube Help pages on 2026-10-31 and 2026-11-01:
 
-- 16:9 is the standard aspect on a computer. YouTube also accepts vertical and square uploads.
+- 16:9 is the standard aspect on a computer. A square or vertical upload of 3 minutes or less is a Short.
 - A file is 256 GB or 12 hours, whichever is less. An unverified account uploads 15 minutes at most by default.
 - YouTube asks for H.264, an MP4 container with the moov atom at the front, AAC-LC audio at 48 kHz, and BT.709 colour for SDR.
 - At 1080p, YouTube lists 8 Mbps for 24 to 30 fps and 12 Mbps for 48 to 60 fps.
@@ -41,7 +41,7 @@ The verb writes `films/my-video/page.html` with `<meta name="aspect" content="16
 bin/vawe dev films/my-video/page.html
 ```
 
-A draft is half size at 30 fps with the sound mixed. See [Draft](/docs/draft).
+See [Draft](/docs/draft).
 
 </Step>
 <Step>

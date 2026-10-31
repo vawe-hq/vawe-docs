@@ -118,6 +118,7 @@ A name that is not in the list stops the render and prints the valid voices. The
 |---|---|
 | `bin/vawe sound <track>` | The beat grid and hits of a music file |
 | `bin/vawe sound <page>` | The bed, the synth cues and the cuts of a page |
+| `bin/vawe sound <track> --cuts <page>` | For each cut of the page: the nearest hit and beat line, the offset in ms and frames, and the second to move the cut to |
 | `bin/vawe sound <page> --at 0.8,2.75` | The cues that sound at those seconds, with the level of each in dB |
 | `bin/vawe sound <page> --waveform` | A PNG of the mixed waveform. Prints LUFS and true peak |
 | `bin/vawe sound <file> --sfx --film <page>` | Trim, pitch, fade and level an effect file into `assets/sfx/` of the film and print the `<audio>` line |

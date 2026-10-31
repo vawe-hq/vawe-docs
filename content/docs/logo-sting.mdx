@@ -6,7 +6,7 @@ icon: Sparkles
 
 At the end of this page you have a <Term id="film">film</Term> of 3 to 8 s in which motion is the message: a logo reveal, a stat hit or a moving title. A sting has no narration.
 
-You need a vawe checkout and a name for the brand. If the brand does not exist, invent it. The example film `films/examples/colour-sting` does this.
+You need a name for the brand. If the brand does not exist, invent it. The example film `films/examples/colour-sting` does this.
 
 ## What this film needs
 
@@ -81,7 +81,7 @@ bin/vawe new onsen --from prompts/beat-sheet.md --length 5 --aspect 16:9
 bin/vawe frames films/onsen/page.html
 ```
 
-The `first-frame` rule says the subject shows by 0.1 s. Nothing arrives into an empty frame. Read the stills at full size.
+The `first-frame` rule says the subject shows by 0.1 s, and the ground is never empty for the first 0.5 s. Read the stills at full size.
 
 </Step>
 <Step>
@@ -107,10 +107,8 @@ A sting takes a few <Term id="cue">cues</Term>, placed 30 ms before their frame.
 
 ## Pitfalls from the taste digest
 
-- **Frame 0 has a subject** (`first-frame`). A black open for 0.5 s fails the hook.
 - **End on motion** (`moving-tail`). A wordmark may land and hold, but one part of the lockup moves in the last second. A camera push does not count.
 - **Use the sheen band once** (`no-tells`). The `logo-sting` move and the `mark-trace` move each carry a stock device. Take one of them, not both.
-- **Exits are faster than entrances** (`exits-shorter`). A 5 s film has little time to waste on a slow exit.
 - **The logo is large enough** (`logo-prominence`): at least 5 percent of the frame height, about 7 percent in practice.
 - **Choose the hero from the direction**, not from the attractor list (`attractors`): a glowing orb, a dusk sun, a lens streak, an accent bar. A disc needs a light source and a surface.
 

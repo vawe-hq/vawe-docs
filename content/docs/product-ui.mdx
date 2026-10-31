@@ -1,23 +1,23 @@
 ---
 title: Product UI
-description: Show a product as a faithful copy of its real interface, and move each surface as the real one moves. A terminal steps and a large panel never overshoots.
+description: Show a product through its real interface, and move each surface the way the real one moves.
 icon: AppWindow
 ---
 
-A film about a product must show the product working. That means the real interface: a capture of it, or a faithful copy built as a page component. A grey window with a word in a box is not a beat. This page says how to build the screen, and how each kind of surface moves.
+A film about a product shows the product working, in its real interface: a capture, or a faithful copy built as a page component. A grey window with a word in a box is not a beat.
 
 ## Why it exists
 
-The rule `show-real-thing` says that each beat shows a real artifact working. A hand-written mock fails in the same way every time. It has a grey window, small type and a sparse grid, because that is what "a UI" looks like in a model's memory. In a measured comparison, the reference films filled 0.71 of the frame with picture, and a first mock filled 0.17.
+The rule `show-real-thing` says that each beat shows a real artifact working. A hand-written mock has a grey window, small type and a sparse grid. In a measured comparison, reference films filled 0.71 of the frame with picture, and a first mock filled 0.17.
 
-A copy of a real interface also solves a second problem. The viewer knows how ChatGPT, GitHub or a terminal behaves. A copy that moves differently reads as fake, even when the viewer cannot say why.
+The viewer also knows how ChatGPT, GitHub or a terminal behaves. A copy that moves differently reads as fake.
 
 ## Choose the source of the screen
 
 Take the first option that fits.
 
 1. **Capture the real product.** A capture of the real UI beats any mock. `bin/vawe shot <target> --tour <steps.json>` drives a drawn cursor through a route or URL with real mouse events and writes an mp4. Add `--scale 3` for a sharp close-up.
-2. **Copy a real interface as a component.** The Product moments group of the [moves](/docs/moves) library has faithful copies: `terminal-run`, `approval-gate`, `model-picker`, `diff-card`, `ai-stream-response`, `agent-progress`, `command-palette-summon` and more. Each copies one real surface at full size, with its real type, its real colours and its real behaviour.
+2. **Copy a real interface as a component.** The Product moments group of the [moves](/docs/moves) library has faithful copies: `terminal-run`, `approval-gate`, `model-picker`, `diff-card`, `ai-stream-response`, `agent-progress`, `command-palette-summon` and more. Each copies one real surface with its real type, colours and behaviour.
 3. **Design an interface for an invented product.** Build it as a real interface: real-looking data, and controls that do something. Do not make functionless chrome.
 
 <Diagram

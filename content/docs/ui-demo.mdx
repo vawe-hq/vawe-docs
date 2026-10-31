@@ -6,7 +6,7 @@ icon: MousePointerClick
 
 At the end of this page you have a <Term id="film">film</Term> of 12 to 60 s in which a cursor uses an interface and the interface answers. Every click has a visible result.
 
-You need a vawe checkout and a product. For a real product you need its URL. For an invented product the brief must say to invent the interface.
+You need a product. For a real product you need its URL. For an invented product the brief must say to invent the interface.
 
 ## What this film needs
 
@@ -115,7 +115,6 @@ The index in `prompts/moves/README.md` lists them by job. Show a click doing its
 - **The camera holds still** (`constant-camera`). One move at the spectacle at most. A part moving inside the frame keeps a hold alive.
 - **Read lines** (`readable-hold`). A UI screen dwells at least 1.2 s (`shot-length-varies`).
 - **No tells** (`no-tells`). No glow on UI chrome unless the brief asks.
-- **Exits are faster than entrances** (`exits-shorter`).
 
 Four traps come from the recipes. Use one window for `clip-expand` and `ai-stream-response`, with the same pixels at the swap. A capture cannot morph, so rebuild only the button as live DOM when a move must animate it. Exit the cursor down before each pan, or it streaks with the pan. Pick a zoom target with no glyph under it, such as a status pill.
 
@@ -143,5 +142,5 @@ Four traps come from the recipes. Use one window for `clip-expand` and `ai-strea
   shot --tour, --scale: bin/vawe shot --help
   data-ui 3 percent, data-chrome 2.5 percent, 6 percent: taste/rules/readable-text-size.md; AGENTS.md "Text checks"
   moves by job: prompts/moves/README.md "Pick by job"
-  show-real-thing, cause-first, constant-camera, no-tells, exits-shorter: taste/build/DIGEST.md; dwell 1.2 s: taste/rules/shot-length-varies.md
+  show-real-thing, cause-first, constant-camera, no-tells: taste/build/DIGEST.md; dwell 1.2 s: taste/rules/shot-length-varies.md
 */}

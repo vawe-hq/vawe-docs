@@ -1,12 +1,12 @@
 ---
 title: Loops
-description: Make a film that repeats with no jump, where the last frame leads into the first frame.
+description: Make a film that repeats with no jump and no stall, where the last frame leads into the first frame.
 icon: Repeat
 ---
 
-At the end of this page you have a <Term id="film">film</Term> whose last frame is the same as its first frame. When a player repeats the film, the viewer sees no seam.
+At the end of this page you have a <Term id="film">film</Term> whose last frame leads into its first frame like any other frame step. When a player repeats the film, the viewer sees no seam.
 
-You need a vawe checkout. The template for a loop is `prompts/ui-morph-loop.md`.
+The template for a loop is `prompts/ui-morph-loop.md`.
 
 ## What this film needs
 
@@ -19,8 +19,8 @@ The element is never cut. Each state is the same element that morphs its size, r
 The <Term id="spectacle">spectacle</Term> still applies: choose one state as the big moment, and give it quiet before it.
 
 <Diagram
-  label="Three boxes in a row: the first frame, the states on the beat grid, and the last frame, which equals the first."
-  caption="The last frame carries the cursor position and velocity of the first."
+  label="Three boxes in a row: the first frame, the states on the beat grid, and the last frame, one frame step before the first."
+  caption="The page at t = duration equals the page at 0 s. The renderer paints the last frame one frame step before that."
   narrow={
     <svg viewBox="0 0 361 221">
       <DiagramBox x={0} y={0} w={360} h={50} />
@@ -28,10 +28,10 @@ The <Term id="spectacle">spectacle</Term> still applies: choose one state as the
       <DiagramText x={344} y={30} kind="mono" anchor="end">state 1, cursor at rest</DiagramText>
       <DiagramBox x={0} y={85} w={360} h={50} accent />
       <DiagramText x={16} y={115}>States</DiagramText>
-      <DiagramText x={344} y={115} kind="mono" anchor="end">one per bar, on the grid</DiagramText>
+      <DiagramText x={344} y={115} kind="mono" anchor="end">8 to 12, on the beat grid</DiagramText>
       <DiagramBox x={0} y={170} w={360} h={50} />
       <DiagramText x={16} y={200}>Last frame</DiagramText>
-      <DiagramText x={344} y={200} kind="mono" anchor="end">equals the first</DiagramText>
+      <DiagramText x={344} y={200} kind="mono" anchor="end">one step before the first</DiagramText>
       <DiagramArrow points={[[180, 51], [180, 84]]} />
       <DiagramArrow points={[[180, 136], [180, 169]]} />
     </svg>
@@ -44,11 +44,11 @@ The <Term id="spectacle">spectacle</Term> still applies: choose one state as the
     <DiagramArrow points={[[201, 40], [239, 40]]} />
     <DiagramBox x={240} y={0} w={200} h={80} accent />
     <DiagramText x={256} y={30}>States</DiagramText>
-    <DiagramText x={256} y={56} kind="mono">one per bar, on the grid</DiagramText>
+    <DiagramText x={256} y={56} kind="mono">8 to 12, on the beat grid</DiagramText>
     <DiagramArrow points={[[441, 40], [479, 40]]} />
     <DiagramBox x={480} y={0} w={200} h={80} />
     <DiagramText x={496} y={30}>Last frame</DiagramText>
-    <DiagramText x={496} y={56} kind="mono">equals the first</DiagramText>
+    <DiagramText x={496} y={56} kind="mono">one step before the first</DiagramText>
   </svg>
 </Diagram>
 
@@ -77,9 +77,11 @@ For a periodic part, `loopT(t, dur)` in the same file wraps `t` into `[0, dur)`,
 </Step>
 <Step>
 
-### Make the last frame the first frame
+### Make the page at the duration equal the page at 0 s
 
-End each value on the value it had at 0 s, including the position and the speed of the cursor. A spring that is still moving at the last frame shows as a stutter at the seam.
+Give each value at `t = duration` the value it has at 0 s, including the position and the speed of the cursor. The renderer never paints `t = duration`: the last frame is at `duration - 1/fps`. So the last frame is one ordinary frame step before the first frame.
+
+Do not make the last frame identical to the first frame. Then the player shows that picture twice, and the loop stalls for one frame. A spring that is still moving at the duration shows as a jump at the seam.
 
 </Step>
 <Step>
@@ -87,12 +89,16 @@ End each value on the value it had at 0 s, including the position and the speed 
 ### Test the seam
 
 ```bash
-bin/vawe still films/morph/page.html --at 0
-bin/vawe still films/morph/page.html --at 14
 bin/vawe critique films/morph/page.html
 ```
 
-The template's test is to render `t=0` and `t=duration` and compare the two PNGs. They must be identical. A time past the last frame moves to the last frame, and `still` says so. The critique writes the loop seam: the last frame next to the first, with the pixel difference. Read [Critique and fix](/docs/critique).
+The critique writes the loop seam: the last 0.5 s and the first 0.5 s on one sheet. It compares the last-to-first pixel difference with the usual difference between two adjacent frames of the last 0.5 s. It prints one of three verdicts:
+
+- `seam reads like an ordinary frame step`: the loop is good.
+- `jump`: the seam moves more than 3 times an ordinary frame step. A value at the duration is not its value at 0 s.
+- `doubled frame`: the last frame equals the first, so the loop stalls for one frame. Let the values reach their 0 s values at the duration, one frame step later.
+
+Do not test the seam with `still --at 0` and `still --at 14`. `still` moves a time past the last frame to the last frame, so `--at 14` gives the frame at `14 - 1/fps`. On a good loop, that frame differs from the first frame by one frame step. Read [Critique and fix](/docs/critique).
 
 </Step>
 <Step>
@@ -112,7 +118,7 @@ bin/vawe dev films/morph/page.html --small
 
 - **Do not fake the blur.** The renderer applies <Term id="motion-blur">motion blur</Term> from subframes on its own.
 - **A swap is its own problem.** A morph between two states with different content is a shape tween plus a content swap. Give the swap its own 120 ms and blur it, and let the shape carry the eye.
-- **Zoom the wrapper.** Zoom the wrapper, never the element, or its springs fight the camera.
+- **Zoom the wrapper, never the element,** or its springs fight the camera.
 - **No `will-change`** on anything the camera scales, or the text renders blurry.
 - **Text that swaps in a morphing container** needs its own enter and exit timing, or it overlaps.
 - **The `loop` attribute is for the bed.** On an `<audio>` tag, `loop` marks the music <Term id="bed">bed</Term> under the film. It does not make the film repeat.
@@ -123,8 +129,9 @@ From the taste digest, three rules matter most. Keep the accent to one thing in 
 
 | What you see | Why | What to do |
 |---|---|---|
-| A small jump at the seam | The cursor or a spring has not settled at the last frame | End on the first frame's values, with the same speed |
-| The two seam PNGs differ in one corner | A state keeps a part that the first state lacks | Return that part to its first state |
+| The loop seam says `jump` | The cursor or a spring at the duration has not come back to its value at 0 s | Give each value at the duration its value at 0 s, with the same speed |
+| The loop seam says `doubled frame` | The last frame equals the first frame | End the values at the duration, not at the last frame |
+| The seam sheet shows one part that changes at the cut | A state keeps a part that the first state lacks | Return that part to its first state |
 | The text is blurry after the zoom | `will-change` on a scaled element | Remove it |
 
 ## What to read next
@@ -142,7 +149,9 @@ From the taste digest, three rules matter most. Keep the accent to one thing in 
   loopT: core/motion/springs.js line 167-168
   spring, track: core/motion/springs.js lines 13, 26
   loop seam in critique: bin/vawe critique --help; content/docs/critique.mdx
-  still past the last frame: bin/vawe still --help (--at)
+  still past the last frame moves to duration - 1/fps: harness/media/see-views.mjs:58-61, harness/media/still.mjs:20
+  loop seam sheet, verdicts jump / doubled frame / ordinary step: harness/media/see-views.mjs:91-119; critique runs see.mjs --loop: harness/cli/verbs.mjs:305
+  NOTE: prompts/ui-morph-loop.md:31,62,85 says the last frame equals the first; see-views.mjs:116 calls that a doubled frame
   --small: bin/vawe dev --help
   audio loop = music bed: AGENTS.md "Audio"
   hook-payoff break-when "a loop that has no answer": taste/rules/hook-payoff.md

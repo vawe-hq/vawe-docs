@@ -34,10 +34,10 @@ Every render goes to `out/` in the vawe checkout. `<name>` is the folder name of
 | `out/<name>-draft.mp4` | `dev` | The <Term id="draft">draft</Term> |
 | `out/<name>-draft-<from>-<to>.mp4` | `dev --from --to` | A window of the draft. It is silent |
 | `out/<name>-draft.png` | `dev` | The key-frame sheet, next to the mp4 |
-| `out/<name>-draft-full.png` | `dev` | A full-size still of the draft |
+| `out/<name>-draft-full.png` | `dev` | A full-size still of one review frame, for you to read |
 | `out/<name>.dev.md` | `dev` | Every note of the last draft, including the taste lines |
-| `out/<name>.acceptance.json` | `dev`, `ship` | The acceptance rows and their history |
-| `out/<name>.checks.json` | the verbs that run checks | The stored result of each check (`harness/lib/check-runner.mjs`) |
+| `out/<name>.acceptance.json` | `dev` of the whole film (no `--from` or `--to`), `ship` | The acceptance rows and their history |
+| `out/<name>.checks.json` | `dev` | The stored result of each draft check, so an unchanged page runs no check again |
 | `out/<name>-frames/<id>.png` | `frames` | One still per world |
 | `out/<name>-frames.png` | `frames` | The contact sheet |
 | `out/looks-<name>/` | `frames --looks` | One grid per second of lens looks |
@@ -59,7 +59,7 @@ The `ship` verb refuses to run without the approval file. See [Ship](/docs/ship)
 
 ## The run log
 
-Every call of `bin/vawe` appends one JSON line to `out/<film>.runs.jsonl`. A call that names no film goes to `out/_unfiled.runs.jsonl`. The log is how you answer three questions without asking the agent: where the time went, what failed and why, and whether each draft fixed what the last one flagged. See <Term id="run-log">run log</Term>.
+Every call of `bin/vawe` appends one JSON line to `out/<film>.runs.jsonl`. A call that names no film goes to `out/_unfiled.runs.jsonl`. The log tells you where the time went, what failed and why, and whether each draft fixed what the last one flagged. See <Term id="run-log">run log</Term>.
 
 Each line starts with the same fields (`harness/lib/runlog.mjs`):
 
@@ -116,7 +116,7 @@ A corrupt line in the log is dropped when it is read, not an error (`readRuns`).
 {/* sources (vawe 4d9a5acb4):
   films/<name> files: harness/cli/new.mjs:472-473, 525-535; AGENTS.md stage 3 table row
   frames.html: harness/media/frames.mjs:4
-  out file names: harness/cli/verbs.mjs lines 121, 164, 214, 217, 237, 378, 414, 537, 581, 635; harness/media/frames.mjs:4-8; harness/media/render-page.mjs:10, 988-996, 1109, 1171; harness/lib/check-runner.mjs:19; harness/media/acceptance-run.mjs:2; harness/lib/approval.mjs:14
+  out file names: harness/cli/verbs.mjs lines 121, 164, 214, 217, 237, 378, 414, 537, 581, 635; harness/media/frames.mjs:4-8; harness/media/render-page.mjs:10, 988-996, 1109, 1171; harness/lib/check-runner.mjs:19 (saved only with cache on: render-page.mjs:1241, the dev draft); acceptance written by draftAcceptance when the render is whole (render-page.mjs:1127) and finalAcceptance (ship-job.mjs:114); draft-full.png: harness/live/dev-end.mjs:21; harness/media/acceptance-run.mjs:2; harness/lib/approval.mjs:14
   ship jobs: harness/media/ship-job.mjs:10
   run-log fields and events: harness/lib/runlog.mjs, harness/lib/run-events.mjs, harness/lib/verb-log.mjs, harness/live/log-read.mjs:29
   bin/vawe runs: bin/vawe runs --help

@@ -20,7 +20,13 @@ Any agent that reads files and runs shell commands. Claude Code reads `CLAUDE.md
 
 ## Does vawe call an AI model?
 
-The render does not. Two steps start a separate headless Claude session through the `claude` CLI: `bin/vawe judge --fresh`, and the fresh judge that `ship` runs on the final. The judge advises and never blocks (`harness/media/judge-fresh.mjs:1-5`). `VAWE_SHIP_JUDGE=0` skips the judge in `ship` (`harness/media/ship-job.mjs:14`). A page, a draft and a final need no API key of their own.
+The render does not. Three steps start a separate headless Claude session through the `claude` CLI:
+
+- `bin/vawe judge --fresh`.
+- The stills judge that `dev` runs on the three directions of the brief.
+- The fresh judge that `ship` runs on the final.
+
+The judge advises and never blocks (`harness/media/judge-fresh.mjs:1-5`). `dev --no-judge` skips the stills judge (`harness/media/directions-judge.mjs`), and `VAWE_SHIP_JUDGE=0` skips the judge in `ship` (`harness/media/ship-job.mjs:14`). A page, a draft and a final need no API key of their own.
 
 ## Do I need a GPU?
 
@@ -28,7 +34,7 @@ No. A final captures with software rendering (`frameFormat` and `runShards` in `
 
 ## How long can a film be?
 
-The renderer has no maximum length. The cost grows with the length. A final that needs more than 8000 subframes prints advice with an estimate: 19200 subframes took 15 to 23 minutes when measured. Lower the blur or shorten the fast moves (`render-page.mjs:129-130`, `:871`). A film over 60 s or more than one session takes one chapter file per agent (`AGENTS.md`, "The loop"). See [Ship](/docs/ship).
+The renderer has no maximum length. The cost grows with the length. A final that needs more than 8,000 subframes prints advice with an estimate: 19,200 subframes took 15 to 23 minutes when measured. To cut the cost, shorten the fast moves (`render-page.mjs:129-130`, `:871`). See [Motion blur](/docs/motion-blur). A film over 60 s or more than one session takes one chapter file per agent (`AGENTS.md`, "The loop"). See [Ship](/docs/ship).
 
 ## Can a film have sound?
 
@@ -55,11 +61,11 @@ const tl = gsap.timeline({ paused: true });
 window.seek = (t) => { tl.time(t); };
 ```
 
-The seek awaits only a native Promise, because a GSAP timeline has a `then()` that never settles (`core/engine/page-seek.js:8-9`). The blog post "GSAP to MP4" shows a full page.
+The seek awaits only a native Promise, because a GSAP timeline has a `then()` that never settles (`core/engine/page-seek.js:8-9`). The blog post [GSAP to MP4](https://vawe.dev/blog/gsap-to-mp4) shows a full page.
 
 ## Can I use three.js?
 
-Yes. Pose the scene from `t` in `window.seek` or in a `vawe.onFrame` hook, and render one frame. Do not read a `THREE.Clock`. Import `core/engine/page-api.js` to get `vawe.three` with the helpers `studio`, `extrude` and `material` (`core/engine/page-api.js`). The example `films/examples/three-star` does this. See [Page API](/docs/page-api). The blog post "Three.js to MP4" shows a full page.
+Yes. Pose the scene from `t` in `window.seek` or in a `vawe.onFrame` hook, and render one frame. Do not read a `THREE.Clock`. Import `core/engine/page-api.js` to get `vawe.three` with the helpers `studio`, `extrude` and `material` (`core/engine/page-api.js`). The example `films/examples/three-star` does this. See [Page API](/docs/page-api). The blog post [Three.js to MP4](https://vawe.dev/blog/threejs-to-mp4) shows a full page.
 
 ## How is it different from screen recording?
 

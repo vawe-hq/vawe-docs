@@ -11,17 +11,17 @@ At the end of this page you have a 1080 x 1920 film for a TikTok post or ad. Tik
 
 ## The limits
 
-The sourced table is in [Video specs by platform](/docs/platforms). Read on 2026-10-31:
+The sourced table is in [Video specs by platform](/docs/platforms). Read on 2026-10-31 and 2026-11-01:
 
 - In-feed ad: 9:16 at 540 x 960 or more is recommended. 16:9 needs 960 x 540 or more, and 1:1 needs 640 x 640 or more. Up to 10 minutes, 500 MB or less, formats `.mp4`, `.mov`, `.mpeg`, `.3gp` and `.avi`.
-- Post: MP4 or WebM, 720 x 1280 or more, up to 30 minutes, under 10 GB. `support.tiktok.com` answered 503 to a direct fetch, so these numbers come from a search excerpt of the English creator-tools page. Check the page before you rely on them. A Latvian TikTok page gives 10 minutes.
+- Post: not verified. `support.tiktok.com` answered 503 on 2026-10-31 and 2026-11-01. Search excerpts give 720 x 1280 or more and up to 10 GB, and disagree on length (10 or 60 minutes). Read the TikTok upload screen before you rely on a length.
 - TikTok publishes no frame rate and no loudness target on the pages read.
 
 ## Safe zone
 
 TikTok publishes safe-zone templates for ads, as downloadable files. The Ads help page says the zone depends on the dimension, the caption length and any added formats. It gives no pixel list. There are files for left-to-right regions, files for Arabic, and files that include anchors. Download the template that fits your ad from the TikTok Ads help page.
 
-For a post, TikTok publishes no pixels. As an estimate, use the Meta Reels numbers: 14% top, 35% bottom, 6% each side, which are 269 px, 672 px and 65 px on a 1080 x 1920 frame. These numbers come from Instagram ads and are not a TikTok rule.
+For a post, TikTok publishes no pixels. As an estimate, use the Meta numbers for Reels ads on [Instagram Reels](/docs/instagram-reels#safe-zone). They are not a TikTok rule.
 
 ## Make the film
 
@@ -75,13 +75,13 @@ To render one film per row of data, read [Batch from data](/docs/batch-from-data
 
 <Cards>
   <Card title="Video specs by platform" href="/docs/platforms">All six platforms, with sources.</Card>
-  <Card title="Vertical and square films" href="/docs/vertical-social">Lay out for 9:16.</Card>
+  <Card title="Vertical social" href="/docs/vertical-social">Lay out for 9:16.</Card>
   <Card title="Batch from data" href="/docs/batch-from-data">One film per row.</Card>
 </Cards>
 
 {/* sources (vawe 4d9a5acb4):
   ad limits and safe zone text: https://ads.tiktok.com/help/article?aid=6669199281502552069 read 2026-10-31 (formats .mp4 .mov .mpeg .3gp .avi; 10 minutes; 500 MB; 516 kbps)
-  post limits: search excerpt of https://support.tiktok.com/en/using-tiktok/creating-videos/creator-tools-on-tiktok?lang=en ; fetch 503
+  post limits: not verified; support.tiktok.com 503 on 2026-10-31 and 2026-11-01; excerpts: creator-tools page (720 x 1280, 10 GB), tiktok.com/creators/creator-portal/en-us/tiktok-content-strategy/creating-videos-longer-than-one-minute (60 minutes)
   14/35/6: Meta Ads Guide Reels video
   --param in ship: bin/vawe ship --help
   encode -crf 16: harness/media/render-page.mjs:580

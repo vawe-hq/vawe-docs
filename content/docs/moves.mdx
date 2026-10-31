@@ -1,16 +1,14 @@
 ---
 title: Moves
-description: A move is a named piece of motion with a CSS or Web Animations snippet and a one-second clip, and the library has 130 of them in seven groups.
+description: A move is a named piece of motion to copy into a page, with a CSS or Web Animations snippet and a one-second clip.
 icon: Blocks
 ---
 
-A <Term id="move">move</Term> is a named piece of motion that you copy into your <Term id="page">page</Term>. Each move is one markdown file in `prompts/moves/` with a snippet of 10 to 40 lines, a note on when to use it, a `Sound:` line and a one-second clip. The library has 130 moves in seven groups.
+A <Term id="move">move</Term> is a named piece of motion that you copy into your <Term id="page">page</Term>. Each move is one markdown file in `prompts/moves/` with a snippet of 10 to 40 lines, a `Sound:` line and a one-second clip. The library has 130 moves in seven groups.
 
 ## Why they exist
 
-A model that writes motion from memory writes the same few moves: a fade up, a scale in, a slide. A move gives the page a proven version instead. Its numbers were tuned against a real clip, and its curve is an `EASE` name from `core/motion/presets.js`, never a hand-fitted `cubic-bezier()`.
-
-The clip is the first thing to read. Choose from the clip, not from the name.
+An agent that writes motion from memory writes the same few moves: a fade up, a scale in, a slide. A move gives the page a proven version. Its curve is an `EASE` name from `core/motion/presets.js`, never a hand-fitted `cubic-bezier()`. Choose a move from its clip, not from its name.
 
 <Diagram
   label="Four steps: pick a move from its clip, copy its snippet into the page, set the beat time, and draft only those seconds."
@@ -60,12 +58,12 @@ Open the gallery at [vawe.dev/video-components](https://vawe.dev/video-component
 </Step>
 <Step>
 
-Read the move file `prompts/moves/<move>.md`. The first paragraph starts with "Use when" and says what the move is for and what it costs.
+Read the move file `prompts/moves/<move>.md`. Its first paragraph starts with "Use when".
 
 </Step>
 <Step>
 
-Copy the snippet into the page. Keep its numbers. The snippet delays start at 0, so add the start time of your <Term id="beat">beat</Term> to each delay. Name the beat time once, as a custom property such as `--beat-2: 1.60s`.
+Copy the snippet into the page and keep its numbers. The snippet delays start at 0, so add the start of your <Term id="beat">beat</Term> to each delay. Name each beat time once, for example `--beat-2: 1.60s`.
 
 </Step>
 <Step>
@@ -84,7 +82,7 @@ bin/vawe dev films/<name>/page.html --from 2 --to 6
 </Step>
 </Steps>
 
-The demo page that each clip came from is `prompts/moves/demo/<move>.html`. It links `demo/demo.css`, and the snippets name its classes. Copy the classes that you use, or write your own.
+Each clip comes from `prompts/moves/demo/<move>.html`. The snippets name classes from `demo/demo.css`: copy the classes that you use.
 
 ### Two rules the snippets already follow
 
@@ -94,12 +92,12 @@ Keep both when you change a snippet.
 - `var()` never goes inside the `animation` shorthand. Write the longhands. Chromium drops the whole declaration otherwise.
 
 <Callout kind="note">
-A move animates designed things: type, shapes, UI, illustration and colour fields. A photo may be the content of a move, such as a card or a tile, and the move moves it whole. A move that only works by cutting a captured image into depth layers, or by tracking footage, is a footage technique. It is not part of vawe. Sampling a photo into a designed particle form is in scope. See [Image to particles](/docs/image-to-particles).
+A move animates designed things: type, shapes, UI, illustration and colour fields. A photo can be the content of a move (a card, a tile), moved whole. Moves that cut a photo into depth layers or track footage are not part of vawe. To sample a photo into particles, see [Image to particles](/docs/image-to-particles).
 </Callout>
 
 ## The seven groups
 
-`prompts/moves/README.md` lists every move in seven groups, and a "Pick by job" table with one row per job. The group sizes are below.
+`prompts/moves/README.md` lists every move in seven groups, and a "Pick by job" table.
 
 | group | moves | the job |
 |---|---|---|
@@ -111,7 +109,7 @@ A move animates designed things: type, shapes, UI, illustration and colour field
 | Product moments | 21 | A product does one real thing. |
 | Grounds | 13 | A living ground, plus a few loops and photo effects. |
 
-Five moves are featured first in the gallery: `marquee-along-path`, `lens`, `counter-dive`, `ticker-takeover` and `shape-trace-morph`. Three blind reviewers scored every clip, and only clips with a median of 8 or more can be featured.
+The gallery shows five moves first: `marquee-along-path`, `lens`, `counter-dive`, `ticker-takeover` and `shape-trace-morph`. A featured clip has a median blind score of 8 or more from three reviewers.
 
 ## The moves
 
@@ -219,7 +217,7 @@ The camera, the focus and the exposure of a whole world.
 | [`pull-back-reveal`](https://vawe.dev/video-components/pull-back-reveal) | Open tight on a detail and pull back to the whole. |
 | [`parallax-dive`](https://vawe.dev/video-components/parallax-dive) | The camera flies forward through layers at real depths. |
 | [`exposure-flash`](https://vawe.dev/video-components/exposure-flash) | A cut reads as over-exposure: three white frames. |
-| [`lens`](https://vawe.dev/video-components/lens) | A screen filmed as a real object. See Lens and effects. |
+| [`lens`](https://vawe.dev/video-components/lens) | A screen filmed as a real object. See [Lens and effects](/docs/lens-and-effects). |
 | [`camera-moves`](https://vawe.dev/video-components/camera-moves) | Push, pull and whip for a whole world as one wrapper. |
 | [`depth-resolve`](https://vawe.dev/video-components/depth-resolve) | Far words resolve as the camera arrives. |
 | [`scale-through`](https://vawe.dev/video-components/scale-through) | Fly into a plain element and its colour is the next world. |
@@ -298,13 +296,11 @@ A living ground for a held frame. The group also holds a few loops and photo eff
 
 ## From a move to a film
 
-A single move is one second. A film needs a chain. A <Term id="recipe">recipe</Term> joins moves into a short film, with a table of beats, the sound cues and the traps at each seam. `prompts/moves/RECIPES.md` has fifteen recipes: eight short films, six complete videos of 20 to 30 s, and one spectacle beat for any film. See [Recipes](/docs/recipes).
-
-Pick the recipe from the family of your direction (type-led, object- or product-led, graphic- or colour-led). Then change at least two moves. A film that follows a recipe almost 1:1 gets advice from `dev`.
+A move is one second. A <Term id="recipe">recipe</Term> joins moves into a short film. `prompts/moves/RECIPES.md` has fifteen recipes. See [Recipes](/docs/recipes).
 
 ## Render a clip again
 
-The clips are not tracked as masters. The web copy of each clip is `site/public/moves/<move>.mp4`. To render the master of one move, run this in a vawe checkout.
+The web copy of each clip is `site/public/moves/<move>.mp4`. The masters are not in git. To render the master of one move, run this command in a vawe checkout.
 
 ```bash
 bin/vawe moves --only weight-morph
@@ -314,8 +310,7 @@ The verb renders the clip to `prompts/moves/<move>.mp4` at 1280 px and 60 fps, a
 
 ## Limits
 
-- A move is a snippet. It does not check your page. The checks of `dev` do that.
-- A move earns its place with a real reference, an approved clip and a clear use. A clip that is not approved goes out of the library.
+- A move does not check your page. The checks of `dev` do that.
 - Some moves are "once per film": `logo-sting`, `wordmark-cascade`, `mark-trace`, `shape-trace-morph`, `calm-lockup`, `thanks-sweep`, `chain-beats`, `rack-focus` and `skeleton-reveal`. Each move file says so.
 
 <Cards>

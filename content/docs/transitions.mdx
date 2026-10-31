@@ -1,6 +1,6 @@
 ---
 title: Transitions
-description: Plan the seam between two beats. Name the handoff that carries the eye, pick one of twelve families, time it, and check that the film does not read as a slideshow.
+description: Plan the seam between two beats. Name the handoff, pick one of twelve families, time it, and check for slideshow tells.
 icon: ArrowLeftRight
 blog:
   - slug: transitions
@@ -9,7 +9,7 @@ blog:
 
 At the end of this page every <Term id="cut">cut</Term> of your film has a named <Term id="handoff">handoff</Term>: the one thing that leaves beat A and starts beat B. Or the cut is a hard cut, chosen on purpose.
 
-A model asked to join two beats writes the same few: a crossfade, a whip pan, a slide-up and a scale-in. Used on every cut, one of them says nothing ten times. The fix is to choose a seam for a reason.
+An agent asked to join two beats writes the same few seams: a crossfade, a whip pan, a slide-up and a scale-in. Choose each seam for a reason.
 
 ## The prime rule
 
@@ -88,7 +88,7 @@ bin/vawe check slideshow films/<name>/page.html
 </Step>
 </Steps>
 
-An agent can run this procedure from the `vawe-transitions` <Term id="skill">skill</Term>. It makes the choice on purpose for every cut.
+The `vawe-transitions` <Term id="skill">skill</Term> gives an agent this procedure.
 
 ## The twelve families
 
@@ -174,7 +174,7 @@ The thresholds are repeat counts: 3 or more cuts, 5 or more elements, a 75 perce
 
 ## Waive a check with a reason
 
-Both checks advise. To keep a seam that a check names, declare a <Term id="waiver">waiver</Term> in the page with a reason that names a second and a measured value. See [Waivers](/docs/waivers).
+Both checks advise. To keep a seam that a check names, declare a <Term id="waiver">waiver</Term> in the page. The reason names a second and a measured value. See [Waivers](/docs/waivers).
 
 ```html
 <script type="application/json" id="authoring">{"allow": ["transitions"], "_why": {"transitions": "the cut at 7.8 s is a plain fade: 1.1 s of calm between two held frames"}}</script>

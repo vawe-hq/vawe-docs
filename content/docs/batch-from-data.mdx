@@ -6,7 +6,7 @@ icon: Layers3
 
 At the end of this page you have one page and a list of films, one for each row of your data. Each film has its own file name.
 
-You need a vawe checkout and a page that works as one film.
+You need a page that works as one film.
 
 ## What vawe does and does not do
 
@@ -90,7 +90,7 @@ bin/vawe dev films/card/page.html --param name="Ada Lovelace" --silent
 bin/vawe dev films/card/page.html --param name="Grace Hopper" --silent
 ```
 
-Write the loop in your own script. It reads your CSV or JSON and starts one `dev` for each row. In an agent session, call the verb once for each row with literal arguments: `AGENTS.md` says a call with a `for` loop or `$(...)` is refused in a worktree.
+Write the loop in your own script. It reads your CSV or JSON and starts one `dev` for each row.
 
 </Step>
 <Step>
@@ -140,5 +140,4 @@ bin/vawe ship --status --wait
   no CSV or JSON input: grep of harness/cli, harness/lib, bin found no csv reader; bin/vawe --help --all lists no batch verb
   fixture page: tests/fixtures/pages/param-look.html
   ship refusal: bin/vawe ship --help
-  loop refused in a worktree: AGENTS.md "Shell" (line 62)
 */}

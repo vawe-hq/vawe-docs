@@ -1,6 +1,6 @@
 ---
 title: Three.js and canvas
-description: Draw a canvas or a three.js scene as a pure function of the seek time, with seeded random and no live clock, so every render gives the same frames.
+description: Draw a canvas or a three.js scene as a pure function of the seek time, so every render gives the same frames.
 icon: Box
 blog:
   - slug: threejs-to-mp4
@@ -13,9 +13,9 @@ A canvas, a WebGL canvas and a three.js scene all work on a vawe <Term id="page"
 
 ## Why the rule exists
 
-A normal canvas page runs a `requestAnimationFrame` loop and reads the real clock. The cube is then at a different angle each time a screenshot lands. In a test with a spinning cube that read `THREE.Clock`, 30 screenshots on one page and 30 on a fresh page gave 30 different pairs of hashes.
+A normal canvas page runs a `requestAnimationFrame` loop and reads the real clock. The cube is then at a different angle each time a screenshot lands. In a test, a cube spun from `clock.getElapsedTime()`. Thirty screenshots on one page and thirty on a fresh page gave 30 pairs of different hashes.
 
-The renderer fixes this in two ways. It seeks the page instead of playing it. And it replaces the clock, so code that reads the time still sees the seek time.
+The renderer fixes this in two ways. It seeks the page instead of playing it. It also replaces the clock, so code that reads the time sees the seek time.
 
 ## How the seek reaches your code
 
@@ -77,7 +77,7 @@ The renderer waits for a promise that `window.seek` or a hook returns. So a hook
 | `setTimeout`, `setInterval` | fire when a seek passes their due time, in due order |
 | `Math.random` | a mulberry32 generator, reseeded from `t` on every seek |
 
-`Math.random` is a function of the time. At the same `t` it gives the same sequence. But it gives a different sequence at the next frame. A particle that gets its position from `Math.random()` therefore jumps on every frame. Do not use it for a thing that must hold still.
+`Math.random` is a function of the time. At the same `t` it gives the same sequence, and at the next frame a different sequence. A particle placed with `Math.random()` therefore jumps on every frame.
 
 Use a seeded generator instead. `rng(seed)` in `core/motion/springs.js` returns a function with uniform numbers in [0, 1). The same seed gives the same sequence, in any render order. `noise1(x, seed)` gives smooth noise in [-1, 1].
 
@@ -183,7 +183,7 @@ See [Lens and effects](/docs/lens-and-effects).
 
 ## Load assets without a black first frame
 
-The renderer waits for image decodes, `fetch` calls and `document.fonts`. It waits for nothing else. A module-level `await` of another promise, such as a dynamic `import()`, lets the renderer paint frame 0 before your hook exists, and that frame is black.
+The renderer waits for image decodes, `fetch` calls and `document.fonts`. It waits for nothing else. A module-level `await` of another promise, such as a dynamic `import()`, lets the renderer paint frame 0 before your hook exists. That frame is black.
 
 - Load an image with `img.decode()` and build the scene inside the first hook call.
 - Or register the hook first and `await` inside it.
@@ -200,6 +200,7 @@ For a canvas page the gate reads the source and reports:
 - `THREE.Clock` or `.getDelta()`
 - an unseeded `Math.random()`
 - `setTimeout` or `setInterval`
+- a CSS `transition` used for motion
 - a `WebGLRenderer` built without `preserveDrawingBuffer`
 - a page that draws WebGL and registers no `onFrame` hook
 
@@ -226,7 +227,7 @@ Read [Determinism](/docs/determinism) for the other traps.
   studio kinds metal/glass, extrude path commands, material presets: core/three/index.js:104-126 and the comment before svgExtrudeGeometry
   three.js r185, both files side by side, no Clock/Mixer/Math.random: assets/vendor/README.md
   importmap, preserveDrawingBuffer, setPixelRatio(1), window.THREE, vawe.three.studio/material, WAAPI word: films/examples/three-star/page.html:8-73
-  anim-traps list: quality/gates/anim-traps.mjs:153-171
+  anim-traps list: quality/gates/anim-traps.mjs:150-171
   module-level await rule: skills/vawe-page/SKILL.md "Page-code mistakes" item 11; render waits only for decode, fetch, fonts: core/engine/page-seek.js installPageReady
   30 of 30 pairs differed with THREE.Clock: site/content/blog/threejs-to-mp4.md "Why not a render loop"
   text checks read DOM only: content/docs/text-and-fonts.mdx:89

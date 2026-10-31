@@ -11,16 +11,16 @@ At the end of this page you have a 1080 x 1920 film for a Reel. Instagram publis
 
 ## The limits
 
-The sourced table is in [Video specs by platform](/docs/platforms). Read on 2026-10-31:
+The sourced table is in [Video specs by platform](/docs/platforms). Read on 2026-10-31 and 2026-11-01:
 
 - Reels ad (Meta Ads Guide): 9:16, 1440 x 2560, up to 15 minutes, up to 4 GB, MP4 or MOV, stereo AAC at 128 kbps or more, a fixed frame rate.
-- Reel post (Instagram): Instagram recommends Reels of 3 minutes or less to people who do not follow you. The feature page says you can record 20 minutes.
+- Reel post (Instagram): you can record up to 20 minutes, but Instagram does not recommend a Reel over 3 minutes to people who do not follow you.
 - Instagram publishes no loudness target.
 - The Instagram help page for Reel sizes did not load text. Its ratio, frame-rate and resolution numbers are not on this page.
 
 ## Safe zone
 
-Meta states the safe zone for Reels ads: keep text, logos and key elements out of 14% from the top, 35% from the bottom and 6% from each side. The source is the Meta Ads Guide page for Reels video. For a Reel post, Instagram publishes no pixel values, so treat these numbers as an estimate for posts too.
+The Meta Ads Guide page for Reels video suggests a safe zone for ads: "Consider leaving at least 14% of the top, 35% of the bottom, and 6% on each side of your asset free". It is a design recommendation, not a rule. For a Reel post, Instagram publishes no values, so treat these numbers as an estimate for posts too.
 
 | Edge | Share | Pixels at 1080 x 1920 |
 |---|---|---|
@@ -94,7 +94,7 @@ The final is H.264 with stereo AAC audio. Check the loudness with `bin/vawe soun
 </Cards>
 
 {/* sources (vawe 4d9a5acb4):
-  ad row and safe zone: https://www.facebook.com/business/ads-guide/update/video/instagram-reels read 2026-10-31 (text came back in Hindi; values 9:16, 1440x2560, 0 s to 15 min, 4 GB, MP4/MOV, AAC stereo 128 kbps+, fixed frame rate, 14/35/6)
+  ad row and safe zone: https://www.facebook.com/business/ads-guide/update/video/instagram-reels?locale=en_US read 2026-11-01 in English (safe zone under "Design Recommendations"; values 9:16, 1440x2560, 0 s to 15 min, 4 GB, MP4/MOV, AAC stereo 128 kbps+, fixed frame rate, 14/35/6)
   3 minutes: https://creators.instagram.com/faq?locale=en_US ; 20 minutes: https://about.instagram.com/features/reels
   Reel size help page did not load: https://help.instagram.com/1038071743007909
   AAC 192k 48 kHz: harness/media/page-audio.mjs mixAndMux (-b:a 192k, RATE 48000)

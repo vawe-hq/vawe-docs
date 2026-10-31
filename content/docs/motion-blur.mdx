@@ -1,24 +1,24 @@
 ---
 title: Motion blur
-description: How the final adds motion blur by blending up to 32 subframes for each frame, and how to add a streak of your own to a push, a whip or a zoom.
+description: The final blends up to 32 subframes into each frame for motion blur. Add your own streak to a push, a whip or a zoom.
 icon: Wind
 blog:
   - slug: motion-blur
     title: 'CSS motion blur for video: blend 1 to 32 subframes'
 ---
 
-At the end of this page you know what <Term id="motion-blur">motion blur</Term> the renderer adds without your help, what it costs, and how to add a streak of your own to a fast move in the page.
+The renderer adds <Term id="motion-blur">motion blur</Term> to the final without your help. This page gives what that blur costs, and how to add a streak of your own to a fast move.
 
 ## What you get without any work
 
-A browser has no shutter, so CSS cannot blur a fast move in a video. The renderer does it by capture. For each output frame it seeks the page at several times inside the frame, takes a screenshot at each time, and blends the screenshots into one frame.
+A browser has no shutter, so CSS cannot blur a fast move in a video. The renderer does it by capture. For each output frame it seeks the page at several times inside the frame and takes a screenshot at each time. Then it blends the screenshots into one frame.
 
 - A <Term id="draft">draft</Term> has no blur. A draft is 30 fps, half size.
 - A <Term id="final">final</Term> has up to 32 subframes for each frame. `bin/vawe ship` renders the final.
 - The shutter is 180 degrees. The blur spans half of the frame interval (`SHUTTER = 0.5` in `harness/media/render-page.mjs`).
 - A still frame gets one subframe. A fast frame gets enough subframes that neighbours sit at most 3 px apart.
 
-You do not turn this on. It has no flag on `ship`. To judge the blur you must look at a final, or at a render of a short window.
+The blur has no flag on `ship`. To judge the blur, look at a final.
 
 <Diagram
   label="For each output frame the renderer measures how far things move, picks a count of 1 to 32 subframes, captures them inside half of the frame interval, and blends them into one frame."
@@ -76,7 +76,7 @@ The travel comes from the page, before any screenshot.
 
 ## Add a streak of your own
 
-The final blurs by time. It does not know which direction a thing moves, and it makes no streak in a draft. A transition often needs a directional streak that you can see in a draft too. Four moves do this in plain page code:
+The final blurs by time, and a draft has no blur. For a directional streak that also shows in a draft, use one of these four moves:
 
 | move | how it makes the streak |
 |---|---|

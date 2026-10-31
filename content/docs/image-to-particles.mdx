@@ -1,20 +1,18 @@
 ---
 title: Image to particles
-description: Sample a photo into a seeded point cloud with imagePoints, then gather, light and film the points in three.js as a pure function of the seek time.
+description: Sample a photo into a seeded point cloud with imagePoints, then gather, light and film the points in three.js.
 icon: Sparkles
 ---
 
 At the end of this page you have a film beat in which a photo gathers out of scattered points, holds, and breathes. The points keep the colour and the detail of the photo. The beat is <Term id="determinism">deterministic</Term>: the same inputs give the same cloud.
 
-`imagePoints` in `core/surfaces/image-points.js` is the part vawe adds. It turns an image into positions, colours, normals and depth for each point. You write the three.js scene yourself. The clip of the finished effect is the move [`photo-particles`](https://vawe.dev/video-components/photo-particles).
+`imagePoints` in `core/surfaces/image-points.js` turns an image into a position, a colour and a normal for each point. You write the three.js scene yourself. The clip of the finished effect is the move [`photo-particles`](https://vawe.dev/video-components/photo-particles), and its full page is `prompts/moves/demo/photo-particles.html`.
 
 ## Before you start
 
 - A photo with detail that a hand-modelled shape cannot give: veins, scales, fibres, filaments. A dark ground works best, because dark pixels get no points.
 - A page that uses three.js. See [Three.js and canvas](/docs/three-and-canvas).
 - A licence for the photo. See [Backgrounds and images](/docs/backgrounds-and-images).
-
-Sampling a photo into a designed particle form is in scope for vawe. Cutting a captured image into depth layers or tracking footage is not.
 
 ## Steps
 
