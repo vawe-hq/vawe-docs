@@ -78,7 +78,7 @@ bin/vawe new onsen --from prompts/beat-sheet.md --length 5 --aspect 16:9
 ### Check the first frame
 
 ```bash
-bin/vawe frames films/onsen/page.html
+bin/vawe frame films/onsen/page.html --world all
 ```
 
 The `first-frame` rule says the subject shows by 0.1 s, and the ground is never empty for the first 0.5 s. Read the stills at full size.
@@ -90,7 +90,7 @@ The `first-frame` rule says the subject shows by 0.1 s, and the ground is never 
 
 ```bash
 bin/vawe dev films/onsen/page.html
-bin/vawe strip films/onsen/page.html --cuts
+bin/vawe frame films/onsen/page.html --cuts
 ```
 
 Read [Draft](/docs/draft) and [Motion pass](/docs/motion-pass). In a 5 s film each seam matters, so look at every one.

@@ -1,6 +1,6 @@
 ---
 title: Render flags
-description: The flags of dev, still, frames, strip and ship that change what the renderer draws, with defaults and examples.
+description: The flags of dev, frame and ship that change what the renderer draws, with defaults and examples.
 icon: SlidersHorizontal
 blog:
   - slug: batch-render-videos
@@ -15,7 +15,7 @@ blog:
     title: 'Resume a failed Puppeteer render and catch hangs'
 ---
 
-This page lists the flags that change a render. The list comes from `bin/vawe <verb> --help` for `dev`, `still`, `frames`, `strip` and `ship`. A wrong flag exits 2 and prints the valid ones. For the other verbs, see [CLI](/docs/cli).
+This page lists the flags that change a render. The list comes from `bin/vawe <verb> --help` for `dev`, `frame` and `ship`. A wrong flag exits 2 and prints the valid ones. For the other verbs, see [CLI](/docs/cli).
 
 Four flags work the same way in more than one verb:
 
@@ -26,7 +26,7 @@ Four flags work the same way in more than one verb:
 
 ## dev
 
-The <Term id="draft">draft</Term>: half size, 30 fps. It also writes a key-frame sheet PNG next to the mp4. See [Draft](/docs/draft).
+The <Term id="draft">draft</Term>: half size, 30 fps. It also writes a key-frame sheet PNG next to the mp4. See [Draft](/docs/draft). While the "Ideas" or the "Board" of the brief is empty and no full draft exists, `dev` renders a small 2 s window around the big moment to `out/<name>-plan-window.mp4`. Use `--whole` to render the full film.
 
 | Flag | What it does | Default | Example |
 |---|---|---|---|
@@ -41,68 +41,59 @@ The <Term id="draft">draft</Term>: half size, 30 fps. It also writes a key-frame
 | `--fast` | Run only the fast checks | off | `--fast` |
 | `--full` | Also run the ship-tier checks: per-frame box motion lint, object tracks, loudness and peak | off | `--full` |
 | `--taste` | Also print the taste lines. They are always in `out/<name>.dev.md` | off | `--taste` |
+| `--whole` | Render the whole film. Without it, an empty plan gives a 2 s window around the big moment | off | `--whole` |
 | `--no-judge` | Skip the stills judge that `dev` runs on the three directions, once per change of `directions.html` or their brief lines (about 25 s) | off | `--no-judge` |
 
 ```bash
 bin/vawe dev films/my-film/page.html --from 2 --to 6
 ```
 
-## still
+## frame
 
-One exact full-size frame as a PNG. The input is a page, an mp4 or an https mp4 URL.
+A picture of a film. The input is a page, an mp4, a reference id or a folder. One mode flag picks what `frame` draws. See [Key frames](/docs/key-frames) and [Critique and fix](/docs/critique).
+
+| Mode | What it draws | Example |
+|---|---|---|
+| `--at <s>` | One exact full-size PNG. A second past the last frame moves to the last frame, and the output says so | `--at 4.2` |
+| `--at <s,s,s>` | A labelled sheet. `--at cuts`, or no `--at`, picks the cuts | `--at 0.5,1.2,3` |
+| `--world <id\|all>` | A still of the key state of each world, and with `all` a contact sheet | `--world s3,s5` |
+| `--cuts` | One grid of frames per cut | `--cuts` |
+| `--moment <s>` | The frames through that second, with motion numbers. A page needs a draft: run `dev` first | `--moment 8.4` |
+| `--moment <s> --onion` | One blended image of the path of the move | `--moment 8.4 --onion` |
+| `--moment <s> --velocity` | A speed graph for each element | `--moment 8.4 --velocity` |
+| `--at <s> --box x,y,w,h` | A region enlarged with no smoothing. `--auto` finds the densest edge | `--at 2.4 --auto` |
+| `--looks` | The frame under every named lens look, one grid per second | `--looks --at 4.5,9` |
+| `--board` | An HTML board with a card per world | `--board` |
+| `--directions` | The directions board: options A, B and C side by side | `--directions` |
+| `--vs <mp4>` | The reference on the left, your film on the right, at the same seconds | `--vs ref.mp4 --at 2.5,3` |
+
+A flag outside its mode exits with a one-line error. The old verbs `still`, `frames`, `sheet`, `strip`, `zoom` and `storyboard` still run. Each prints the `frame` command it became.
 
 | Flag | What it does | Default | Example |
 |---|---|---|---|
-| `--at <s>` | The film second to write. A second past the last frame moves to the last frame, and the output says so | none | `--at 4.2` |
-| `--size <WxH>` | PNG size. A page only. The ratio must match the aspect of the page, or the verb refuses | the aspect at 1920 on the long edge | `--size 1200x630` |
-| `--aspect <W:H>` | Set the aspect | the page meta, else 16:9 | `--aspect 1200:630` |
-| `--param <key=value>` | Pass an option to the page | none | `--param look=riso` |
-| `--out <path>` | The PNG path | `out/still/<name>-<s>s.png` | `--out /tmp/f.png` |
+| `--size <WxH>` | With `--at <s>`: the PNG size. A page only. The ratio must match the aspect of the page, or the verb refuses | the aspect at 1920 on the long edge | `--size 1200x630` |
+| `--aspect <W:H>` | With `--at`: set the aspect | the page meta, else 16:9 | `--aspect 1200:630` |
+| `--param <key=value>` | With `--at`: pass an option to the page | none | `--param look=riso` |
+| `--sheet` | With one `--at` second: write a sheet of one tile | off | `--at 3 --sheet` |
+| `--labels`, `--cols <n>`, `--from <s>` | With a sheet: the labels, the columns, the first second | none | `--cols 3` |
+| `--full` | With `--world`: full-size stills as `out/<name>-frames/<id>-full.png`. No sheet and no `frames.html` | off | `--world s3 --full` |
+| `--sharp` | With `--world`: also shoot a full-size still per world (about 5 s more), so a click in `frames.html` opens it sharp | off | `--sharp` |
+| `--span <s>` | With `--moment` or `--cuts`: seconds of film in the grid, the onion or the velocity window | 1 (`--onion` 0.3) | `--span 0.6` |
+| `--fps <n>` | With `--moment`: frames per second of film in the grid. A grid holds 9 frames | 8 | `--fps 15` |
+| `--n <n>` | With `--onion`: frames blended | 5 | `--n 6` |
+| `--sel <css>`, `--ids <a,b>` | With `--velocity`: the elements to graph. A canvas painted in `window.seek` has no element, so pass `--sel` | the 4 elements that move most | `--sel .hero` |
+| `--only <look,look>` | With `--looks`: the look names | all | `--only anamorphic,crt` |
+| `--scale <n>`, `--at-b <s>` | With `--box`: the enlargement, and with `--vs` the second of the reference | none | `--at-b 2.6` |
+| `--out <path>` | The output path. Not with `--world` | see [Files and outputs](/docs/files-and-outputs) | `--out out/f.png` |
 
 ```bash
-bin/vawe still films/card/page.html --at 0 --aspect 1200:630 --size 1200x630
-```
-
-## frames
-
-One still per `data-world` element and a contact sheet. See [Key frames](/docs/key-frames).
-
-| Flag | What it does | Default | Example |
-|---|---|---|---|
-| `--full` | Full-size stills as `out/<name>-frames/<id>-full.png`. No sheet and no `frames.html` | off | `--full` |
-| `--zoom` | Also shoot a full-size still per world (about 5 s more), so a click in `frames.html` opens it sharp | off | `--zoom` |
-| `--world <id>` | Only this world. A comma list or a repeated flag. No sheet and no `frames.html`. Each still is at the time of its own world | none | `--world s3,s5` |
-| `--looks` | Show a page frame under every named lens look, and as is, one labelled grid per second. The page is not edited | off | `--looks` |
-| `--at <s,s>` | With `--looks`: comma-separated film seconds | none | `--at 4.5,9` |
-| `--only <look,look>` | With `--looks`: the look names. All when left out | none | `--only anamorphic,crt` |
-| `--out <path>` | With `--looks`: the folder for the grids | `out/looks-<film>` | `--out out/looks` |
-
-`frames` takes no `--aspect`, `--param`, `--from` or `--to`. A normal run writes `out/<film>-frames/<id>.png`, the sheet `out/<film>-frames.png` and `films/<film>/frames.html` (`harness/media/frames.mjs:4`).
-
-## strip
-
-The frames through one moment or every cut, with motion numbers. The input is a rendered mp4, a page or a reference id from `bin/vawe refs list`. For a page, the verb reads its last draft, so run `dev` first. See [Critique and fix](/docs/critique).
-
-| Flag | What it does | Default | Example |
-|---|---|---|---|
-| `--at <s>` | The second to centre the strip on | none | `--at 8.4` |
-| `--cuts` | One strip per world change (page or mp4) or per shot cut (reference). The strip is centred on the cut | off | `--cuts` |
-| `--span <s>` | Seconds of film in the strip, the onion or the velocity window | 1 (`--onion` 0.3) | `--span 0.6` |
-| `--fps <n>` | Frames per second of film in the strip. At most the fps of the video read. A grid holds 9 frames | 8 | `--fps 15` |
-| `--onion` | Blend several frames of the move at `--at` into one image: spacing, path and overshoot | off | `--onion` |
-| `--n <n>` | With `--onion`: frames blended, 2 to 12 | 5 | `--n 6` |
-| `--velocity` | Graph the speed and scale of page elements around `--at`. Reads a page only | off | `--velocity` |
-| `--sel <css>` | With `--velocity`: graph every element the selector matches. A canvas painted in `window.seek` has no element, so pass this | the 4 elements that move most | `--sel .hero` |
-| `--ids <a,b>` | With `--velocity`: element ids instead of `--sel` | none | `--ids title,logo` |
-| `--out <path>` | The folder for the grids or the PNG | `out/strip/<film>` (`--onion` `out/onion/<film>`, `--velocity` `out/velocity`) | `--out out/s` |
-
-```bash
-bin/vawe strip films/my-film/page.html --at 2.75 --velocity
+bin/vawe frame films/card/page.html --at 0 --aspect 1200:630 --size 1200x630
+bin/vawe frame films/my-film/page.html --moment 2.75 --velocity
 ```
 
 ## ship
 
-The <Term id="final">final</Term>: 60 fps, <Term id="motion-blur">motion blur</Term>, audio mixed, then a final check and a fresh judge. It runs in the background. The verb refuses until a fresh review of the page and the owner approval exist. See [Ship](/docs/ship).
+The <Term id="final">final</Term>: 60 fps, <Term id="motion-blur">motion blur</Term>, audio mixed, then a final check and a fresh judge. It runs in the background. The verb refuses until a fresh review of the page exists and you have given two OKs: the plan, then the full draft. See [Ship](/docs/ship).
 
 | Flag | What it does | Default | Example |
 |---|---|---|---|
@@ -142,9 +133,9 @@ The CSS viewport is always the full aspect size, so a draft lays out exactly lik
 - [Files and outputs](/docs/files-and-outputs) lists what each verb writes.
 
 {/* sources (vawe 4d9a5acb4):
-  dev, still, frames, strip, ship flags and defaults: bin/vawe <verb> --help
+  dev, frame, ship flags and defaults: bin/vawe <verb> --help; frame modes: bin/vawe frame --help; old verbs: harness/cli/aliases.mjs
   --param repeated key refused: harness/lib/page-params.mjs paramsQuery
-  frames outputs: harness/media/frames.mjs:4-8
+  frame --world outputs: harness/media/frames.mjs:4-8
   web copy: harness/media/render-page.mjs:10, :988
   draft 0.5 scale, final 1: harness/media/render-page.mjs resolveFrame
   fps 30/60, blur 1/32: harness/media/render-page.mjs:1233-1235

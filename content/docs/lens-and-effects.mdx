@@ -117,10 +117,10 @@ lens(src, { ...OFF, bloom: { strength: 0.9, radius: 42 } });
 | `cyanotype` | A blue-grey palette with a cold halo and grain. |
 | `crt` | A phosphor grid, tear, fringe, bloom and vignette. |
 
-To compare looks before you choose, run `frames` with `--looks`. It writes one labelled grid for each second you name, and it does not edit the page.
+To compare looks before you choose, run `frame` with `--looks`. It writes one labelled grid for each second you name, and it does not edit the page.
 
 ```bash
-bin/vawe frames films/<name>/page.html --looks --at 4.5,9 --only anamorphic,crt
+bin/vawe frame films/<name>/page.html --looks --at 4.5,9 --only anamorphic,crt
 ```
 
 An unknown look name throws an error that lists the valid names.
@@ -221,7 +221,7 @@ The draft prints lens lines. They are advice, not refusals.
   htmlSource inlines styles, fonts, img, url(); scripts, iframes, video, counters do not carry over; canvasSource depth: core/surfaces/lens-source.js:1-6
   VIEWS, MOVES (10), CLAMP_DEG 25, lensPose, moveBetween: core/surfaces/lens-views.js (moveBetween ran in node with seed 7)
   texel 1.05 advice, tilt advice READ_DEG 10: harness/lib/lens-advice.mjs:7, :19; lens-views.js:105
-  frames --looks --at --only: bin/vawe frames --help
+  frame --looks --at --only: bin/vawe frame --help
   real-optics: taste/rules/real-optics.md
   seek awaits an onFrame promise: core/engine/page-seek.js seekTo
 */}

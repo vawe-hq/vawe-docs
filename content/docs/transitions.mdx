@@ -186,7 +186,7 @@ Both checks advise. To keep a seam that a check names, declare a <Term id="waive
 |---|---|---|
 | `transitions` names a cut with no planned handoff. | The Board column is empty for that cut. | Write `family: object` in the `handoff` column, or write `deliberate cut: why`. |
 | One family on adjacent cuts. | Two cuts use the same family. | Change one family, or make one cut a hard cut. |
-| A planned handoff measures as a hard cut. | The move starts too late, or too small. | Raise the handoff object above both beats. Check the frames with `bin/vawe strip <page> --cuts`. |
+| A planned handoff measures as a hard cut. | The move starts too late, or too small. | Raise the handoff object above both beats. Check the frames with `bin/vawe frame <page> --cuts`. |
 | The copy is a double at the seam. | Both beats show text across the cut. | End the outgoing text at the seam. |
 | Two seams in a row move the same way. | The axis repeats. | Change the axis or direction. The `seam-variety` check names it. |
 

@@ -13,7 +13,7 @@ A <Term id="world">world</Term> is an element with `data-world="<id>"`. It holds
 
 A page is one HTML file with no cuts in it. The renderer sees a stream of frames, so it cannot know where one beat ends and the next starts. The `data-world` attribute tells it. With the worlds, vawe can do these jobs:
 
-- `bin/vawe frames <page>` writes one still of each world, before any motion exists.
+- `bin/vawe frame <page> --world all` writes one still of each world, before any motion exists.
 - The `world-held` check finds a beat that stays on screen too long.
 - `bin/vawe sound <track> --cuts <page>` reads the exact world starts from the DOM and compares them with the beat grid of a music file you give.
 - `data-on="world:<id>"` on an `<audio>` tag starts a cue with a world, so the cue follows the world when you move it.
@@ -69,7 +69,7 @@ For each span the check also reads the ground and the text that the world shows.
 <Figure
   src="loop/worlds-sheet.webp"
   alt="A sheet of colour-sting with the world id printed on each frame."
-  caption="vawe sheet --labels prints the id of the world on top at each second."
+  caption="vawe frame --labels prints the id of the world on top at each second."
   width={1600}
   height={700}
 />

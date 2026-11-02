@@ -31,6 +31,10 @@ The render does not. Three steps start a separate headless Claude session throug
 
 The judge advises and never blocks (`harness/media/judge-fresh.mjs:1-5`). `dev --no-judge` skips the stills judge (`harness/media/directions-judge.mjs`), and `VAWE_SHIP_JUDGE=0` skips the judge in `ship` (`harness/media/ship-job.mjs:14`). A page, a draft and a final need no API key of their own.
 
+## Who approves a film?
+
+The owner gives two OKs by typing `/vawe-approve` in the chat: first the plan (a picked direction and the Board), then the full draft. The agent cannot approve. A draft never waits for an OK, but `ship` needs both. See [Ship](/docs/ship).
+
 ## Do I need a GPU?
 
 No. A final captures with software rendering (`frameFormat` and `runShards` in `harness/media/render-page.mjs`). A draft uses the GPU raster, except for a page with an SVG filter, which also renders in software. Output can differ between hosts that rasterise on a different GPU or Chrome version (`README.md`, "Install").

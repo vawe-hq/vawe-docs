@@ -33,7 +33,7 @@ The draft prints these. Each one is clean, or the page declares a <Term id="waiv
 ### Strip every cut
 
 ```bash
-bin/vawe strip films/hello/page.html --cuts
+bin/vawe frame films/hello/page.html --cuts
 ```
 
 This writes one strip for each <Term id="world">world</Term> change, centred on the <Term id="cut">cut</Term>. Read each grid at full size. Look at how the outgoing part and the incoming part overlap.
@@ -44,8 +44,8 @@ This writes one strip for each <Term id="world">world</Term> change, centred on 
 ### Look closer at the spectacle second
 
 ```bash
-bin/vawe strip films/hello/page.html --at 2.75 --onion
-bin/vawe strip films/hello/page.html --at 2.75 --velocity
+bin/vawe frame films/hello/page.html --moment 2.75 --onion
+bin/vawe frame films/hello/page.html --moment 2.75 --velocity
 ```
 
 `--onion` blends several frames of one move into one image: the newest is the strongest, and older frames are fainter. It shows the spacing, the path and the overshoot. `--velocity` graphs the speed and scale of the elements that move most, with the start, peak, settle and overshoot of each. `--sel` picks elements by a CSS selector. `--velocity` reads a page only.
@@ -66,7 +66,7 @@ Edit the page. Render only the seconds you changed.
 
 ```bash
 bin/vawe dev films/hello/page.html --from 2 --to 4
-bin/vawe strip films/hello/page.html --at 2.75
+bin/vawe frame films/hello/page.html --moment 2.75
 ```
 
 </Step>
@@ -81,12 +81,12 @@ In `brief.md`, fill the "Motion pass" section with one row for each cut: each pr
 
 ## What you see
 
-Each `strip` run prints the path of an image. A grid also gives the seconds when the move starts, peaks and settles. `--onion` writes to `out/onion/<film>` and `--velocity` writes a PNG to `out/velocity`.
+Each `frame --moment` or `frame --cuts` run prints the path of an image. A grid also gives the seconds when the move starts, peaks and settles. `--onion` writes to `out/onion/<film>` and `--velocity` writes a PNG to `out/velocity`.
 
 <Figure
   src="loop/strip-cut.webp"
   alt="A grid of frames through the cut at 1.53 s of colour-sting."
-  caption="vawe strip --cuts: the frames through one cut, with its motion numbers."
+  caption="vawe frame --cuts: the frames through one cut, with its motion numbers."
   width={1566}
   height={882}
 />
@@ -94,7 +94,7 @@ Each `strip` run prints the path of an image. A grid also gives the seconds when
 <Figure
   src="loop/onion.webp"
   alt="Six frames of one move blended into one image, older frames fainter."
-  caption="vawe strip --onion: the path, spacing and overshoot of one move."
+  caption="vawe frame --moment --onion: the path, spacing and overshoot of one move."
   width={960}
   height={608}
 />
@@ -102,7 +102,7 @@ Each `strip` run prints the path of an image. A grid also gives the seconds when
 <Figure
   src="loop/velocity.webp"
   alt="A graph of speed and scale over time for the moving element at the cut."
-  caption="vawe strip --velocity: start, peak and settle of each moving element."
+  caption="vawe frame --moment --velocity: start, peak and settle of each moving element."
   width={1200}
   height={760}
 />
@@ -118,7 +118,7 @@ Each `strip` run prints the path of an image. A grid also gives the seconds when
 
 | What you see | Why | What to do |
 |---|---|---|
-| `strip --cuts` finds no cuts | The page has no `data-world` elements, or no full draft exists | Add the elements, then run `bin/vawe dev` |
+| `frame --cuts` finds no cuts | The page has no `data-world` elements, or no full draft exists | Add the elements, then run `bin/vawe dev` |
 | A camera drift in every hold | You tried to fix `live-hold` with the camera | Give the hold an element motion instead, and keep the camera for the spectacle |
 | `ship` warns that the Motion pass is empty | The section still has its placeholder row | Write the rows; the warning is advice and does not stop the render |
 
@@ -131,9 +131,9 @@ Each `strip` run prints the path of an image. A grid also gives the seconds when
 
 {/* sources (vawe d8481cc61):
   stage order and rows: AGENTS.md loop table row 7; harness/live/stage-say.mjs (SAY.motion, SAY.motionRows)
-  strip, --onion, --velocity flags: bin/vawe strip --help
+  --cuts, --moment, --onion, --velocity flags: bin/vawe frame --help
   rules: taste/rules/overshoot.md, taste/rules/live-hold.md, taste/rules/constant-camera.md, taste/rules/seam-variety.md
   principles list: harness/live/stage-say.mjs (SAY.motion)
   Motion pass section and ship warning: harness/lib/board.mjs (motionFilled, shipWarnings)
-  strip reads the last full draft: bin/vawe strip --help
+  --cuts and --moment read the last full draft: bin/vawe frame --help
 */}

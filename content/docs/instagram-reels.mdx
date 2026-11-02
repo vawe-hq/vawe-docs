@@ -47,7 +47,7 @@ The page gets `<meta name="aspect" content="9:16">` and `<meta name="duration" c
 ### Check the frame against the safe zone
 
 ```bash
-bin/vawe still films/my-reel/page.html --at 2 --aspect 9:16
+bin/vawe frame films/my-reel/page.html --at 2 --aspect 9:16
 ```
 
 Open the PNG in `out/still/`. Text must sit between 269 px and 1248 px from the top (1920 minus 672), and 65 px from each side.
@@ -98,6 +98,6 @@ The final is H.264 with stereo AAC audio. Check the loudness with `bin/vawe soun
   3 minutes: https://creators.instagram.com/faq?locale=en_US ; 20 minutes: https://about.instagram.com/features/reels
   Reel size help page did not load: https://help.instagram.com/1038071743007909
   AAC 192k 48 kHz: harness/media/page-audio.mjs mixAndMux (-b:a 192k, RATE 48000)
-  commands: bin/vawe new|still|dev|ship|sound --help
+  commands: bin/vawe new|frame|dev|ship|sound --help
   1920-672 = 1248
 */}

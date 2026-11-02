@@ -11,7 +11,7 @@ blog:
 
 At the end of this page a session that did not write the page has looked at the draft and ended with `PASS`. The author has fixed every finding on the way. These are stages 8 and 9 of the <Term id="loop">loop</Term>.
 
-The author never grades their own film. Use a <Term id="fresh-session">fresh session</Term> for the <Term id="critique">critique</Term>. For a subagent, set `VAWE_AGENT=<name>`. A `VAWE_AGENT` label alone does not make a new session: run the critique in a separate terminal or agent. The default verdict is `REJECT`: the film passes only when the critic finds no reason to reject it.
+The author never grades their own film. Use a <Term id="fresh-session">fresh session</Term> for the <Term id="critique">critique</Term>. The simplest way is `bin/vawe critique <page> --fresh`: it starts a separate read-only critic for you. For a subagent, set `VAWE_AGENT=<name>`. A `VAWE_AGENT` label alone does not make a new session: run the critique in a separate terminal or agent. The default verdict is `REJECT`: the film passes only when the critic finds no reason to reject it.
 
 ## Steps for the critic
 
@@ -25,6 +25,14 @@ VAWE_AGENT=critic bin/vawe critique films/hello/page.html
 ```
 
 The verb checks the page for animation traps. It then writes the phone sheet, the strip and the loop seam, and prints the measured deltas. It renders a draft first when the last one is old or has no sound. This takes 1 to 3 minutes.
+
+To let vawe start the critic, add `--fresh`:
+
+```bash
+bin/vawe critique films/hello/page.html --fresh
+```
+
+After the views, the verb starts a separate headless `claude` session that can only read. It critiques the draft and writes `out/hello.critique-<n>.md`, which ends in `REJECT` or `PASS`. This takes 1 to 5 minutes. Run `bin/vawe wait films/hello/page.html` to wait for it. It exits 2 if the `claude` CLI is missing. `--model <name>` picks the model. The ship gate accepts this review from your own session.
 
 </Step>
 <Step>
@@ -138,7 +146,7 @@ If your eye catches a flaw, fix it. A green check run does not make the flaw fin
 | What you see | Why | What to do |
 |---|---|---|
 | The critic grades what the film meant | They read the brief and not the frames | Grade what is on screen |
-| The author runs the critique | Same session as the authoring | Start a fresh session |
+| The author runs the critique | Same session as the authoring | Run `critique --fresh`, or start a fresh session |
 | The same finding returns | It was moved, not fixed | Compare with the last report |
 
 ## What to read next
@@ -149,7 +157,7 @@ If your eye catches a flaw, fix it. A green check run does not make the flaw fin
 </Cards>
 
 {/* sources (vawe d8481cc61):
-  critique build steps and 1 to 3 min: harness/cli/verbs.mjs (critique)
+  critique build steps and 1 to 3 min: harness/cli/verbs.mjs (critique); --fresh, --model, critique-<n>.md, 1 to 5 min, exit 2: bin/vawe critique --help
   separate session, VAWE_AGENT=critic: harness/lib/critique-gate.mjs
   judge criteria: harness/lib/judge-codes.mjs JUDGE_CODES (12), guides/judge.md "Commands" and "The fresh judge" (1 to 10, under 8 needs a fix); Ideas view: skills/vawe-critique/SKILL.md "The judge"
   views, report shape, judge, defaults, stop rule: skills/vawe-critique/SKILL.md

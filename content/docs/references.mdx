@@ -69,7 +69,7 @@ In `films/<name>/brief.md`, add 4 to 6 rows to the "Taken from" table. Write the
 ### Study how the references move
 
 ```bash
-bin/vawe strip <ref-id> --cuts
+bin/vawe frame <ref-id> --cuts
 ```
 
 `--cuts` writes one strip for each shot cut, centred on the cut. Do this on two references. Read every strip. The output also prints the seconds when a move starts, peaks and settles.
@@ -92,12 +92,12 @@ Add three rows to the "move taken" table of "Taken from": the name of the <Term 
 
 ## What you see
 
-Each `strip` run prints the path of each grid. A grid holds 9 frames by default (`--fps 8`, `--span 1`), left to right and top to bottom. Read each grid at full size: the frames show the order in which the parts of the move arrive.
+Each `frame --cuts` run prints the path of each grid. A grid holds 9 frames by default (`--fps 8`, `--span 1`), left to right and top to bottom. Read each grid at full size: the frames show the order in which the parts of the move arrive.
 
 <Figure
   src="loop/strip-cut.webp"
   alt="A grid of frames through one cut, read left to right, top to bottom."
-  caption="A cut strip from vawe strip --cuts. The same view works on a reference id."
+  caption="A cut strip from vawe frame --cuts. The same view works on a reference id."
   width={1566}
   height={882}
 />
@@ -115,8 +115,8 @@ The finished example is `films/examples/colour-sting/brief.md`.
 | What you see | Why | What to do |
 |---|---|---|
 | The `next:` line still asks for "Taken from" | Fewer than 4 frame rows hold a path to a png, jpg or webp | Add rows until there are 4 |
-| The `next:` line asks for moves | Fewer than 3 rows in "move taken" | Run `strip --cuts` on a second reference and name more |
-| You took a look but no move | You read a contact sheet only | Read the strips of `strip --cuts` |
+| The `next:` line asks for moves | Fewer than 3 rows in "move taken" | Run `frame --cuts` on a second reference and name more |
+| You took a look but no move | You read a contact sheet only | Read the strips of `frame --cuts` |
 
 ## What to read next
 
@@ -127,7 +127,7 @@ The finished example is `films/examples/colour-sting/brief.md`.
 
 {/* sources (vawe d8481cc61):
   refs actions and flags: bin/vawe refs --help
-  strip flags and --cuts: bin/vawe strip --help
+  --cuts flag: bin/vawe frame --help
   motion grammar note, refs path: harness/live/stage-say.mjs (SAY.moves); harness/cli/new.mjs (takenFromText)
   --no-measure: bin/vawe refs --help
   4 to 6 frames, 3 moves, thresholds: harness/live/stage-say.mjs (TAKEN_FROM_MIN, MOVES_MIN, SAY.study, SAY.moves)

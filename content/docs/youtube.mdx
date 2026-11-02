@@ -64,7 +64,7 @@ bin/vawe ship films/my-video/page.html --aspect 16:9
 bin/vawe ship --status --wait
 ```
 
-`ship` needs a fresh critique and the owner approval first. See [Ship](/docs/ship). The master is `out/my-video.mp4`.
+`ship` needs a fresh critique and the two OKs of the owner first. See [Ship](/docs/ship). The master is `out/my-video.mp4`.
 
 </Step>
 </Steps>
@@ -91,7 +91,7 @@ YouTube asks to upload at the recording frame rate. A vawe final is always 60 fp
   YouTube limits: https://support.google.com/youtube/answer/1722171 and /71673, read 2026-10-31
   new --aspect --length, meta written: bin/vawe new --help
   sound --waveform prints LUFS and true peak: bin/vawe sound --help
-  ship needs critique and approval: bin/vawe ship --help
+  ship needs critique and two OKs: bin/vawe ship --help
   encode args: harness/media/render-page.mjs:580 (libx264 high yuv420p fast crf 16 faststart); AAC 192k 48 kHz harness/media/page-audio.mjs
   no colour tag: grep for bt709, colorspace, -color in render-page.mjs found nothing (2026-10-31)
   60 fps, no fps flag: bin/vawe ship --help

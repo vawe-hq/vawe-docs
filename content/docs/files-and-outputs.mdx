@@ -21,7 +21,7 @@ This page lists where vawe keeps a film and what each verb writes. The sources a
 | `films/<name>/assets/` | The fonts, images and audio of the film. Relative paths only | `new` copies the starter face. You add the rest |
 | `films/<name>/DESIGN.md` | Palette roles, type, ground and light, one line per rung of the skill ladder | you, at stage 3 |
 | `films/<name>/kit/` | The ground layers and the parts that move, each its own element | you, at stage 3 |
-| `films/<name>/frames.html` | The key frames of the worlds, with a click-to-zoom view | `frames` |
+| `films/<name>/frames.html` | The key frames of the worlds, with a click-to-zoom view | `frame --world all` |
 
 A recreation lives in `films/recreations/<name>/` and holds `SPEC.md`. See [Match a reference film](/docs/match-a-reference).
 
@@ -33,29 +33,33 @@ Every render goes to `out/` in the vawe checkout. `<name>` is the folder name of
 |---|---|---|
 | `out/<name>-draft.mp4` | `dev` | The <Term id="draft">draft</Term> |
 | `out/<name>-draft-<from>-<to>.mp4` | `dev --from --to` | A window of the draft. It is silent |
-| `out/<name>-draft.png` | `dev` | The key-frame sheet, next to the mp4 |
+| `out/<name>-draft.png` | `dev` | The key-frame sheet, next to the mp4. With a `--out` that is not the default, the name is `<name>-sheet.png` |
+| `out/<name>-plan-window.mp4` | `dev` | A small 2 s window around the big moment, while the plan is empty and no full draft exists. `--whole` renders the full film instead |
 | `out/<name>-draft-full.png` | `dev` | A full-size still of one review frame, for you to read |
 | `out/<name>.dev.md` | `dev` | Every note of the last draft, including the taste lines |
 | `out/<name>.acceptance.json` | `dev` of the whole film (no `--from` or `--to`), `ship` | The acceptance rows and their history |
 | `out/<name>.checks.json` | `dev` | The stored result of each draft check, so an unchanged page runs no check again |
-| `out/<name>-frames/<id>.png` | `frames` | One still per world |
-| `out/<name>-frames.png` | `frames` | The contact sheet |
-| `out/looks-<name>/` | `frames --looks` | One grid per second of lens looks |
-| `out/still/<name>-<s>s.png` | `still` | One frame |
-| `out/strip/<film>/` | `strip` | The grids. `--onion` writes `out/onion/<film>`, `--velocity` writes `out/velocity` |
-| `out/sheet-<name>.png` | `sheet` | A labelled contact sheet |
+| `out/<name>-frames/<id>.png` | `frame --world` | One still per world |
+| `out/<name>-frames.png` | `frame --world all` | The contact sheet |
+| `out/looks-<name>/` | `frame --looks` | One grid per second of lens looks |
+| `out/still/<name>-<s>s.png` | `frame --at <s>` | One frame |
+| `out/strip/<film>/` | `frame --cuts`, `frame --moment` | The grids. `--onion` writes `out/onion/<film>`, `--velocity` writes `out/velocity` |
+| `out/sheet-<name>.png` | `frame --at s,s,s` | A labelled contact sheet |
 | `out/<name>-animatic.mp4` | `animatic` | The timing check of the key frames |
-| `out/<name>-storyboard.html` | `storyboard` | A board with a card per world |
+| `out/<name>-storyboard.html` | `frame --board` | A board with a card per world |
+| `out/<name>-directions.html` | `frame --directions` | The directions board: options A, B and C side by side. Its images are in `out/<name>-directions/` |
+| `out/<name>.critique-<n>.md` | `critique --fresh` | The report of the separate critic. It ends in `REJECT` or `PASS` |
 | `out/<name>.mp4` | `ship` | The <Term id="final">final</Term> |
 | `out/<name>.web.mp4` | `ship` | A small web copy beside the master |
 | `out/<name>-9x16.mp4` | `ship --aspect all` | One final per aspect, with the aspect in the name (`9x16` for 9:16) |
 | `out/ship-jobs/<id>.json` and `<id>.log` | `ship` | The state and the log of a background final. The id starts with the film name |
-| `out/<name>.approved` | `approve` | The sign-off of the owner. `ship` needs one that matches the page |
+| `out/<name>.plan-approved` | `/vawe-approve` | The first OK of the owner, on the Directions and the Board. `ship` needs one that matches them |
+| `out/<name>.approved` | `/vawe-approve` | The second OK of the owner, on the full draft. `ship` needs one that matches the page |
 | `out/<name>.judge.json` | `judge --verdict` | A recorded PASS or FIX |
 | `out/<name>-waveform.png` | `sound --waveform` | The mixed waveform |
 | `out/<name>.runs.jsonl` | every verb | The run log |
 
-The `ship` verb refuses to run without the approval file. See [Ship](/docs/ship). A render stores its captured frames in `<out>.frames-<key>/`. See <Term id="kept-frames">kept frames</Term>.
+The `ship` verb refuses to run without both approval files. The owner types `/vawe-approve` in the chat to write them; an agent cannot. See [Ship](/docs/ship). A render stores its captured frames in `<out>.frames-<key>/`. See <Term id="kept-frames">kept frames</Term>.
 
 ## The run log
 
@@ -85,7 +89,7 @@ Set `VAWE_AGENT=<name>` and `VAWE_MODEL=<model>` in your shell, one name per age
 | `dev` | A draft | The seconds of each phase (`captureS`, `encodeS`, `audioS`, ...), `frames`, `fps`, `width`, `height`, `workers`, `checksS`, `acceptance`, `rules_fired`. A failed draft has `failed: true` and `reason` |
 | `judge` | A judge run | `stage`, `verdict`, `scores`, `total`, `notes`, `waivers` |
 | `ship` | A final ends | `verdict`, `renderS`, `acceptance`. A failed final adds `failedAt`, `reason` and `page` |
-| `approve` | `vawe approve` | `verdict`, `note`, `draft`, `pageHash` |
+| `approve` | `/vawe-approve` | `verdict`, `note`, `draft`, `pageHash` |
 | `read` | An agent reads an image that a verb printed | `image` |
 
 A `verb` line from a failed draft, trimmed:

@@ -1,6 +1,6 @@
 ---
 title: Key frames and the board
-description: Build one still per world from the kit, then plan the time in the Board before you write any motion.
+description: Build one still per world from the kit, then plan the time in the Board and show the options before you write any motion.
 icon: LayoutGrid
 blog:
   - slug: skill-combos
@@ -26,7 +26,7 @@ Use the kit parts only. Aim for about 1 line and 2 or 3 things in each frame. Ad
 ### Render the stills
 
 ```bash
-bin/vawe frames films/hello/page.html
+bin/vawe frame films/hello/page.html --world all
 ```
 
 This writes one still for each `data-world` element, with the other worlds hidden. It also writes a contact sheet and prints the still-frame layout rules.
@@ -37,7 +37,7 @@ This writes one still for each `data-world` element, with the other worlds hidde
 ### Look at them at full size
 
 ```bash
-bin/vawe frames films/hello/page.html --full --world s3,s5
+bin/vawe frame films/hello/page.html --world s3,s5 --full
 ```
 
 `--full` writes stills at the size of the page (1920x1080 for 16:9) as `out/<name>-frames/<id>-full.png`. `--world` limits the run to the listed ids. Read each file. Fix text that is cramped, overlapping or unreadable now.
@@ -45,7 +45,7 @@ bin/vawe frames films/hello/page.html --full --world s3,s5
 </Step>
 </Steps>
 
-A <Term id="key-frame">key frame</Term> is the settled state of one world. If a still has a flat ground, add a device and render again. To try the lens looks on one frame, use `bin/vawe frames <page> --looks --at <s>`.
+A <Term id="key-frame">key frame</Term> is the settled state of one world. If a still has a flat ground, add a device and render again. To try the lens looks on one frame, use `bin/vawe frame <page> --looks --at <s>`.
 
 ## Fill the ideas
 
@@ -53,7 +53,7 @@ Before the board, fill the "Ideas" table of `brief.md`. Write one row for each b
 
 ## Fill the board
 
-The <Term id="board">board</Term> is a plan for time, not for frames. Run `bin/vawe storyboard films/hello/page.html` first. It lists what the taste docs say about the plan. Add the board to `brief.md` under the heading "Board". It has four parts.
+The <Term id="board">board</Term> is a plan for time, not for frames. Run `bin/vawe frame films/hello/page.html --board` first. It lists what the taste docs say about the plan. Add the board to `brief.md` under the heading "Board". It has four parts.
 
 <Steps>
 <Step>
@@ -104,6 +104,18 @@ Add rows under a table whose first column is `at s`. Plan small effects on actio
 </Step>
 </Steps>
 
+## Show the options and the plan
+
+The brief has three directions, A, B and C, in its "Directions" section. Each has a family, a sentence, a key frame, a palette, a typeface, a move and a thread. It can also have a `risk:` line, what could go wrong, and a `from:` line, the reference it takes from.
+
+```bash
+bin/vawe frame films/hello/page.html --directions
+```
+
+This writes `out/hello-directions.html`: the options side by side, in plain words. A direction can have a test page in `films/hello/directions/<a|b|c>/page.html`. The board then shows stills of the opening, the turn and the end, and a looping clip of the turn. Without a test page, it shows one still for each direction.
+
+Show the board and the Board to the owner. Write `picked: <A, B or C>, because <reason>` in the brief. End your message with `If you like it, type /vawe-approve`, then stop. That is the first OK. The draft does not wait for it, but `ship` does. If you change the Directions or the Board later, ask again.
+
 ## What you see
 
 `bin/vawe` reads the board and advises. It never refuses. The advice lines start with `board:` or `transitions:` and say, for example, `all 5 cuts last 0.7 s; vary them` or `cuts 1 and 2 both use flood; change the family on adjacent cuts`. A plan that you keep on purpose needs no change.
@@ -113,7 +125,7 @@ The example is the "Board" section of `films/examples/colour-sting/brief.md`.
 <Figure
   src="loop/frames-sheet.webp"
   alt="Five stills of colour-sting, one for each world: cold, warm, hot, amber, red."
-  caption="The contact sheet of vawe frames: one still for each world."
+  caption="The contact sheet of vawe frame --world all: one still for each world."
   width={1600}
   height={700}
 />
@@ -143,13 +155,13 @@ The example is the "Board" section of `films/examples/colour-sting/brief.md`.
 </Cards>
 
 {/* sources (vawe d8481cc61):
-  frames flags: bin/vawe frames --help; layout rules: harness/media/frames.mjs header
+  frame flags: bin/vawe frame --help; layout rules: harness/media/frames.mjs header
   out/<name>-frames.png sheet name: harness/live/stage-say.mjs (framed)
   board parts, thresholds (0.4, 0.9, 0.25), advice text: harness/lib/board.mjs; stage order: harness/live/stage-say.mjs
   board tables and example rows: films/examples/colour-sting/brief.md "Board"
   EASE.nudge, EASE.pop, handoff column, sound without bed: skills/vawe-page/SKILL.md step 5; AGENTS.md "Hard rules"
   Ideas ledger: guides/IDEATE.md; ideas gate: bin/vawe check (lists "ideas")
-  storyboard: bin/vawe storyboard --help; handoff advice: harness/lib/handoffs.mjs (handoffAdvice, MAX_PER_FILM)
-  frames --looks: bin/vawe frames --help
+  storyboard: bin/vawe frame --help; --board handoff advice: harness/lib/handoffs.mjs (handoffAdvice, MAX_PER_FILM)
+  frame --looks, --directions: bin/vawe frame --help; directions slots and risk, from: harness/lib/directions.mjs FIELDS; board path: harness/media/directions-board.mjs; plan OK: harness/lib/approval.mjs planProblem
   ship advice on beat starts and unused moves: harness/live/ship-warn.mjs, harness/lib/board.mjs
 */}

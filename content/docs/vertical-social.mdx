@@ -97,7 +97,7 @@ A draft of a page that is already 9:16 needs no flag. For a 16:9 page, the flag 
 ### Check the real boxes
 
 ```bash
-bin/vawe still films/teaser/page.html --at 3 --aspect 9:16
+bin/vawe frame films/teaser/page.html --at 3 --aspect 9:16
 bin/vawe critique films/teaser/page.html
 ```
 
@@ -112,7 +112,7 @@ The critique writes a phone sheet, the film at 360 px wide. Ask of each string: 
 bin/vawe ship films/teaser/page.html --aspect all
 ```
 
-`all` renders the five common aspects (16:9, 9:16, 1:1, 4:5, 4:3), one file each. To ship only the vertical film, pass `--aspect 9:16`. `ship` needs a fresh review and the <Term id="owner">owner</Term>'s approval first. Read [Ship](/docs/ship).
+`all` renders the five common aspects (16:9, 9:16, 1:1, 4:5, 4:3), one file each. To ship only the vertical film, pass `--aspect 9:16`. `ship` needs a fresh review and the two OKs of the <Term id="owner">owner</Term> first. Read [Ship](/docs/ship).
 
 </Step>
 </Steps>
@@ -140,7 +140,7 @@ bin/vawe ship films/teaser/page.html --aspect all
 </Cards>
 
 {/* sources (vawe 4d9a5acb4):
-  new --aspect, dev/ship/still --aspect, --aspect all: bin/vawe new|dev|ship|still --help
+  new --aspect, dev/ship/frame --aspect, --aspect all: bin/vawe new|dev|ship|frame --help
   --vw --vh data-aspect, never crop, five aspects: AGENTS.md "The page contract"; content/docs/aspect-ratios.mdx
   output name -9x16: harness/lib/page-params.mjs aspectSlug
   viewer "once, muted or not, in a feed": films/examples/colour-sting/brief.md "Task"
@@ -148,6 +148,6 @@ bin/vawe ship films/teaser/page.html --aspect all
   text-margin check: harness/lib/layout-lint.mjs line 76
   phone sheet 360 px: content/docs/critique.mdx (lead-main harness/media critique)
   first-frame, hook-payoff, cta-last-short: taste/rules
-  ship needs review and approval: bin/vawe ship --help
+  ship needs review and two OKs: bin/vawe ship --help; harness/lib/approval.mjs shipProblem
   6 percent of 1920 = 115 px: arithmetic from taste/rules/readable-text-size.md (cap height 6 percent of frame height)
 */}

@@ -53,6 +53,12 @@ The worst failures are silent. The browser accepts your input, does something el
 
 **`ship` refuses a recreation.** Run `bin/vawe critique <page> --ref <ref.mp4>` until it passes.
 
+**`ship` waits for an OK.** The message says `waiting for the person's OK` on the plan or on the draft. Show the directions board and the Board (`bin/vawe frame <page> --directions`) or the draft. End with `If you like it, type /vawe-approve`, and stop. An agent cannot approve. A change to the Directions, the Board or the page after an OK asks for a new OK. See [Ship](/docs/ship).
+
+**`ship` has no fresh review.** Run `bin/vawe critique <page> --fresh`.
+
+**You typed an old verb.** `still`, `frames`, `sheet`, `strip`, `zoom` and `storyboard` still run. Each prints the `frame` command it became. See [CLI](/docs/cli).
+
 ## Still stuck
 
 Run `bin/vawe --help` for the verbs and `bin/vawe check` for the gates. Run `bin/vawe doctor` to check the tools.

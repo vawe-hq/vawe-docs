@@ -24,7 +24,7 @@ You need a page with motion and a filled "Board".
 bin/vawe dev films/hello/page.html
 ```
 
-The draft is half size at 30 fps, with the sound of the `<audio>` tags mixed. The verb also writes a key-frame sheet PNG next to the mp4. It prints the plan status first: what is empty and what the plan findings are.
+The draft is half size at 30 fps, with the sound of the `<audio>` tags mixed. The verb also writes a key-frame sheet PNG next to the mp4. It prints the plan status first: what is empty and what the plan findings are. While the "Ideas" or the "Board" is empty and no full draft exists, `dev` renders only a small 2 s window around the big moment, to `out/<name>-plan-window.mp4`. Add `--whole` to render the whole film. A draft never waits for an OK of the owner.
 
 </Step>
 <Step>
@@ -74,6 +74,7 @@ The ship-tier checks are optional here:
 | `--full` | per-frame box motion lint, object tracks, loudness and peak |
 | `--taste` | print the taste lines |
 | `--lock-length` | write the found length of a `duration="auto"` page into its meta |
+| `--whole` | render the whole film even with an empty plan |
 | `--no-judge` | skip the stills judge that runs on the three directions (about 25 s) |
 
 The three motion checks that the next stage needs are `overshoot-share`, `live-hold` and `seam-variety`. Read [Motion pass](/docs/motion-pass).

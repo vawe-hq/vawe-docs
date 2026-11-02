@@ -15,7 +15,7 @@ You need a page that works as one film.
 
 vawe has no verb or flag that reads a CSV or JSON file. It has one input for a page: the <Term id="param">param</Term>. A param is a `key=value` pair that you pass on the command line. The page reads it. Your script reads the rows of your data and runs the verb once for each row.
 
-The `--param` flag exists on four verbs: `dev`, `ship`, `still` and `sheet`. It is repeatable, with a different key each time. The same key twice stops the verb with the error `--param look is given twice: a page reads one value per key`. A flag without an equals sign stops it with `--param needs key=value`.
+The `--param` flag exists on three verbs: `dev`, `ship` and `frame` (with `--at`). It is repeatable, with a different key each time. The same key twice stops the verb with the error `--param look is given twice: a page reads one value per key`. A flag without an equals sign stops it with `--param needs key=value`.
 
 A param is part of the <Term id="render-key">render key</Term>. The default output name also carries it, so two rows do not overwrite each other. For `--param look=riso` on the page `films/card/page.html`, the draft is `out/card-look-riso-draft.mp4`.
 
@@ -78,10 +78,10 @@ The script runs before the first frame. It reads only the query string, so the p
 ### Look at one row
 
 ```bash
-bin/vawe still films/card/page.html --at 2 --param name="Ada Lovelace"
+bin/vawe frame films/card/page.html --at 2 --param name="Ada Lovelace"
 ```
 
-`still` writes a PNG of the frame with the param applied. Check one row of each kind before you render all of them: the longest name, the shortest name, and a name with a character your font lacks.
+`frame --at` writes a PNG of the frame with the param applied. Check one row of each kind before you render all of them: the longest name, the shortest name, and a name with a character your font lacks.
 
 </Step>
 <Step>
@@ -105,7 +105,7 @@ bin/vawe ship films/card/page.html --param name="Ada Lovelace"
 bin/vawe ship --status --wait
 ```
 
-`ship` runs in the background. It is refused until a fresh review of the page and the owner's approval exist. The same flags work with `--aspect`, so one row and one aspect make one file. Read [Ship](/docs/ship).
+`ship` runs in the background. It is refused until a fresh review of the page and the two OKs of the owner exist. The same flags work with `--aspect`, so one row and one aspect make one file. Read [Ship](/docs/ship).
 
 </Step>
 </Steps>
@@ -114,7 +114,7 @@ bin/vawe ship --status --wait
 
 - **A param is a string.** The page converts it. Parse numbers in the page and give them a default.
 - **The layout must fit the longest value.** The checks run on the rows you render. Draft the extremes.
-- **A param goes to a page only.** `still`, `sheet` and the other verbs refuse `--param` for an mp4 input.
+- **A param goes to a page only.** `frame` and the other verbs refuse `--param` for an mp4 input.
 
 ## Common mistakes
 
@@ -135,9 +135,9 @@ bin/vawe ship --status --wait
 </Cards>
 
 {/* sources (vawe 4d9a5acb4):
-  --param on dev, ship, still, sheet: ran `bin/vawe <verb> --help` for dev ship still sheet frames strip critique check see storyboard; only the four list --param
+  --param on dev, ship, frame --at: bin/vawe dev|ship|frame --help; frame ONLY table in harness/cli/frame.mjs
   flag text, render key, output name -look-riso: bin/vawe dev --help (--param)
-  errors "needs key=value", "given twice": harness/lib/page-params.mjs paramsQuery; the "given twice" message ran on bin/vawe still
+  errors "needs key=value", "given twice": harness/lib/page-params.mjs paramsQuery; the "given twice" message ran on bin/vawe frame
   "goes to a page": harness/cli/verbs.mjs needsPage (line 70-71)
   default name out/card-look-riso-draft.mp4: harness/lib/page-params.mjs paramsFilm; ran bin/vawe dev on tests/fixtures/pages/param-look.html and got out/param-look-look-riso-draft.mp4
   no CSV or JSON input: grep of harness/cli, harness/lib, bin found no csv reader; bin/vawe --help --all lists no batch verb

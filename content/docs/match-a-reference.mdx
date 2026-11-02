@@ -52,7 +52,7 @@ Match in this order: the light map, then the camera and depth of field, then the
 Check a few frames without a render:
 
 ```bash
-bin/vawe sheet films/recreations/hello-remake/page.html --ref quality/refs/ad/source.mp4 --at 2.5,3.1,4
+bin/vawe frame films/recreations/hello-remake/page.html --vs quality/refs/ad/source.mp4 --at 2.5,3.1,4
 ```
 
 Each row of the sheet is the reference on the left and your page on the right, at the same second. `--at cuts` uses the middle of each world change of the last full draft. Do not render a range only to look at a few frames.
@@ -115,7 +115,7 @@ A fresh session then critiques the draft with `--ref`. Anything the draft added 
 {/* sources (vawe d8481cc61):
   new --ref, --score: bin/vawe new --help
   see --spec: bin/vawe see --help
-  sheet --ref, --at cuts: bin/vawe sheet --help
+  sheet --ref, --at cuts: bin/vawe frame --help
   critique --ref/--from/--to/--final: bin/vawe critique --help
   check coverage flags: harness/media/coverage.mjs header and flags (--ref, --step, --min, --out, --text)
   SPEC contents, KEEP/CHANGE, order, three-pass stop, fresh critique: skills/vawe-reference/SKILL.md

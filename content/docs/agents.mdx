@@ -67,16 +67,16 @@ Tell the agent to read `AGENTS.md` first. Any agent that reads files and runs sh
 | Brief | Asks for the missing facts, then writes the <Term id="brief">brief</Term>. With `--defaults` it guesses and marks each guess. | `bin/vawe new <name> --request "<the ask>"` |
 | Reference study | Lists the references and fills "Taken from" in `brief.md`. | `bin/vawe refs list` |
 | Design system and kit | Writes `DESIGN.md` and `kit/` for the film. | none |
-| States | Builds one key frame for each world. | `bin/vawe frames <page>` |
-| Ideas, board | Fills "Ideas" and "Board" in `brief.md`, then makes the storyboard. | `bin/vawe storyboard <page>` |
+| States | Builds one key frame for each world. | `bin/vawe frame <page> --world all` |
+| Ideas, board | Fills "Ideas" and "Board" in `brief.md`, then makes the board. The person gives the first OK on the plan. | `bin/vawe frame <page> --board` |
 | Draft | Renders a half-size draft with sound. `--silent` leaves the sound out. | `bin/vawe dev <page>` |
-| Motion pass | Reads a strip of every cut and writes one "Motion pass" row for each cut. | `bin/vawe strip <page> --cuts` |
-| Critique | Runs in a <Term id="fresh-session">fresh session</Term> that did not write the page. | `bin/vawe critique <page>` |
+| Motion pass | Reads a strip of every cut and writes one "Motion pass" row for each cut. | `bin/vawe frame <page> --cuts` |
+| Critique | Runs in a <Term id="fresh-session">fresh session</Term> that did not write the page. | `bin/vawe critique <page> --fresh` |
 | Fix | Renders again only the seconds that the critique names. | `bin/vawe dev <page> --from s --to s` |
-| Final | Asks for a fresh judge. The owner approves. Then the agent ships and waits. | `bin/vawe judge <page> --fresh`, `bin/vawe approve <page>`, `bin/vawe ship <page>`, `bin/vawe wait <page>` |
+| Final | Asks for a fresh judge. The owner gives the second OK on the full draft. Then the agent ships and waits. | `bin/vawe judge <page> --fresh`, `bin/vawe ship <page>`, `bin/vawe wait <page>` |
 
 <Callout kind="rule">
-The owner runs `bin/vawe approve <page>`. The agent never runs it. `ship` refuses until a fresh review and the owner approval both exist.
+The owner gives two OKs by typing `/vawe-approve` in the chat: first the plan (a picked direction and the Board), then the full draft. The agent cannot approve and never runs `approve`. Drafting never waits for an OK. `ship` refuses until a fresh review and both OKs exist.
 </Callout>
 
 The critique and the judge run in a session that did not write the page. An agent never judges its own page or records its PASS.
@@ -129,7 +129,7 @@ bin/vawe runs --all          # one row for each film of the last 30 days, then m
   no tracked .claude/settings.json: harness/README.md "Hooks"
   stage-say hook, silent after 3 hours: harness/live/stage-say.mjs header and RECENT_MS
   stage table: AGENTS.md "The loop" rows 1 to 10
-  approve, never self-run, fresh review: AGENTS.md "Hard rules"; bin/vawe approve --help; bin/vawe ship --help
+  two OKs, never self-approve, fresh review: AGENTS.md "Hard rules"; skills/vawe-approve/SKILL.md; bin/vawe ship --help
   shell rules: AGENTS.md "Shell" and "Hard rules"
   run log fields, VAWE_AGENT, subagent note, "#": harness/lib/runlog.mjs agentId, namedAgent, appendRun
   critique from another session, a VAWE_AGENT label is not a session: harness/lib/critique-gate.mjs critiqueProblem; AGENTS.md "The proof before you say done" item 4
