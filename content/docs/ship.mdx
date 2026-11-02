@@ -24,7 +24,7 @@ You need a page that passed the critique on drafts. `ship` refuses without three
 bin/vawe critique films/hello/page.html --fresh
 ```
 
-This starts a separate read-only critic and writes `out/hello.critique-<n>.md`. If the `claude` CLI is missing, it exits 2. `bin/vawe judge films/hello/page.html --fresh` also counts. Either one must run on the page as it is now. An edit after the review makes the review stale. See [Critique and fix](/docs/critique).
+This starts a separate read-only critic and writes `out/hello.critique-<n>.md`. If the `claude` CLI is missing, it exits 2. `bin/vawe-dev judge films/hello/page.html --fresh` also counts. Either one must run on the page as it is now. An edit after the review makes the review stale. See [Critique and fix](/docs/critique).
 
 </Step>
 <Step>
@@ -58,7 +58,7 @@ The final is 60 fps, with motion blur and the audio mixed. The job runs in the b
 bin/vawe wait films/hello/page.html
 ```
 
-One call waits up to about 3.5 minutes and prints a progress line each minute. If it says `STILL RUNNING`, call it again. Run it alone. For a final, `bin/vawe ship --status films/hello/page.html --wait` does the same. While you wait, fill any empty Board or Motion pass rows, or prepare the critique notes.
+One call waits up to about 3.5 minutes and prints a progress line each minute. If it says `STILL RUNNING`, call it again. Run it alone. While you wait, fill any empty Board or Motion pass rows, or prepare the critique notes.
 
 </Step>
 <Step>
@@ -86,7 +86,6 @@ The result includes a final check and the judge. Fix the worst finding first. It
 | `--out <path>` | the output file (not with `--aspect all`); the default is `out/<name>.mp4` |
 | `--param key=value` | a page option, repeatable; the page reads it with `new URLSearchParams(location.search)`; the default output name gets it (`-look-riso`) |
 | `--wait` | wait until the render ends, instead of a background job |
-| `--status` | print the progress or the result of a background render; with `--wait`, wait up to 3.5 minutes |
 | `--profile` | print a cost table: frames, subframes, screenshots, capture and encode seconds, the 5 costliest seconds |
 
 ## What you see
@@ -127,7 +126,7 @@ If a gate refuses, the message says which one and ends with the command to run, 
 </Cards>
 
 {/* sources (vawe d8481cc61):
-  ship refusal, flags, background job, --status --wait 3.5 min: bin/vawe ship --help
+  ship refusal, flags, background job: bin/vawe ship --help
   wait: bin/vawe wait --help; AGENTS.md "Shell"
   two OKs, refusal messages: harness/lib/approval.mjs (shipProblem, SHOW_PLAN, SHOW_OWNER); skills/vawe-approve/SKILL.md; critique --fresh: bin/vawe critique --help
   fresh review, exit 2, same-session message: harness/lib/critique-gate.mjs

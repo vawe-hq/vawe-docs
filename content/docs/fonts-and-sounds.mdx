@@ -4,11 +4,11 @@ description: The free font faces and the synth voices that vawe carries, and how
 icon: Library
 ---
 
-This page lists the output of two verbs: `bin/vawe fonts` and `bin/vawe sound` with no argument. For the rules of text and sound, read [Text and fonts](/docs/text-and-fonts) and [Audio](/docs/audio).
+This page lists the free font faces and the output of `bin/vawe sound` with no argument. For the rules of text and sound, read [Text and fonts](/docs/text-and-fonts) and [Audio](/docs/audio).
 
 ## Fonts
 
-`bin/vawe fonts` prints the free faces (OFL) that vawe carries. Each line is the family, the weight and the file in `assets/fonts/`.
+`bin/vawe new` writes the free faces (OFL) that vawe carries into `brief.md`. The same list follows. Each line is the family, the weight and the file in `assets/fonts/`.
 
 | Family | Weight | File |
 |---|---|---|
@@ -69,7 +69,7 @@ Two errors tell you the face is wrong. A face that does not load stops the rende
 
 ### System fonts
 
-`bin/vawe fonts --system` lists the faces installed on this machine, each with its `local()` name:
+The retired alias `bin/vawe fonts --system` lists the faces installed on this machine, each with its `local()` name:
 
 ```css
 @font-face { font-family: "Mine"; src: local("American Typewriter"); }
@@ -127,8 +127,8 @@ A name that is not in the list stops the render and prints the valid voices. The
 The verb is `sound`. A call to `bin/vawe sounds` exits with `unknown verb`.
 
 {/* sources (vawe 4d9a5acb4):
-  font list: bin/vawe fonts (20 rows)
-  --system: bin/vawe fonts --help and output
+  font list: bin/vawe fonts (20 rows); the brief gets it from harness/cli/new.mjs:316; verb retired: harness/cli/aliases.mjs RETIRED
+  --system: bin/vawe fonts --help and output (alias)
   font load error: harness/media/render-page.mjs fontProblems; font-fallback: quality/gates/page-check.mjs:21, 177
   starter copies the face: harness/cli/new.mjs:472-473
   voice list, gains, tails: bin/vawe sound

@@ -26,18 +26,7 @@ npm install
 npx puppeteer browsers install chrome
 ```
 
-The install runs `doctor` at the end.
-
-</Step>
-<Step>
-
-### Check the tools
-
-```bash
-bin/vawe doctor
-```
-
-When all is well, you see `ok, 7 checks` and the name of your system. If a tool is missing, `doctor` prints `MISSING` and a `fix:` line with the install command. Read [Install](/docs/install).
+The install ends with a tool check.
 
 </Step>
 <Step>
@@ -47,6 +36,8 @@ When all is well, you see `ok, 7 checks` and the name of your system. If a tool 
 ```bash
 bin/vawe new hello --request "a 5 s sting for a coffee brand" --defaults --length 5
 ```
+
+`new` checks the tools first. If a required tool is missing, it prints the install line. For a full check, run `bin/vawe-dev doctor`. Read [Install](/docs/install).
 
 `new` writes `films/hello/page.html`, a valid starter <Term id="page">page</Term>, and `films/hello/brief.md`. The <Term id="brief">brief</Term> holds the facts of the film.
 
@@ -91,7 +82,7 @@ Every verb ends with a line such as `vawe: dev ok in 12s`. Each verb also adds a
 
 | What you see | Why | What to do |
 |---|---|---|
-| `MISSING ...` from `doctor` | A required tool is not installed. | Run the `fix:` line, then run `bin/vawe doctor` again. |
+| `install the missing tool` from `new`, or `MISSING ...` from `doctor` | A required tool is not installed. | Run the `fix:` line, then run `bin/vawe-dev doctor` again. |
 | `unknown verb` | The verb name has a typo, or the checkout is old. | Run `bin/vawe --help` and compare the names. |
 | `new` prints questions | The request leaves a required detail open. | Answer with `--answers <file>` or `--detail key=value`, or add `--defaults`. |
 
@@ -104,8 +95,8 @@ Every verb ends with a line such as `vawe: dev ok in 12s`. Each verb also adds a
 </Cards>
 
 {/* sources (vawe d8481cc61):
-  clone URL, npm install, Chrome install: README.md "Quickstart"; postinstall (doctor --quiet): package.json "scripts"
-  doctor output "ok, N checks", MISSING and fix lines, 7 tools: harness/dev/doctor.mjs (TOOLS list, report block); bin/vawe doctor run on main, 2026-10-30
+  clone URL, npm install, Chrome install: README.md "Quickstart"; postinstall (doctor --quiet): package.json "scripts"; tool check in new: bin/vawe:95, harness/lib/tool-probe.mjs
+  doctor output "ok, N checks", MISSING and fix lines, 7 tools: harness/dev/doctor.mjs (TOOLS list, report block)
   new flags and the open details: bin/vawe new --help
   new writes page.html and brief.md: bin/vawe new --help
   dev flags, output paths, --no-judge, directions.html: bin/vawe dev --help

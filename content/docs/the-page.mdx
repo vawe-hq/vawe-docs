@@ -90,7 +90,7 @@ Write `calc(var(--vh) * 0.11)`. Never write `* 0.11px`, because `--vh` already h
 Time is the seek, never the clock. Every frame must come from `t` alone. See [Determinism](/docs/determinism).
 </Callout>
 
-- Every tunable number is a <Term id="literal">literal</Term> in the page: a `[[f, v]]` table, a keyframe stop or a `:root` custom property. `bin/vawe studio <page>` edits these in place.
+- Every tunable number is a <Term id="literal">literal</Term> in the page: a `[[f, v]]` table, a keyframe stop or a `:root` custom property. `bin/vawe dev <page> --studio` edits these in place.
 - A page can read options from the URL: `--param look=riso` loads `page.html?look=riso`, and the page reads it with `new URLSearchParams(location.search)`.
 - Sound is `<audio>` tags: small effects on actions. A music track only comes from a file that you give.
 

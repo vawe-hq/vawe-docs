@@ -101,17 +101,17 @@ A `verb` line from a failed draft, trimmed:
 ### Read the log
 
 ```bash
-bin/vawe runs my-film
-bin/vawe runs --all
-bin/vawe runs --taste
-bin/vawe runs my-film --json
+bin/vawe-dev runs my-film
+bin/vawe-dev runs --all
+bin/vawe-dev runs --taste
+bin/vawe-dev runs my-film --json
 ```
 
 | Call | What it prints |
 |---|---|
-| `bin/vawe runs <film>` | Where a film's time went, per stage and verb, with the slot wait. What failed, by cause. The draft series |
-| `bin/vawe runs --all` | One row per film of the last 30 days: drafts, median draft seconds, first and best judged total, PASS. Then medians per model |
-| `bin/vawe runs --taste` | The taste report over every film: per rule fired, fixed, waived and the score gain |
+| `bin/vawe-dev runs <film>` | Where a film's time went, per stage and verb, with the slot wait. What failed, by cause. The draft series |
+| `bin/vawe-dev runs --all` | One row per film of the last 30 days: drafts, median draft seconds, first and best judged total, PASS. Then medians per model |
+| `bin/vawe-dev runs --taste` | The taste report over every film: per rule fired, fixed, waived and the score gain |
 | `--json` | The records, or with `--all` or `--taste` the report, as JSON |
 | `--dir <path>` | The folder that holds the `.runs.jsonl` files. Default `out` |
 
@@ -123,6 +123,6 @@ A corrupt line in the log is dropped when it is read, not an error (`readRuns`).
   out file names: harness/cli/verbs.mjs lines 121, 164, 214, 217, 237, 378, 414, 537, 581, 635; harness/media/frames.mjs:4-8; harness/media/render-page.mjs:10, 988-996, 1109, 1171; harness/lib/check-runner.mjs:19 (saved only with cache on: render-page.mjs:1241, the dev draft); acceptance written by draftAcceptance when the render is whole (render-page.mjs:1127) and finalAcceptance (ship-job.mjs:114); draft-full.png: harness/live/dev-end.mjs:21; harness/media/acceptance-run.mjs:2; harness/lib/approval.mjs:14
   ship jobs: harness/media/ship-job.mjs:10
   run-log fields and events: harness/lib/runlog.mjs, harness/lib/run-events.mjs, harness/lib/verb-log.mjs, harness/live/log-read.mjs:29
-  bin/vawe runs: bin/vawe runs --help
+  bin/vawe-dev runs: bin/vawe-dev runs --help
   example line: out/colour-sting.runs.jsonl, a failed run on this checkout
 */}

@@ -102,7 +102,7 @@ Write the loop in your own script. It reads your CSV or JSON and starts one `dev
 
 ```bash
 bin/vawe ship films/card/page.html --param name="Ada Lovelace"
-bin/vawe ship --status --wait
+bin/vawe wait films/card/page.html
 ```
 
 `ship` runs in the background. It is refused until a fresh review of the page and the two OKs of the owner exist. The same flags work with `--aspect`, so one row and one aspect make one file. Read [Ship](/docs/ship).
@@ -140,7 +140,7 @@ bin/vawe ship --status --wait
   errors "needs key=value", "given twice": harness/lib/page-params.mjs paramsQuery; the "given twice" message ran on bin/vawe frame
   "goes to a page": harness/cli/verbs.mjs needsPage (line 70-71)
   default name out/card-look-riso-draft.mp4: harness/lib/page-params.mjs paramsFilm; ran bin/vawe dev on tests/fixtures/pages/param-look.html and got out/param-look-look-riso-draft.mp4
-  no CSV or JSON input: grep of harness/cli, harness/lib, bin found no csv reader; bin/vawe --help --all lists no batch verb
+  no CSV or JSON input: grep of harness/cli, harness/lib, bin found no csv reader; bin/vawe --help lists no batch verb
   fixture page: tests/fixtures/pages/param-look.html
   ship refusal: bin/vawe ship --help
 */}

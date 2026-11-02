@@ -1,6 +1,6 @@
 ---
 title: Render flags
-description: The flags of dev, frame and ship that change what the renderer draws, with defaults and examples.
+description: The flags of dev, frame, ship and new --from-url that change what the renderer draws, with defaults and examples.
 icon: SlidersHorizontal
 blog:
   - slug: batch-render-videos
@@ -15,7 +15,7 @@ blog:
     title: 'Resume a failed Puppeteer render and catch hangs'
 ---
 
-This page lists the flags that change a render. The list comes from `bin/vawe <verb> --help` for `dev`, `frame` and `ship`. A wrong flag exits 2 and prints the valid ones. For the other verbs, see [CLI](/docs/cli).
+This page lists the flags that change a render. The list comes from `bin/vawe <verb> --help` for `dev`, `frame`, `ship` and `new --from-url`. A wrong flag exits 2 and prints the valid ones. For the other verbs, see [CLI](/docs/cli).
 
 Four flags work the same way in more than one verb:
 
@@ -44,8 +44,14 @@ The <Term id="draft">draft</Term>: half size, 30 fps. It also writes a key-frame
 | `--whole` | Render the whole film. Without it, an empty plan gives a 2 s window around the big moment | off | `--whole` |
 | `--no-judge` | Skip the stills judge that `dev` runs on the three directions, once per change of `directions.html` or their brief lines (about 25 s) | off | `--no-judge` |
 
+| `--animatic` | Instead of a draft: the key frame of each world held for its planned span, hard cuts, silent | off | `--animatic` |
+| `--fps <n>` | With `--animatic`: the frame rate | 10 | `--fps 12` |
+| `--studio` | Instead of a draft: a live preview that edits the page literals in place. Ctrl-C stops it | off | `--studio` |
+| `--port <n>` | With `--studio`: the http port | 8799 | `--port 8800` |
+
 ```bash
 bin/vawe dev films/my-film/page.html --from 2 --to 6
+bin/vawe dev films/my-film/page.html --animatic
 ```
 
 ## frame
@@ -100,18 +106,38 @@ The <Term id="final">final</Term>: 60 fps, <Term id="motion-blur">motion blur</T
 | `--aspect <W:H\|all>` | Set the aspect, or `all` for one file per aspect | the page meta, else 16:9 | `--aspect all` |
 | `--param <key=value>` | Pass an option to the page | none | `--param look=riso` |
 | `--out <path>` | Output file. It does not combine with `--aspect all` | `out/<name>.mp4` | `--out out/b.mp4` |
-| `--wait` | Block until the render ends. With `--status`: wait up to 3.5 minutes, one progress line per minute | off | `--wait` |
-| `--status` | Print the progress or the result of a background render | off | `--status` |
+| `--wait` | Block until the render ends, instead of a background job | off | `--wait` |
 | `--profile` | Print a cost table: frames, subframes, screenshots, capture and encode seconds, the 5 costliest seconds | off | `--profile` |
 
-The argument is a page, or with `--status` a page or a job id. The default job is the newest one.
+`bin/vawe wait <page>` waits for a background render and prints the result. One call returns after about 3.5 minutes with a progress line each minute. If it says `STILL RUNNING`, call it again.
 
 ```bash
 bin/vawe ship films/my-film/page.html --aspect all
-bin/vawe ship --status --wait
+bin/vawe wait films/my-film/page.html
 ```
 
 A final also writes a small web copy beside the master, `<name>.web.mp4` (`harness/media/render-page.mjs:10`, `:988`).
+
+## new --from-url
+
+`bin/vawe new --from-url <route|url|page.html>` captures a website. Give a film name and the film starts from a launch template, and the PNGs go to `films/<name>/assets/site/`. Leave the name out and only the PNGs are written, to `out/shot`. A comma list shoots each target.
+
+| Flag | What it does | Default | Example |
+|---|---|---|---|
+| `--w <list>` | Viewport widths, comma separated | 1440,390 | `--w 1280` |
+| `--full` | The whole page height, not the first screen | off | `--full` |
+| `--base <url>` | The site server for routes. A localhost server that is down is started and stopped by the verb | http://localhost:3080 | `--base http://localhost:3000` |
+| `--tour <steps.json>` | Drive a drawn cursor through one route or url with real mouse events. Writes `films/<name>/assets/tour.mp4` | none | `--tour tour.json` |
+| `--fps <n>` | With `--tour`: the frame rate of the mp4 | 60 | `--fps 30` |
+| `--scale <n>` | With `--tour`: the device scale factor. 3 gives a 3840 by 2160 mp4 | 1 | `--scale 2` |
+| `--out <path>` | The folder for the PNGs, or with `--tour` the mp4 file | see above | `--out out/app-tour.mp4` |
+
+```bash
+bin/vawe new --from-url /,/blog --full
+bin/vawe new acme-tour --from-url https://acme.com/app --tour tour.json --w 1600
+```
+
+The old verb `shot` still runs as an alias of `new --from-url`.
 
 ## What the verbs fix
 
@@ -133,7 +159,7 @@ The CSS viewport is always the full aspect size, so a draft lays out exactly lik
 - [Files and outputs](/docs/files-and-outputs) lists what each verb writes.
 
 {/* sources (vawe 4d9a5acb4):
-  dev, frame, ship flags and defaults: bin/vawe <verb> --help; frame modes: bin/vawe frame --help; old verbs: harness/cli/aliases.mjs
+  dev, frame, ship, new --from-url flags and defaults: bin/vawe <verb> --help; wait: bin/vawe wait --help; frame modes: bin/vawe frame --help; old verbs: harness/cli/aliases.mjs
   --param repeated key refused: harness/lib/page-params.mjs paramsQuery
   frame --world outputs: harness/media/frames.mjs:4-8
   web copy: harness/media/render-page.mjs:10, :988

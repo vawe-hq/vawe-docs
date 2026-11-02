@@ -15,7 +15,7 @@ vawe uses the Apache License 2.0 (`LICENSE`, `package.json` field `license`). Th
 
 ## What do I need to install?
 
-You need Node 22 or newer, git, and ffmpeg with libx264 and drawtext. Tesseract is optional, for OCR. Chrome comes from `npx puppeteer browsers install chrome`. Run `bin/vawe doctor` to check each tool. It prints the install line for your system (macOS, Linux or Windows) for each missing one (`README.md`, "Install"). See [Install](/docs/install).
+You need Node 22 or newer, git, and ffmpeg with libx264 and drawtext. Tesseract is optional, for OCR. Chrome comes from `npx puppeteer browsers install chrome`. `bin/vawe new` checks the tools when it starts a film. `bin/vawe-dev doctor` checks each one on demand and prints the install line for your system (macOS, Linux or Windows) for each missing one (`README.md`, "Install"). See [Install](/docs/install).
 
 ## Which agents can use it?
 
@@ -25,7 +25,7 @@ Any agent that reads files and runs shell commands. Claude Code reads `CLAUDE.md
 
 The render does not. Three steps start a separate headless Claude session through the `claude` CLI:
 
-- `bin/vawe judge --fresh`.
+- `bin/vawe-dev judge --fresh`.
 - The stills judge that `dev` runs on the three directions of the brief.
 - The fresh judge that `ship` runs on the final.
 
@@ -84,7 +84,7 @@ Yes, but they do not run on the real clock. They follow the seek time. `setTimeo
 
 {/* sources (vawe 4d9a5acb4):
   license: LICENSE line 1-2, package.json:25, NOTICE
-  install: README.md "Install", "Quickstart"; bin/vawe doctor (ok, 7 checks)
+  install: README.md "Install", "Quickstart"; bin/vawe-dev doctor (ok, 7 checks)
   agents: README.md "Use it from your agent"; CLAUDE.md
   model calls: harness/media/judge-fresh.mjs:1-5, 259; harness/media/ship-job.mjs:11-14
   GPU: harness/media/render-page.mjs:148-151, 411; README.md "Install"

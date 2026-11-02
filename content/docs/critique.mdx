@@ -54,7 +54,7 @@ Write one line for each finding under each view.
 ### Score the film
 
 ```bash
-bin/vawe judge films/hello/page.html --struct --runs A,B
+bin/vawe-dev judge films/hello/page.html --struct --runs A,B
 ```
 
 This prepares key frames and the rubric for a fresh session to score. `--struct --runs A,B` writes one rubric for each run. Two judges score the 12 criteria in `harness/lib/judge-codes.mjs`, and two runs close a beat. `--fresh` scores now with a separate headless `claude` session (about 30 s). It scores each axis of `guides/judge.md` from 1 to 10, and a score under 8 needs a fix. It advises and never blocks.
@@ -161,6 +161,6 @@ If your eye catches a flaw, fix it. A green check run does not make the flaw fin
   separate session, VAWE_AGENT=critic: harness/lib/critique-gate.mjs
   judge criteria: harness/lib/judge-codes.mjs JUDGE_CODES (12), guides/judge.md "Commands" and "The fresh judge" (1 to 10, under 8 needs a fix); Ideas view: skills/vawe-critique/SKILL.md "The judge"
   views, report shape, judge, defaults, stop rule: skills/vawe-critique/SKILL.md
-  judge flags (--struct, --runs, --fresh): bin/vawe judge --help
+  judge flags (--struct, --runs, --fresh): bin/vawe-dev judge --help
   fresh session, VAWE_AGENT: AGENTS.md "Every step logs", skills/vawe-critique/SKILL.md
 */}

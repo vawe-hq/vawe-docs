@@ -73,10 +73,10 @@ Tell the agent to read `AGENTS.md` first. Any agent that reads files and runs sh
 | Motion pass | Reads a strip of every cut and writes one "Motion pass" row for each cut. | `bin/vawe frame <page> --cuts` |
 | Critique | Runs in a <Term id="fresh-session">fresh session</Term> that did not write the page. | `bin/vawe critique <page> --fresh` |
 | Fix | Renders again only the seconds that the critique names. | `bin/vawe dev <page> --from s --to s` |
-| Final | Asks for a fresh judge. The owner gives the second OK on the full draft. Then the agent ships and waits. | `bin/vawe judge <page> --fresh`, `bin/vawe ship <page>`, `bin/vawe wait <page>` |
+| Final | Asks for a fresh review. The owner gives the second OK on the full draft. Then the agent ships and waits. | `bin/vawe critique <page> --fresh`, `bin/vawe ship <page>`, `bin/vawe wait <page>` |
 
 <Callout kind="rule">
-The owner gives two OKs by typing `/vawe-approve` in the chat: first the plan (a picked direction and the Board), then the full draft. The agent cannot approve and never runs `approve`. Drafting never waits for an OK. `ship` refuses until a fresh review and both OKs exist.
+The owner gives two OKs by typing `/vawe-approve` in the chat: first the plan (a picked direction and the Board), then the full draft. The agent cannot approve and never runs `vawe-dev approve`. Drafting never waits for an OK. `ship` refuses until a fresh review and both OKs exist.
 </Callout>
 
 The critique and the judge run in a session that did not write the page. An agent never judges its own page or records its PASS.
@@ -105,13 +105,13 @@ export VAWE_MODEL=<model>
 
 `VAWE_AGENT` is the only way to name an agent. A subagent shares the session id of its parent, so the session cannot tell them apart. Without `VAWE_AGENT`, the log writes the first 8 characters of the session id, a `#` and a short tag. A name with a `#` counts as unnamed.
 
-The critique must come from another session than the author. Another `VAWE_AGENT` name in the same session does not count: `ship` refuses it. `bin/vawe runs <name>` shows a `critique` line with the agent that ran it.
+The critique must come from another session than the author. Another `VAWE_AGENT` name in the same session does not count: `ship` refuses it. `bin/vawe-dev runs <name>` shows a `critique` line with the agent that ran it.
 
-Read the log with `vawe runs`:
+Read the log with `vawe-dev runs`:
 
 ```bash
-bin/vawe runs hello          # time, failures and the draft series of one film
-bin/vawe runs --all          # one row for each film of the last 30 days, then medians for each model
+bin/vawe-dev runs hello          # time, failures and the draft series of one film
+bin/vawe-dev runs --all          # one row for each film of the last 30 days, then medians for each model
 ```
 
 ## What to read next
@@ -133,5 +133,5 @@ bin/vawe runs --all          # one row for each film of the last 30 days, then m
   shell rules: AGENTS.md "Shell" and "Hard rules"
   run log fields, VAWE_AGENT, subagent note, "#": harness/lib/runlog.mjs agentId, namedAgent, appendRun
   critique from another session, a VAWE_AGENT label is not a session: harness/lib/critique-gate.mjs critiqueProblem; AGENTS.md "The proof before you say done" item 4
-  runs flags: bin/vawe runs --help
+  runs flags: bin/vawe-dev runs --help
 */}

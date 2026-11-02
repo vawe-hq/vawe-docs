@@ -306,7 +306,7 @@ A move is one second. A <Term id="recipe">recipe</Term> joins moves into a short
 The web copy of each clip is `site/public/moves/<move>.mp4`. The masters are not in git. To render the master of one move, run this command in a vawe checkout.
 
 ```bash
-bin/vawe moves --only weight-morph
+bin/vawe-dev moves --only weight-morph
 ```
 
 The verb renders the clip to `prompts/moves/<move>.mp4` at 1280 px and 60 fps, and writes a 12-frame contact sheet to `out/moves/<move>-sheet.png`. Without `--only`, it renders the clips whose demo, `demo/demo.css` or imported `core/` files changed. `--all` renders every clip.
@@ -329,7 +329,7 @@ The verb renders the clip to `prompts/moves/<move>.mp4` at 1280 px and 60 fps, a
   featured five, blind score, median 8: prompts/moves/README.md "## Featured"
   two snippet rules (no from on exit, no var() in animation shorthand): prompts/moves/README.md after the Product moments table
   beat time shift, --beat-2, fifteen recipes, recipe-echo advice: prompts/moves/RECIPES.md lines 1-19
-  bin/vawe moves --only/--all, 1280 px, 60 fps, 12-frame sheet: bin/vawe moves --help
+  bin/vawe-dev moves --only/--all, 1280 px, 60 fps, 12-frame sheet: bin/vawe-dev moves --help
   once per film: "use once per film" in the README rows of logo-sting, wordmark-cascade, mark-trace, shape-trace-morph, calm-lockup, thanks-sweep, chain-beats, rack-focus, skeleton-reveal
   gallery and per-move route: site/app/video-components/MovesGallery.tsx:123
 */}

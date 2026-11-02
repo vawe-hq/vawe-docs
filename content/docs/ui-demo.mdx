@@ -78,7 +78,7 @@ Swap the template for the subject. Fill the Shots, Words and Objects tables. Lis
 ### Capture a real flow as one clip
 
 ```bash
-bin/vawe shot https://example.com --tour steps.json --w 1280 --out films/ledger-demo/assets/tour.mp4
+bin/vawe new --from-url https://example.com --tour steps.json --w 1280 --out films/ledger-demo/assets/tour.mp4
 ```
 
 A real page worked by a cursor is one mp4, not screenshots. Hover and click are real events. Add `--scale 3` for a close-up that must stay sharp.
@@ -139,7 +139,7 @@ Four traps come from the recipes. Use one window for `clip-expand` and `ai-strea
   template table and lengths: guides/ROUTING.md rows 2, 3, 7; prompts/brand-launch-from-url.md line 12; prompts/interactive-lab-capture.md line 16; prompts/ui-morph-loop.md line 15
   recipes 9, 10, 11 and their traps: prompts/moves/RECIPES.md
   quiet ~2 s before the spectacle: RECIPES.md recipe 10 ("Keep the report still for 2 s")
-  shot --tour, --scale: bin/vawe shot --help
+  new --from-url --tour, --scale: bin/vawe new --help
   data-ui 3 percent, data-chrome 2.5 percent, 6 percent: taste/rules/readable-text-size.md; AGENTS.md "Text checks"
   moves by job: prompts/moves/README.md "Pick by job"
   show-real-thing, cause-first, constant-camera, no-tells: taste/build/DIGEST.md; dwell 1.2 s: taste/rules/shot-length-varies.md

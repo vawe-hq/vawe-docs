@@ -20,10 +20,9 @@ A vawe film is one HTML page. Claude Code writes the page. The renderer opens it
 
 ```bash
 npm install
-bin/vawe doctor
 ```
 
-`bin/vawe doctor` checks each tool and prints the install line for any that is missing.
+`bin/vawe new` checks each tool and prints the install line for any that is missing. `bin/vawe-dev doctor` runs the same check on demand.
 
 ## Ask for the film
 
@@ -76,7 +75,7 @@ bin/vawe ship films/v2-launch/page.html
 
 `bin/vawe dev` renders a draft at half size and 30 fps, with the audio tags mixed, to `out/v2-launch-draft.mp4`. Use `--from` and `--to` to render only the seconds you are working on. A range is silent. Add `--silent` for a picture-only draft of the whole film.
 
-`bin/vawe ship` renders the final at 60 fps with motion blur and the audio mix, to `out/v2-launch.mp4`. It runs in the background. Run `bin/vawe ship --status films/v2-launch/page.html --wait` to wait for the result. It waits up to 3.5 minutes. If the render is not done, run it again.
+`bin/vawe ship` renders the final at 60 fps with motion blur and the audio mix, to `out/v2-launch.mp4`. It runs in the background. Run `bin/vawe wait films/v2-launch/page.html` to wait for the result. It waits up to 3.5 minutes. If the render is not done, run it again.
 
 ## Review the film in a fresh session
 

@@ -21,7 +21,7 @@ The viewer also knows how ChatGPT, GitHub or a terminal behaves. A copy that mov
 
 Take the first option that fits.
 
-1. **Capture the real product.** A capture of the real UI beats any mock. `bin/vawe shot <target> --tour <steps.json>` drives a drawn cursor through a route or URL with real mouse events and writes an mp4. Add `--scale 3` for a sharp close-up.
+1. **Capture the real product.** A capture of the real UI beats any mock. `bin/vawe new --from-url <target> --tour <steps.json>` drives a drawn cursor through a route or URL with real mouse events and writes an mp4. Add `--scale 3` for a sharp close-up.
 2. **Copy a real interface as a component.** The Product moments group of the [moves](/docs/moves) library has faithful copies: `terminal-run`, `approval-gate`, `model-picker`, `diff-card`, `ai-stream-response`, `agent-progress`, `command-palette-summon` and more. Each copies one real surface with its real type, colours and behaviour.
 3. **Design an interface for an invented product.** Build it as a real interface: real-looking data, and controls that do something. Do not make functionless chrome.
 
@@ -44,7 +44,7 @@ Take the first option that fits.
   <svg viewBox="0 0 881 81">
     <DiagramBox x={0} y={0} w={270} h={80} accent />
     <DiagramText x={16} y={30}>1. Capture</DiagramText>
-    <DiagramText x={16} y={56} kind="mono">vawe shot --tour</DiagramText>
+    <DiagramText x={16} y={56} kind="mono">vawe new --tour</DiagramText>
     <DiagramArrow points={[[271, 40], [299, 40]]} />
     <DiagramBox x={300} y={0} w={270} h={80} />
     <DiagramText x={316} y={30}>2. Copy</DiagramText>
@@ -119,10 +119,10 @@ The presets are for surfaces that animate. A terminal steps, and only `UI.typing
 <Steps>
 <Step>
 
-Pick the source from the list above. For a real product, capture it with `bin/vawe shot`.
+Pick the source from the list above. For a real product, capture it with `bin/vawe new --from-url`.
 
 ```bash
-bin/vawe shot https://example.com/app --tour tour.json --w 1600 --scale 2 --out out/app-tour.mp4
+bin/vawe new --from-url https://example.com/app --tour tour.json --w 1600 --scale 2 --out out/app-tour.mp4
 ```
 
 </Step>
@@ -180,7 +180,7 @@ To film the screen as a physical object, with tilt, depth and bloom, give it to 
   GitHub page whole, state swaps on one frame: prompts/moves/diff-card.md; model menu opens with short fade and scale, label swaps on one frame: prompts/moves/model-picker.md
   UI presets table, terminal steps, panel no scale, large panel no overshoot, snap 3 to 20 px: core/motion/ui.js and core/motion/README.md "Product UI presets" (lines 136-158)
   chunks of 1 to 3 words: prompts/moves/ai-stream-response row in prompts/moves/README.md
-  shot --tour, --scale: bin/vawe shot --help
+  new --from-url --tour, --scale: bin/vawe new --help; shot alias: harness/cli/aliases.mjs
   Product moments group (21 moves): prompts/moves/README.md "## Product moments"
   overshoot-share compares with reference films: content/docs/draft.mdx line 74 and glossary Overshoot
 */}

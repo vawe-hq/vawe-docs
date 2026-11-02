@@ -28,7 +28,7 @@ For a post:
 
 ## The 30 fps gap
 
-`bin/vawe ship` renders at 60 fps. Its help lists `--aspect`, `--param`, `--out`, `--wait`, `--status` and `--profile`, and no fps flag. A 60 fps final does not meet the ad rule of less than 30 fps. A 60 fps final is inside the post range of 10 to 60 fps.
+`bin/vawe ship` renders at 60 fps. Its help lists `--aspect`, `--param`, `--out`, `--wait` and `--profile`, and no fps flag. A 60 fps final does not meet the ad rule of less than 30 fps. A 60 fps final is inside the post range of 10 to 60 fps.
 
 For an ad, vawe cannot make the file today. Convert the final to a lower frame rate with your own tool outside vawe. This is a known gap: `ship` needs an fps flag. A draft is 30 fps, which is not less than 30, and it is half size.
 
@@ -63,7 +63,7 @@ See [Draft](/docs/draft). A 4:5 final is 1080 x 1350, which is the maximum on th
 
 ```bash
 bin/vawe ship films/my-post/page.html --aspect 4:5
-bin/vawe ship --status --wait
+bin/vawe wait films/my-post/page.html
 ```
 
 To make a 1:1 and a 16:9 from the same page, run `bin/vawe ship films/my-post/page.html --aspect all`. It writes five files, one per common aspect.

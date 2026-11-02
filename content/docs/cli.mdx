@@ -15,9 +15,9 @@ blog:
     title: 'AI agent observability: one JSONL line per command'
 ---
 
-One command runs everything: `bin/vawe`. `bin/vawe --help` lists the core verbs and `bin/vawe --help --all` lists every verb. `bin/vawe <verb> --help` lists the flags. A wrong flag exits 2 and prints the valid ones.
+One command runs everything: `bin/vawe`. `bin/vawe --help` lists the 10 verbs. `bin/vawe <verb> --help` lists the flags. A wrong flag exits 2 and prints the valid ones.
 
-The core verbs, the loop. There are 10:
+The verbs, the loop. There are 10:
 
 | Verb | What it does |
 |---|---|
@@ -34,18 +34,36 @@ The core verbs, the loop. There are 10:
 
 The old picture verbs `still`, `frames`, `sheet`, `strip`, `zoom` and `storyboard` still work as aliases. Each prints the `frame` command it became. `storyboard --text` became `see --plan`.
 
-More verbs, shown by `--help --all`:
+The old picture verbs `still`, `frames`, `sheet`, `strip`, `zoom` and `storyboard` still work as aliases. Each prints the `frame` command it became. `storyboard --text` became `see --plan`. Four more old verbs became flags:
+
+| Old verb | Now |
+|---|---|
+| `animatic` | `dev --animatic`: the key frame of each world, held for its planned span, hard cuts, silent |
+| `studio` | `dev --studio`: a live scrubbable preview that edits the page literals in place |
+| `shot` | `new --from-url <url>`: screenshots of a site route, a url or an html page at several widths |
+| `fonts`, `palette` | retired. `new` writes the free faces and the palette seed into `brief.md` |
+
+## Developer tool: vawe-dev
+
+`bin/vawe-dev` holds the tools for work on vawe itself. A film maker does not need it. `bin/vawe-dev <verb> --help` lists the flags.
 
 | Verb | What it does |
 |---|---|
-| `animatic` | check the timing before you animate: the key frame of each world, held for its planned span, hard cuts, silent |
-| `shot` | screenshots of a site route, a url or an html page at several widths |
-| `judge` | prepare key frames and the rubric for a fresh session to score |
-| `fonts` | the free font faces |
-| `palette` | one OKLCH brand seed |
-| `studio` | live scrubbable preview. It edits the page literals in place |
+| `land` | put the current branch on main: fetch, rebase, run the tests, push |
+| `claim` | declare or release the scope a worktree works in |
+| `e2e` | page tests plus a parallel half-size draft of every film |
+| `test` | run every `tests/**/*.test.mjs` |
+| `runs` | where a film's time went and what failed. `--all` gives one row per film |
+| `moves` | render the stale clips of the moves library |
+| `doctor` | check Node, ffmpeg, Chrome and the other tools. It prints the install line for each missing one |
+| `check` | run one repo gate or report by name. The film gates stay in `bin/vawe check` |
+| `judge` | prepare key frames and the rubric for a fresh session to score. `--fresh` scores now |
+| `approve` | record the owner OK on the full draft |
+| `worktrees`, `bots` | list the agent worktrees, read the site bot log |
 
-Maintainer verbs: `e2e`, `test`, `land`, `claim`, `doctor`, `runs`, `moves`, `approve`. You do not run `approve` in a film session. The person gives the OKs by typing `/vawe-approve` in the chat. See [Ship](/docs/ship).
+The old forms `bin/vawe land`, `claim`, `e2e`, `test`, `runs`, `moves`, `doctor`, `judge` and `approve` still run as aliases. Each prints the `vawe-dev` command it became.
+
+You do not run `approve` in a film session. The person gives the OKs by typing `/vawe-approve` in the chat. See [Ship](/docs/ship).
 
 ## The flags you use most
 
@@ -53,12 +71,13 @@ Maintainer verbs: `e2e`, `test`, `land`, `claim`, `doctor`, `runs`, `moves`, `ap
 bin/vawe new my-film --from prompts/story-explainer.md --length 30 --aspect 16:9 --title "..."
 bin/vawe dev films/my-film/page.html --from 2 --to 6 --aspect 9:16 --silent
 bin/vawe ship films/my-film/page.html --aspect all
-bin/vawe ship --status --wait
+bin/vawe wait films/my-film/page.html
 bin/vawe frame films/my-film/page.html --at 2.5,3.1,4
-bin/vawe studio films/my-film/page.html --port 8800
+bin/vawe dev films/my-film/page.html --studio --port 8800
 ```
 
 - `new --ref <mp4>` recreates a reference. It writes `films/recreations/<name>` with `SPEC.md`.
+- `new --from-url <url>` captures a website. See [Render flags](/docs/render-flags).
 - `new --answers <file>` and `new --detail key=value` give the details. `--questions-json` prints the open details as `AskUserQuestion` calls and writes nothing.
 - `--aspect <W:H>` takes any ratio of whole numbers. `16:9`, `9:16`, `1:1`, `4:5` and `4:3` are the common ones. `1200:630` and `2:1` work too. `dev`, `ship` and `frame --at` take it.
 - `--param key=value` passes an option to the page, which reads it with `new URLSearchParams(location.search)`. For example, `--param look=riso`. It is repeatable. `dev`, `ship` and `frame --at` take it. The output name gets the value (`-look-riso`).
@@ -66,11 +85,11 @@ bin/vawe studio films/my-film/page.html --port 8800
 - `dev --silent` leaves the audio out of the draft.
 - `dev --out <path>` sets the output file. The default is `out/<name>-draft.mp4`.
 - `ship --out <path>` sets the output file. The default is `out/<name>.mp4`. It does not combine with `--aspect all`.
-- `ship --wait` blocks until the render ends. `ship --status` prints the progress or the result, and with `--wait` it waits up to 3.5 minutes and prints a progress line each minute. If the render is not done, run it again.
+- `ship --wait` blocks until the render ends. `wait <page>` waits for a background render or critique and prints the result. One call returns after about 3.5 minutes with a progress line each minute. If it says `STILL RUNNING`, run it again.
 - `critique --ref <mp4>` measures against a reference. With `--final`, a pass unlocks `ship`.
 - `critique --fresh` starts a separate read-only critic and writes `out/<film>.critique-<n>.md`. The ship gate accepts it as the fresh review.
 - `dev --whole` renders the whole film. With an empty plan, `dev` renders a short window around the big moment.
-- `judge --fresh` scores now with a separate headless session. It advises and never blocks.
+- `vawe-dev judge --fresh` scores now with a separate headless session. It advises and never blocks.
 
 ## The loop, end to end
 

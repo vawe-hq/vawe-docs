@@ -130,7 +130,7 @@ A storyboard is an HTML page with one card for each world, made by `vawe frame <
 
 ### Animatic [#animatic]
 
-An animatic is a silent mp4 that holds the key frame of each world for its planned time, with hard cuts, made by `vawe animatic`. It tests the timing of a film in a few seconds, before any motion exists. Read [Key frames and the board](/docs/key-frames).
+An animatic is a silent mp4 that holds the key frame of each world for its planned time, with hard cuts, made by `vawe dev <page> --animatic`. It tests the timing of a film in a few seconds, before any motion exists. Read [Key frames and the board](/docs/key-frames).
 
 ### Draft [#draft]
 
@@ -158,7 +158,7 @@ A fresh session is an agent session that did not write the page, in a separate t
 
 ### Judge [#judge]
 
-The judge is a scored review of a film against a rubric, prepared by `vawe judge`. `vawe judge --fresh` scores it in a separate headless session; it advises and never blocks, and an author never records a PASS for their own page. Read [Critique and fix](/docs/critique).
+The judge is a scored review of a film against a rubric, prepared by `vawe-dev judge`. `vawe-dev judge --fresh` scores it in a separate headless session; it advises and never blocks, and an author never records a PASS for their own page. Read [Critique and fix](/docs/critique).
 
 ### Owner [#owner]
 
@@ -174,7 +174,7 @@ A final is the full-quality render: 60 fps, motion blur and the mixed audio, fol
 
 ### Ship [#ship]
 
-To ship is to make the final with `vawe ship <page>`, which runs in the background. It refuses until a fresh review and the two OKs of the owner exist, and `vawe ship --status --wait` reports the result. Read [Approve and ship](/docs/ship).
+To ship is to make the final with `vawe ship <page>`, which runs in the background. It refuses until a fresh review and the two OKs of the owner exist, and `vawe wait <page>` reports the result. Read [Approve and ship](/docs/ship).
 
 ## Motion, look and sound
 
@@ -234,7 +234,7 @@ To duck is to lower the music while a voice speaks. An `<audio>` tag with `data-
 
 ### Verb [#verb]
 
-A verb is one command of the vawe CLI, such as `new`, `dev` or `ship`, run as `bin/vawe <verb>`. `bin/vawe --help` lists the common verbs, `--help --all` lists every verb, and `bin/vawe <verb> --help` explains one. Read [CLI](/docs/cli).
+A verb is one command of the vawe CLI, such as `new`, `dev` or `ship`, run as `bin/vawe <verb>`. `bin/vawe --help` lists the 10 verbs, and `bin/vawe <verb> --help` explains one. Read [CLI](/docs/cli).
 
 ### Next line [#next-line]
 
@@ -246,11 +246,11 @@ A skill is a `SKILL.md` file of instructions that an agent loads for one task, s
 
 ### Doctor [#doctor]
 
-The doctor is the verb `vawe doctor`, which checks Node, git, ffmpeg, ffprobe, Chrome and the fonts. It prints the install line for each missing tool, so a failed setup tells you what to do. Read [Install and doctor](/docs/install).
+The doctor is the verb `vawe-dev doctor`, which checks Node, git, ffmpeg, ffprobe, Chrome and the fonts. It prints the install line for each missing tool, so a failed setup tells you what to do. Read [Install and doctor](/docs/install).
 
 ### Studio [#studio]
 
-The studio is a live preview that you open with `vawe studio <page>`, with a scrubber that uses the render clock and seek. It edits the <Term id="literal">literals</Term> of the page in place, so you tune a number and see the result at once. Read [CLI](/docs/cli).
+The studio is a live preview that you open with `vawe dev <page> --studio`, with a scrubber that uses the render clock and seek. It edits the <Term id="literal">literals</Term> of the page in place, so you tune a number and see the result at once. Read [CLI](/docs/cli).
 
 ### Frame [#frame]
 
@@ -290,7 +290,7 @@ The kept frames are the captured frames that a render stores in a folder named a
 
 ### Run log [#run-log]
 
-The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its stage, time and result. `vawe runs <film>` reads it, so you can see where a film spent its time. Read [Use with an agent](/docs/agents#the-run-log).
+The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its stage, time and result. `vawe-dev runs <film>` reads it, so you can see where a film spent its time. Read [Use with an agent](/docs/agents#the-run-log).
 
 {/* sources (vawe-hq/vawe 0933875ba):
   page, page contract, duration, world, message, spectacle, literal, param, waiver, loop, stages: AGENTS.md "Hard rules" and "The loop"
@@ -300,10 +300,10 @@ The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its 
   page API: core/engine/page-seek.js, core/engine/page-api.js
   brief, template, recreation: bin/vawe new --help; prompts/*.md
   reference: harness/lib/refs.mjs (VAWE_REFS_DIR, ~/.vawe/refs); bin/vawe refs --help
-  key frame, storyboard, directions board, frame, strip, sheet: bin/vawe frame --help; old verbs: harness/cli/aliases.mjs; animatic, studio: bin/vawe animatic|studio --help
+  key frame, storyboard, directions board, frame, strip, sheet: bin/vawe frame --help; old verbs: harness/cli/aliases.mjs; animatic, studio: bin/vawe dev --help
   draft: bin/vawe dev --help; final, ship: bin/vawe ship --help; approve, owner: skills/vawe-approve/SKILL.md, harness/lib/approval.mjs (shipProblem)
   critique, fresh session: bin/vawe critique --help; skills/vawe-critique/SKILL.md:13 (default REJECT)
-  judge: bin/vawe judge --help
+  judge: bin/vawe-dev judge --help
   handoff families (twelve): taste/craft/transitions.md
   moves, seven groups: site/lib/moves.json; recipes (fifteen): prompts/moves/RECIPES.md
   eases (ten), springs: core/motion/README.md, core/motion/presets.js, core/motion/springs.js
@@ -314,9 +314,9 @@ The run log is `out/<film>.runs.jsonl`, one JSON line for each command with its 
   cue, voice, bed, duck (18 dB), banned synth beds: harness/media/page-audio.mjs:3-36; bin/vawe sound
   verb, next line: bin/vawe --help; AGENTS.md
   skill install: README.md "Use it from your agent"
-  doctor: harness/dev/doctor.mjs; bin/vawe doctor --help
+  doctor: harness/dev/doctor.mjs; bin/vawe-dev doctor --help
   check, gate, refuse: bin/vawe check; AGENTS.md "Waivers"
   taste rule, digest: taste/README.md, taste/build/DIGEST.md, taste/rules/exits-shorter.md
   render key, kept frames: harness/media/render-page.mjs:313-318, 564-571, 859-862
-  run log: AGENTS.md; bin/vawe runs --help
+  run log: AGENTS.md; bin/vawe-dev runs --help
 */}

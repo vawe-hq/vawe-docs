@@ -13,7 +13,7 @@ Text in a film has two rules. A font must load from a file in the film folder. A
 
 The renderer waits for `document.fonts`, not for the network. Bundle every face in `films/<name>/assets/` and load it with `@font-face`. A font that the page loads from the network is not waited for.
 
-`bin/vawe fonts` prints the free faces (OFL) that vawe carries, one line each, with the file to copy:
+`bin/vawe new` writes the free faces (OFL) that vawe carries into `brief.md`. The retired alias `bin/vawe fonts` prints the same list, one line each, with the file to copy:
 
 ```bash
 bin/vawe fonts
@@ -106,7 +106,7 @@ Any other marked text is checked as copy, and the draft check says how many text
 </Cards>
 
 {/* sources (vawe d8481cc61):
-  fonts verb output and flags: bin/vawe fonts --help; bin/vawe fonts
+  fonts list: harness/cli/new.mjs:316; alias output and flags: bin/vawe fonts --help; harness/cli/aliases.mjs RETIRED
   renderer waits for document.fonts, not the network: skills/vawe-page/SKILL.md mistake 4; core/engine/page-seek.js awaitFonts (10000 ms, message)
   font error text: harness/media/render-page.mjs fontProblems (672-676); missing line: harness/lib/ensure-fonts.mjs:39-41
   --vh text size advice (taller than frame or under 0.2%): harness/lib/draft-check.mjs frameUnitLines, FONT_TINY_SHARE 0.002

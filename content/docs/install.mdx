@@ -1,16 +1,16 @@
 ---
 title: Install
-description: What vawe needs, how to install it from source, and how to fix the failures that `doctor` finds.
+description: What vawe needs, how to install it from source, and how to fix the failures that the tool check finds.
 icon: Cog
 ---
 
 import { Rocket, Bot } from 'lucide-react';
 
-By the end of this page, `bin/vawe doctor` reports no missing tool and you can render a <Term id="draft">draft</Term>. vawe runs from a source checkout. It has no installer.
+By the end of this page, no tool is missing and you can render a <Term id="draft">draft</Term>. vawe runs from a source checkout. It has no installer.
 
 ## Requirements
 
-`bin/vawe doctor` checks these seven items. The list comes from `harness/dev/doctor.mjs`.
+`bin/vawe new` checks these seven items when it starts a film. `bin/vawe-dev doctor` runs the same check on demand. The list comes from `harness/dev/doctor.mjs`.
 
 | Item | Needed | What it is for |
 |---|---|---|
@@ -35,7 +35,7 @@ Install Node 22 or newer, git and ffmpeg with your system package manager. On ma
 brew install node git ffmpeg
 ```
 
-Add `tesseract` if you want OCR. `doctor` prints the exact line for Debian, Ubuntu, Fedora, Arch, Alpine, openSUSE and Windows.
+Add `tesseract` if you want OCR. `bin/vawe-dev doctor` prints the exact line for Debian, Ubuntu, Fedora, Arch, Alpine, openSUSE and Windows.
 
 </Step>
 <Step>
@@ -48,15 +48,17 @@ npm install
 npx puppeteer browsers install chrome
 ```
 
-The puppeteer postinstall step downloads a full Chrome. The third command installs it again when the download was skipped. The `npm install` ends with `doctor`.
+The puppeteer postinstall step downloads a full Chrome. The third command installs it again when the download was skipped. The `npm install` ends with the tool check.
 
 </Step>
 <Step>
 
-### Run `doctor`
+### Check the tools
+
+`bin/vawe new` checks the tools itself, so a film maker needs no separate step. For a full check, run the developer tool:
 
 ```bash
-bin/vawe doctor
+bin/vawe-dev doctor
 ```
 
 When all is well, you see one line: `ok, 7 checks (macOS)`. The system name changes with your system. The exit code is 0.
@@ -66,7 +68,7 @@ When all is well, you see one line: `ok, 7 checks (macOS)`. The system name chan
 
 ## The `doctor` verb
 
-`vawe doctor` probes each tool, and for each missing tool it prints one line with the cause and one `fix:` line. It exits with code 1 only when a required tool is missing. A missing optional tool prints `optional` and does not change the exit code.
+`vawe-dev doctor` probes each tool, and for each missing tool it prints one line with the cause and one `fix:` line. It exits with code 1 only when a required tool is missing. A missing optional tool prints `optional` and does not change the exit code.
 
 | Flag | What it does |
 |---|---|
@@ -108,7 +110,7 @@ Output can differ between hosts that rasterise on a different GPU or Chrome vers
 {/* sources (vawe d8481cc61):
   requirements table, seven checks, required flags, optional tesseract: harness/dev/doctor.mjs TOOLS list; OCR users: bin/vawe see --help (--no-ocr, --spec), harness/media/coverage.mjs --text
   Node 22: harness/dev/doctor.mjs probeNode; README.md "Install"
-  doctor flags, exit code: bin/vawe doctor --help; harness/dev/doctor.mjs header
+  doctor flags, exit code: bin/vawe-dev doctor --help; tool check in new: bin/vawe:95, harness/lib/tool-probe.mjs; harness/dev/doctor.mjs header
   output format: harness/dev/doctor.mjs report block and probeNode (found ${process.version}, need 22 or newer); brew line: MANAGERS.brew + TOOLS node pkg
   ok line: harness/dev/doctor.mjs final report block
   postinstall (doctor --quiet), puppeteer note: package.json "scripts" and "//puppeteer-note"; clone URL and Chrome command: README.md "Quickstart"

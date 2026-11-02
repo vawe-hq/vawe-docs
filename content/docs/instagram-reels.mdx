@@ -73,7 +73,7 @@ See [Audio](/docs/audio). To land the cuts on the beat, read [Cut to the beat](/
 ```bash
 bin/vawe dev films/my-reel/page.html --aspect 9:16
 bin/vawe ship films/my-reel/page.html --aspect 9:16
-bin/vawe ship --status --wait
+bin/vawe wait films/my-reel/page.html
 ```
 
 The final is H.264 with stereo AAC audio. Check the loudness with `bin/vawe sound films/my-reel/page.html --waveform`.
