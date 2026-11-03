@@ -11,9 +11,9 @@ const mono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variabl
 
 export const metadata: Metadata = {
   // "·" not an em dash, matching the site's titles.
-  title: { default: 'Vawe docs', template: '%s · Vawe docs' },
+  title: { default: 'vawe docs', template: '%s · vawe docs' },
   description:
-    'Documentation for Vawe, the framework for agent-native motion graphics: one HTML page in, one film out. The page contract, motion, audio, and the quality gates.',
+    'Documentation for vawe, the framework for agent-native motion graphics: one HTML page in, one film out. The page contract, motion, audio, and the quality gates.',
   // Relative, and deliberately the SITE's copy: in production this app is proxied under the site's
   // origin, so /assets/favicon.svg resolves to the one favicon there is. Hardcoding an absolute
   // origin would bake in a domain (the site answers on vawe.dev, and answered on vawe.upsurge.cc

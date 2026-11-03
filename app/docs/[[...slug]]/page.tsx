@@ -60,7 +60,8 @@ export async function generateMetadata(props: {
   const { title, description } = page.data;
   const url = `${SITE}${page.url}`;
   return {
-    title,
+    // The docs home is the one docs page that searches for "vawe" find, so its title says what vawe is.
+    title: page.url === '/docs' ? { absolute: 'vawe docs: HTML to video, motion graphics as code' } : title,
     description,
     alternates: { canonical: url, types: { 'text/markdown': markdownUrl(page) } },
     openGraph: {
@@ -68,7 +69,7 @@ export async function generateMetadata(props: {
       description,
       type: 'article',
       url,
-      siteName: 'Vawe docs',
+      siteName: 'vawe docs',
       images: [{ url: `${SITE}/assets/og.png`, width: 1200, height: 630, alt: title }],
     },
     twitter: {
